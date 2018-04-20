@@ -16,7 +16,10 @@ Purple='\033[0;35m'       # Purple
 Cyan='\033[0;36m'         # Cyan
 
 export DEBIAN_FRONTEND=noninteractive
-software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini subversion dialog putty-tools"
+software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools"
+
+subversion_17="http://launchpadlibrarian.net/161750374/subversion_1.7.14-1ubuntu2_amd64.deb" #Subversion 1.7 because SVN 1.8 not supported symlinks
+libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd64.deb" #Dependence for Subversion 1.7
 
 # Defining return code check function
 check_result(){
@@ -295,6 +298,9 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install $software
 check_result $? "apt-get install failed"
 
+dpkg -i $(curl -O -s -w '%{filename_effective}' ${libsvn1_17})
+dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
+
 DIALOG=${DIALOG=dialog}
 
 echo -e "${Purple}#----------------------------------------------------------#
@@ -315,7 +321,6 @@ rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
 echo "[OK]"
 service ssh restart
-svn auth
 
 echo "Checkouting templates files for configuring system"
 rm -rf ${workspace}/checkout/reservationspot.com/install
@@ -533,7 +538,8 @@ Project checkout  on the path ${workspace}
 
 Key for repository 'libs' saved in %Workspace%/keys/libs.key
 Configs for Subversion created for PHPStorm 2018 in %Workspace%/Subversion
-For work Subversion in PHPStorm 2018 you need downloads 'Subversion for Windows' and 'Putty'
+For work Subversion in PHPStorm 2018 you need downloads 'Subversion for Windows <=1.7.9' and 'Putty'
+Subversion: https://sourceforge.net/projects/win32svn/files/1.7.9/apache22/Setup-Subversion-1.7.9.msi/download
 
 Go to PHPStorm adn setup SVN.
 1. File -> Settings -> Version Control -> Subversion
