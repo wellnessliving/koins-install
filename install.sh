@@ -1,12 +1,13 @@
 #!/bin/bash
-# (c) Vladislav Kobzev, Apr 2018, kp42@ya.ru
-# A script for install LAMP on Ubuntu, checkout project and setup
+# © Vladislav Kobzev, Apr 2018, kp42@ya.ru
+# A script for install LAMP on Ubuntu, checkout project and setup.
+#TODO: Возможно стоит отрефакторить код. Добавить префиксы к переменым, убрать лишнее.
 #----------------------------------------------------------#
 #                  Variables&Functions                     #
 #----------------------------------------------------------#
 #COLORS
 # Reset color
-NC='\033[0m'       # Text Reset
+NC='\033[0m'              # Text Reset
 
 # Regular Colors
 Red='\033[0;31m'          # Red
@@ -16,7 +17,7 @@ Purple='\033[0;35m'       # Purple
 Cyan='\033[0;36m'         # Cyan
 
 export DEBIAN_FRONTEND=noninteractive
-software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools  libserf-1-1"
+software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1"
 
 subversion_17="http://launchpadlibrarian.net/161750374/subversion_1.7.14-1ubuntu2_amd64.deb" #Subversion 1.7 because SVN 1.8 not supported symlinks
 libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd64.deb" #Dependence for Subversion 1.7
@@ -91,7 +92,7 @@ help() {
   -h, --help                Print this help
 
   Example simple: bash $0 --key /path/to/key --passphrase PassPhrase --bot-password BotLogin --bot-login BotPassword --email you@email.com
-  Use form for generate install command: http://kasp.me/install/index.html"
+  Use form for generate install command: http://kasp.me/install/index.html" #TODO Change.
   exit 1
 }
 
@@ -184,28 +185,63 @@ if [ ! -n "${email}" ]; then
 fi
 echo "[OK]"
 
+unix_workspace=$(echo "${workspace}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
+win_workspace=$(echo "${unix_workspace}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
+
+echo ${unix_workspace}
+echo ${win_workspace}
+
+if [ $(echo "${unix_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
+  unix_workspace=${unix_workspace::-1}
+fi
+
+if [ $(echo "${win_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
+  win_workspace=${win_workspace::-1}
+fi
+
 printf "Checking path workspace: "
-if [ -d "${workspace:0:6}" ]; then #workspace=/mnt/d/Workspace   ${workspace:0:6}=> /mnt/d
-  mkdir -p -v ${workspace}
-  if [ ! -z "$(ls -A ${workspace})" ]; then
+if [ -d "${unix_workspace:0:6}" ]; then #workspace=/mnt/d/Workspace   ${workspace:0:6}=> /mnt/d
+  mkdir -p -v ${unix_workspace}
+  if [ ! -z "$(ls -A ${unix_workspace})" ]; then
     if [ "$checkout" == "yes" ]; then
       if [ -z "$force" ]; then
-        echo -e "${Red} Directory ${workspace} not empty. Please delete folder ${workspace} ${NC} or use argument --force"
+        echo -e "${Red} Directory ${win_workspace} not empty. Please cleanup folder ${win_workspace} ${NC} or use argument --force for automatic cleanup"
+        exit 1
+      fi
+      # Asking for confirmation to proceed
+      read -p 'Would you like to clean up workspace folder [y/n]: ' answer
+      if [ "$answer" != 'n' ] && [ "$answer" != 'n'  ]; then
+        echo -e 'Goodbye'
         exit 1
       fi
       echo -e "${Red}Remove workspace folder...${NC}"
-      rm -rf ${workspace}
+      rm -rf ${unix_workspace}
     fi
   fi
 else
-  check_result 1 "Path ${workspace:0:6} not found."
+  check_result 1 "Path ${win_workspace:0:6} not found."
   exit 1
 fi
 echo "[OK]"
 
+echo ${key}
+unix_key=$(echo "${key}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
+win_key=$(echo "${unix_key}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
+
+if [ $(echo "${unix_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
+  unix_key=${unix_key::-1}
+fi
+
+if [ $(echo "${win_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
+  win_key=${win_key::-1}
+fi
+
+echo ${unix_key}
+echo ${win_key}
+
 printf "Checking set argument --key: "
-if [ -n "${key}" ]; then
-  if [ ! -f ${key} ]; then
+if [ -n "${unix_key}" ]; then
+  if [ ! -f ${unix_key} ]; then
     check_result 1 "No such key file"
   fi
   echo "[OK]"
@@ -214,7 +250,7 @@ if [ -n "${key}" ]; then
     echo "[OK]"
     echo "Decrypting key..."
     mkdir -p /root/.ssh
-    cp ${key} /root/.ssh/libs.key
+    cp ${unix_key} /root/.ssh/libs.key
     chmod 600 /root/.ssh/libs.key
     openssl rsa -in /root/.ssh/libs.key -out /root/.ssh/libs.pub -passin pass:${passphrase}
     check_result $? 'Decrypt key error'
@@ -253,7 +289,7 @@ fi
 printf "Install packages:\n* "
 echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' #Replace space to newline
 echo "Checkout projects: ${checkout}"
-echo "Workspace: ${workspace}"
+echo "Workspace: ${win_workspace}"
 echo "Login for PRG: ${prg_login}"
 echo "Password for PRG: ${prg_password}"
 echo "Login for DB: ${db_login}"
@@ -271,15 +307,16 @@ if [ "$answer" != 'y' ] && [ "$answer" != 'Y'  ]; then
 fi
 
 printf "Creating file structure: "
-mkdir -p ${workspace}/{checkout,keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
+mkdir -p ${unix_workspace}/{checkout,keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
 
-for site in $(ls ${workspace}/.htprivate); do
-  mkdir -p ${workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var,templates}}
+for site in $(ls ${unix_workspace}/.htprivate); do
+  mkdir -p ${unix_workspace}/.htprivate/${site}/{options/a,writable/{cache,debug,log,php,sql,tmp,var/selemium,templates/app}} #TODO: Надо проверить создание папки app(writable/templates/app), selemium(writable/var/selemium),a(options/a)
 done
 echo "[OK]"
 
 echo "Adding php repository..."
 add-apt-repository ppa:ondrej/php -y
+#TODO: Возможно добавить еще репозиторий phpmyadmin.
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                  Update system packages                 #
@@ -295,6 +332,10 @@ check_result $? 'apt-get upgrade failed'
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
+#Need set mysql root password before install package.
+echo "mysql-server mysql-server/root_password password ${db_password}" | sudo debconf-set-selections #TODO: Проверить корректную установку пароля к root пользователю mysql.
+echo "mysql-server mysql-server/root_password_again password ${db_password}" | sudo debconf-set-selections
+
 apt-get -y install $software
 check_result $? "apt-get install failed"
 
@@ -310,24 +351,24 @@ echo -e "${Purple}#----------------------------------------------------------#
 svn auth
 printf "Configuring SVN: "
 crudini --set /root/.subversion/config tunnels libs "ssh svn@libs.svn.1024.info -p 35469 -i /root/.ssh/libs.pub"
-cp -rf /root/.subversion ${workspace}/Subversion
-cp -rf /root/.ssh/libs.key ${workspace}/keys/libs.key
+cp -rf /root/.subversion ${unix_workspace}/Subversion
+cp -rf /root/.ssh/libs.key ${unix_workspace}/keys/libs.key
 tpm_old_passphrase=$(mktemp -p /tmp)
 tmp_new_passphrase=$(mktemp -p /tmp)
 printf ${passphrase} > ${tpm_old_passphrase}
-puttygen ${workspace}/keys/libs.key -o ${workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase}
-crudini --set ${workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ../keys/libs.ppk libs.svn.1024.info"
+puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase}
+crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
 rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
 echo "[OK]"
 service ssh restart
 
+#TODO: Надо исправить ошибку при первом checkout'e. Возможно добавить проверку успешного выкачивания шаблона. Если не успешно то попробовать еще раз и если не получилось то выход.
 echo "Checkouting templates files for configuring system"
-rm -rf ${workspace}/checkout/reservationspot.com/install
-svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${workspace}/checkout/reservationspot.com/install
+svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
 
 #path to templates
-templates=${workspace}/checkout/reservationspot.com/install/templates
+templates=${unix_workspace}/checkout/reservationspot.com/install/templates
 
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
@@ -336,31 +377,37 @@ if [ ! -z "$(grep php7.2-cli ${tmpfile})" ]; then
 fi
 rm -f ${tmpfile}
 
+crudini --set /etc/wsl.conf automount options '"metadata"'
+chmod -R 777 ${unix_workspace}
+
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
+#TODO: Разобратся с конфигом /etc/phpmyadmin/config-db.php  Когда он генерируется? Какой пароль устанавливается при установке noninteractive ?
+s_pma_password=$(gen_pass)
+mysql -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};" #TODO: Установить пароль такой как в config-db.php или в конфиг записать новый.
+mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+mysql -e "flush privileges"
+mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
 
 #Add option AcceptFilter to config Apache
 echo -e "
-AcceptFilter http none" >> /etc/apache2/apache2.conf
+AcceptFilter http none" >> /etc/apache2/apache2.conf #TODO: Поискать как сконфигурировать apache без использования echo
 
 #Create script to run services
-touch ~/server.sh
-echo "service apache2 start
-service mysql start
-service memcached start" > ~/server.sh
+cp ${templates}/sh/server.sh > /root/server.sh
 
-#Start all service
-service apache2 start
-service mysql start
-service memcached start
+#Create script to dump DB
+sed -e "s;%workspace%;${unix_workspace};g" ${templates}/sh/dump.sh > /root/dump.sh
+crudini --set ~/.my.conf mysqldump user root
+crudini --set ~/.my.conf mysqldump password "${db_password}"
 
-# a2enmod
+# a2enmod & a2enconf
 a2enmod rewrite
 a2enconf phpmyadmin
 
-#Seting config apache for site
+#Setting config apache for site
 PATH_APACHE="/etc/apache2/sites-available"
-document_root=${workspace}/public_html
+document_root=${unix_workspace}/public_html
 
 sed -e "s;%server_alias%;${host_trunk};g" -e "s;%document_root%;${document_root};g" ${templates}/apache2/site.conf > "${PATH_APACHE}/${host_trunk}.conf"
 a2ensite "${host_trunk}.conf"
@@ -369,23 +416,24 @@ sed -e "s;%server_alias%;${host_stable};g" -e "s;%document_root%;${document_root
 a2ensite "${host_stable}.conf"
 
 #Create new DB user
-mysql -e "CREATE USER '${db_login}'@'localhost' IDENTIFIED BY '${db_password}';"
+mysql -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
 
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 #Creating databases
 for project in trunk stable; do
-  mysql -e "CREATE DATABASE ${project}_wl_main;"
-  mysql -e "GRANT alter,create,delete,drop,index,insert,lock tables,references,select,update ON ${project}_wl_main.* TO '${db_login}'@'localhost';"
-  mysql -e "CREATE DATABASE ${project}_wl_geo;"
-  mysql -e "GRANT alter,create,delete,drop,index,insert,lock tables,references,select,update ON ${project}_wl_geo.* TO '${db_login}'@'localhost';"
-  mysql -e "CREATE DATABASE ${project}_wl_control;"
-  mysql -e "GRANT alter,create,delete,drop,index,insert,lock tables,references,select,update ON ${project}_wl_control.* TO '${db_login}'@'localhost';"
-  mysql -e "CREATE DATABASE ${project}_test_main;"
-  mysql -e "GRANT alter,create,delete,drop,index,insert,lock tables,references,select,update ON ${project}_test_main.* TO '${db_login}'@'localhost';"
-  mysql -e "CREATE DATABASE ${project}_test_geo;"
-  mysql -e "GRANT alter,create,delete,drop,index,insert,lock tables,references,select,update ON ${project}_test_geo.* TO '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_wl_main;"
+  mysql -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_wl_geo;"
+  mysql -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_wl_control;"
+  mysql -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_test_main;"
+  mysql -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_test_geo;"
+  mysql -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 done
 
-mysql -e "FLUSH PRIVILEGES"
+mysql -e "flush privileges;"
 
 if [ "$checkout" = 'yes' ]; then
   echo -e "${Purple}#----------------------------------------------------------#
@@ -393,85 +441,111 @@ if [ "$checkout" = 'yes' ]; then
 #----------------------------------------------------------#${NC}"
 
   #Shared
-  svn co svn+libs://libs.svn.1024.info/shared ${workspace}/checkout/shared
-  checkout_dialog "shared" "svn+libs://libs.svn.1024.info/shared" "${workspace}/checkout/shared"
+  svn co svn+libs://libs.svn.1024.info/shared ${unix_workspace}/checkout/shared
+  checkout_dialog "shared" "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/checkout/shared"
 
   #Trunk
-  checkout_dialog "[trunk]core" "svn+libs://libs.svn.1024.info/core/trunk" "${workspace}/checkout/core/trunk" #Core
-
-  checkout_dialog "[trunk]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${workspace}/checkout/namespace/Core/trunk" #namespace.Core
-
-  checkout_dialog "[trunk]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${workspace}/checkout/namespace/Social/trunk" #namespace.Social
-
-  checkout_dialog "[trunk]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${workspace}/checkout/namespace/Wl/trunk" #namespace.Wl
-
-  checkout_dialog "[trunk]project" "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${workspace}/checkout/reservationspot.com/trunk" #project
+  checkout_dialog "[trunk]core" "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/checkout/core/trunk" #Core
+  checkout_dialog "[trunk]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/checkout/namespace/Core/trunk" #namespace.Core
+  checkout_dialog "[trunk]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/checkout/namespace/Social/trunk" #namespace.Social
+  checkout_dialog "[trunk]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/checkout/namespace/Wl/trunk" #namespace.Wl
+  checkout_dialog "[trunk]project" "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/checkout/reservationspot.com/trunk" #project
 
   #Stable
-  checkout_dialog "[stable]core" "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${workspace}/checkout/core/servers/stable.wellnessliving.com" #Core
-
-  checkout_dialog "[stable]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${workspace}/checkout/namespace/Core/servers/wl-stable" #namespace.Core
-
-  checkout_dialog "[stable]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${workspace}/checkout/namespace/Social/servers/wl-stable" #namespace.Social
-
-  checkout_dialog "[stable]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${workspace}/checkout/namespace/Wl/servers/stable" #namespace.Wl
-
-  checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${workspace}/checkout/reservationspot.com/servers/stable" #project
+  checkout_dialog "[stable]core" "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/checkout/core/servers/stable.wellnessliving.com" #Core
+  checkout_dialog "[stable]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/checkout/namespace/Core/servers/wl-stable" #namespace.Core
+  checkout_dialog "[stable]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/checkout/namespace/Social/servers/wl-stable" #namespace.Social
+  checkout_dialog "[stable]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/checkout/namespace/Wl/servers/stable" #namespace.Wl
+  checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/checkout/reservationspot.com/servers/stable" #project
 fi
 
-
-sed -e "s;{host_trunk};${host_trunk};g" -e "s;{host_stable};${host_stable};g" ${templates}/windows/install.bat > "${workspace}/install.bat"
+sed -e "
+s;{host_trunk};${host_trunk};g
+s;{host_stable};${host_stable};g
+" ${templates}/windows/install.bat > "${unix_workspace}/install.bat"
 
 # Creating link
-echo -e "Open the workspace folder: '${Yellow}${workspace}${NC}' and run file '${Yellow}install.bat${NC}' as admin."
+echo -e "Open the workspace folder: '${Yellow}${win_workspace}${NC}' and run file '${Yellow}install.bat${NC}' as admin."
 echo -e "Wait for run file..."
-while [ ! -L "${workspace}/wl.stable/project" ];
+while [ ! -L "${unix_workspace}/wl.stable/project" ];
 do
   sleep 2
 done
 
 echo -e "${Purple}#----------------------------------------------------------#
-#                 Setuping default files                   #
+#                  Setting default files                   #
 #----------------------------------------------------------#${NC}"
 
-#public_html
-path_htprivate=${workspace}/.htprivate/
+path_htprivate="${unix_workspace}/.htprivate/"
+
 #public_html/index.php
-sed -e "s;%path_htprivate%;${path_htprivate};g" -e "s;%host_trunk%;${host_trunk};g" -e "s;%host_stable%;${host_stable};g" ${templates}/public_html/index.php > "${workspace}/public_html/index.php"
+sed -e "
+s;%path_htprivate%;${path_htprivate};g
+s;%host_trunk%;${host_trunk};g
+s;%host_stable%;${host_stable};g
+" ${templates}/public_html/index.php > "${unix_workspace}/public_html/index.php"
+
 #public_html/.htaccess
-sed -e "s;%workspace%;${workspace};g" -e "s;%host_trunk%;${host_trunk};g" ${templates}/public_html/.htaccess > "${workspace}/public_html/.htaccess"
+sed -e "
+s;%workspace%;${unix_workspace};g
+s;%host_trunk%;${host_trunk};g
+" ${templates}/public_html/.htaccess > "${unix_workspace}/public_html/.htaccess"
+
 #public_html/favicon.ico
-cp ${templates}/public_html/favicon.ico "${workspace}/public_html/favicon.ico"
+cp ${templates}/public_html/favicon.ico "${unix_workspace}/public_html/favicon.ico"
 
 #Options
-for site in $(ls ${workspace}/.htprivate); do
-  cp ${templates}/options/options.php ${workspace}/.htprivate/${site}/options/options.php
-  cp ${templates}/options/inc.php ${workspace}/.htprivate/${site}/options/inc.php
-  cp ${templates}/options/cli.php ${workspace}/.htprivate/${site}/options/cli.php
-  cp ${templates}/options/a/cli.php ${workspace}/.htprivate/${site}/options/a/cli.php
+for site in $(ls ${unix_workspace}/.htprivate); do
+  cp ${templates}/options/options.php ${unix_workspace}/.htprivate/${site}/options/options.php
+  cp ${templates}/options/inc.php ${unix_workspace}/.htprivate/${site}/options/inc.php
+  cp ${templates}/options/cli.php ${unix_workspace}/.htprivate/${site}/options/cli.php
+  cp ${templates}/options/a/cli.php ${unix_workspace}/.htprivate/${site}/options/a/cli.php
 done
 
-for site in $(ls ${workspace}/.htprivate); do
+#TODO: Подумать о более разумной реализации заполнения шаблоннов.
+for site in $(ls ${unix_workspace}/.htprivate); do
   [ ${site} == ${host_trunk} ] && project="trunk" || project="stable"
   [ ${project} = "trunk" ] && ADDR_URL_SERVER=${host_trunk} || ADDR_URL_SERVER=${host_stable}
 
-  ADDR_PATH_TOP="${workspace}/.htprivate/${ADDR_URL_SERVER}/"
-  ADDR_PATH_WORKSPACE="${workspace}/wl.${project}/"
-  A_TEST_XML_XSD="${workspace}/shared/xsd/"
+  ADDR_PATH_TOP="${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/"
+  ADDR_PATH_WORKSPACE="${unix_workspace}/wl.${project}/"
+  A_TEST_XML_XSD="${unix_workspace}/shared/xsd/"
   ADDR_SECRET=$(gen_pass)
-  PATH_PUBLIC="${workspace}/public_html/"
+  PATH_PUBLIC="${unix_workspace}/public_html/"
+  path_config=${ADDR_PATH_WORKSPACE}/project/.config
+  mkdir -p -v ${path_config}
 
   #options/addr.php
-  sed -e "s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g" -e "s;%ADDR_PATH_WORKSPACE%;${ADDR_PATH_WORKSPACE};g" -e "s;%A_TEST_XML_XSD%;${A_TEST_XML_XSD};g" -e "s;%ADDR_SECRET%;${ADDR_SECRET};g" -e "s;%email%;${email};g" -e "s;%bot_login%;${bot_login};g" -e "s;%bot_password%;${bot_password};g" -e "s;%prg_login%;${prg_login};g" -e "s;%prg_password%;${prg_password};g" -e "s;%ADDR_URL_SERVER%;${ADDR_URL_SERVER};g" -e "s;%PATH_PUBLIC%;${PATH_PUBLIC};g" ${templates}/options/addr.php > "${workspace}/.htprivate/${ADDR_URL_SERVER}/options/addr.php"
-  #options/db.php
-  sed -e "s;%db_login%;${db_login};g" -e "s;%db_password%;${db_password};g" -e "s;%project%;${project};g" ${templates}/options/db.php > "${workspace}/.htprivate/${ADDR_URL_SERVER}/options/db.php"
+  sed -e "
+  s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
+  s;%ADDR_PATH_WORKSPACE%;${ADDR_PATH_WORKSPACE};g
+  s;%A_TEST_XML_XSD%;${A_TEST_XML_XSD};g
+  s;%ADDR_SECRET%;${ADDR_SECRET};g
+  s;%email%;${email};g
+  s;%bot_login%;${bot_login};g
+  s;%bot_password%;${bot_password};g
+  s;%prg_login%;${prg_login};g
+  s;%prg_password%;${prg_password};g
+  s;%PATH_PUBLIC%;${PATH_PUBLIC};g
+  " ${templates}/options/addr.php > "${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/options/addr.php"
 
-  mkdir -p -v ${ADDR_PATH_WORKSPACE}/project/.config/
-  config=${ADDR_PATH_WORKSPACE}/project/.config/
+  #options/db.php
+  sed -e "
+  s;%db_login%;${db_login};g
+  s;%db_password%;${db_password};g
+  s;%project%;${project};g
+  " ${templates}/options/db.php > "${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/options/db.php"
+
   #.config/a.test.php
-  sed -e "s;%db_login%;${db_login};g" -e "s;%db_password%;${db_password};g" -e "s;%project%;${project};g" -e "s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g" ${templates}/.config/a.test.php > "${config}/a.test.php"
+  sed -e "
+  s;%db_login%;${db_login};g
+  s;%db_password%;${db_password};g
+  s;%project%;${project};g
+  s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
+  " ${templates}/.config/a.test.php > "${path_config}/a.test.php"
+
   #.config/amazon.php
-  cp ${templates}/.config/amazon.php "${config}/amazon.php"
+  cp ${templates}/.config/amazon.php "${path_config}/amazon.php"
 done
 
 
@@ -479,14 +553,16 @@ echo -e "${Purple}#----------------------------------------------------------#
 #                     Update Database                      #
 #----------------------------------------------------------#${NC}"
 #Update DB
-for site in $(ls ${workspace}/.htprivate); do
-  options=${workspace}/.htprivate/${site}/options
+for site in $(ls ${unix_workspace}/.htprivate); do
+  options=${unix_workspace}/.htprivate/${site}/options
+
+  #TODO: Добавить счетчик попыток и обнавлять базу до тех пор пока не обновится или кол-во попыток не превысит норму.
   echo "Update main DB for ${site}"
   php ${options}/cli.php db.update #Main
   echo "Update test DB for ${site}"
   php ${options}/a-cli.php db.update a #Test
 
-  writable=${workspace}/.htprivate/${site}/writable
+  writable=${unix_workspace}/.htprivate/${site}/writable
   mkdir -p ${writable}/templates/system
   for template in $(php ${options}/cli.php cms.template.list); do
     mkdir -p ${writable}/templates/${template}
@@ -504,6 +580,8 @@ service apache2 restart
 service mysql restart
 service memcached restart
 
+#TODO: Подумать что сюда надо еще добавить
+# * Что для запуска сервисом использовать команду sh ~/server.sh с под рута или echo 'Password' | sudo --prompt="" -S sh /root/server.sh
 echo -e "${Green}
 Installation finished successfully.
 Created domains:
@@ -534,20 +612,15 @@ for project in trunk stable; do
 done
 echo -e "Rules have been added to the Windows hosts.
 
-Project checkout  on the path ${workspace}
+Project checkout  on the path ${win_workspace}
 
-Key for repository 'libs' saved in %Workspace%/keys/libs.key
-Configs for Subversion created for PHPStorm 2018 in %Workspace%/Subversion
+Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key
+Configs for Subversion created for PHPStorm 2018 in %AppData%/Subversion
 For work Subversion in PHPStorm 2018 you need downloads 'Subversion for Windows <=1.7.9' and 'Putty'
 Subversion: https://sourceforge.net/projects/win32svn/files/1.7.9/apache22/Setup-Subversion-1.7.9.msi/download
 
-Go to PHPStorm adn setup SVN.
-1. File -> Settings -> Version Control -> Subversion
-2. Set check mark  'Use custom configuration directory'
-3. Select directory %Workspace%/Subversion
-
 1. VCS -> Browse VCS Repository -> Browse Subversion Repository
 2. Add new repository: 'svn+libs://libs.svn.1024.info'
-${NC}"
+${NC}" #TODO: Перенести эту часть инструкции в статью.
 
 exit 0
