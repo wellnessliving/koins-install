@@ -378,7 +378,6 @@ fi
 rm -f ${tmpfile}
 
 crudini --set /etc/wsl.conf automount options '"metadata"'
-chmod -R 777 ${unix_workspace}
 
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
