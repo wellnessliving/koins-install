@@ -369,12 +369,18 @@ rm -f ${tmp_new_passphrase}
 echo "[OK]"
 service ssh restart
 
-#TODO: Надо исправить ошибку при первом checkout'e. Возможно добавить проверку успешного выкачивания шаблона. Если не успешно то попробовать еще раз и если не получилось то выход.
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
 
 #path to templates
 templates=${unix_workspace}/checkout/reservationspot.com/install/templates
+
+if [ ! -d "$templates" ]; then
+  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
+  if [ ! -d "$templates" ]; then
+    check_result 1 "Error while checkouting templates"
+  fi
+fi
 
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
