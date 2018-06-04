@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # © Vladislav Kobzev, Apr 2018, kp42@ya.ru
-# A script for install LAMP on Ubuntu, checkout project and setup.
-#TODO: Возможно стоит отрефакторить код. Добавить префиксы к переменым, убрать лишнее.
+# A script for install LAMP on Ubuntu, checkout and setup project.
 #----------------------------------------------------------#
 #                  Variables&Functions                     #
 #----------------------------------------------------------#
@@ -16,6 +15,7 @@ Yellow='\033[0;33m'       # Yellow
 Purple='\033[0;35m'       # Purple
 
 export DEBIAN_FRONTEND=noninteractive
+export PYTHONIOENCODING=utf8 #Need for decode json
 software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1"
 
 subversion_17="http://launchpadlibrarian.net/161750374/subversion_1.7.14-1ubuntu2_amd64.deb" #Subversion 1.7 because SVN 1.8 not supported symlinks
@@ -84,14 +84,14 @@ help() {
   -l, --prg-login           Login for PRG                  default: admin
   -m, --prg-password        Password for PRG               default: 1
   -g, --checkout            Checkout projects     [yes|no] default: yes
-  -w, --workspace           Path to workspace              default: /mnt/d/Workspace
+  -w, --workspace           Path to workspace              default: /mnt/c/Workspace
   -t, --trunk               Hostname for trunk             default: wellnessliving.local
   -s, --stable              Hostname for stable            default: stable.wellnessliving.local
   -f, --force               Force installing
   -h, --help                Print this help
 
   Example simple: bash $0 --key /path/to/key --passphrase PassPhrase --bot-password BotLogin --bot-login BotPassword --email you@email.com
-  Use form for generate install command: http://kasp.me/install/index.html" #TODO Change.
+  Use form for generate install command: http://output.jsbin.com/feguzef"
   exit 1
 }
 
@@ -152,7 +152,7 @@ set_default_value 'db_password' 'lkchpy91'
 set_default_value 'prg_login' 'admin'
 set_default_value 'prg_password' '1'
 set_default_value 'checkout' 'yes'
-set_default_value 'workspace' '/mnt/d/Workspace'
+set_default_value 'workspace' '/mnt/c/Workspace'
 set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
 
@@ -199,7 +199,7 @@ if [ $(echo "${win_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
 fi
 
 printf "Checking path workspace: "
-if [ -d "${unix_workspace:0:6}" ]; then #workspace=/mnt/d/Workspace   ${workspace:0:6}=> /mnt/d
+if [ -d "${unix_workspace:0:6}" ]; then #workspace=/mnt/c/Workspace   ${workspace:0:6}=> /mnt/c
   mkdir -p -v ${unix_workspace}
   if [ ! -z "$(ls -A ${unix_workspace})" ]; then
     if [ "$checkout" == "yes" ]; then
@@ -343,6 +343,13 @@ dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
 
 DIALOG=${DIALOG=dialog}
 
+#curl -s 'link to Studio.API for get user information' -o user.json
+#email=$(python -c "import sys, json; print json.load(open('user.json', 'r'))['s_mail']")
+
+#curl -s 'link to Studio.API for get repository information' -o repository.json
+#key=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['key']")
+#passphrase=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['passphrase']")
+
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
@@ -456,6 +463,8 @@ if [ "$checkout" = 'yes' ]; then
   checkout_dialog "[stable]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/checkout/namespace/Wl/servers/stable" #namespace.Wl
   checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/checkout/reservationspot.com/servers/stable" #project
 fi
+
+wget -O ${templates}/windows/install.bat "https://raw.githubusercontent.com/Kasp42/koins-install/trunk/templates/windows/install.bat" #TODO: Delete when merged
 
 sed -e "
 s;{host_trunk};${host_trunk};g
