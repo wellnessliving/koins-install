@@ -14,7 +14,6 @@ Red='\033[0;31m'          # Red
 Green='\033[0;32m'        # Green
 Yellow='\033[0;33m'       # Yellow
 Purple='\033[0;35m'       # Purple
-Cyan='\033[0;36m'         # Cyan
 
 export DEBIAN_FRONTEND=noninteractive
 software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1"
@@ -24,9 +23,9 @@ libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd6
 
 # Defining return code check function
 check_result(){
-    if [ $1 -ne 0 ]; then
+    if [ "$1" -ne 0 ]; then
         echo -e "${Red} Error: $2 ${NC}"
-        exit $1
+        exit "$1"
     fi
 }
 
@@ -54,7 +53,7 @@ checkout_dialog()
   local title=$1
   local source=$2
   local destination=$3
-  ${DIALOG}  --keep-tite --backtitle "Subversion checkouting" --title ${title} --gauge "Getting total file count... It will take some time." 7 120 < <(
+  ${DIALOG}  --keep-tite --backtitle "Subversion checkouting" --title "${title}" --gauge "Getting total file count... It will take some time." 7 120 < <(
     n=$(svn info -R ${source} | grep "URL: " | uniq | wc -l)
     i=1
     while read line filename
@@ -96,7 +95,7 @@ help() {
   exit 1
 }
 
-if [ ! -n "${BASH}" ]; then
+if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
 fi
 
@@ -393,7 +392,7 @@ echo -e "
 AcceptFilter http none" >> /etc/apache2/apache2.conf #TODO: Поискать как сконфигурировать apache без использования echo
 
 #Create script to run services
-cp ${templates}/sh/server.sh > /root/server.sh
+cp ${templates}/sh/server.sh /root/server.sh
 
 #Create script to dump DB
 sed -e "s;%workspace%;${unix_workspace};g" ${templates}/sh/dump.sh > /root/dump.sh
