@@ -314,13 +314,12 @@ printf "Creating file structure: "
 mkdir -p ${unix_workspace}/{checkout,keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
 
 for site in $(ls ${unix_workspace}/.htprivate); do
-  mkdir -p ${unix_workspace}/.htprivate/${site}/{options/a,writable/{cache,debug,log,php,sql,tmp,var/selemium,templates/app}} #TODO: Надо проверить создание папки app(writable/templates/app), selemium(writable/var/selemium),a(options/a)
+  mkdir -p ${unix_workspace}/.htprivate/${site}/{options/a,writable/{cache,debug,log,php,sql,tmp,var/selemium,templates/app}}
 done
 echo "[OK]"
 
 echo "Adding php repository..."
 add-apt-repository ppa:ondrej/php -y
-#TODO: Возможно добавить еще репозиторий phpmyadmin.
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                  Update system packages                 #
@@ -337,7 +336,7 @@ echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
 #Need set mysql root password before install package.
-echo "mysql-server mysql-server/root_password password ${db_password}" | sudo debconf-set-selections #TODO: Проверить корректную установку пароля к root пользователю mysql.
+echo "mysql-server mysql-server/root_password password ${db_password}" | sudo debconf-set-selections
 echo "mysql-server mysql-server/root_password_again password ${db_password}" | sudo debconf-set-selections
 
 apt-get -y install $software
@@ -397,16 +396,17 @@ crudini --set /etc/wsl.conf automount options '"metadata"'
 
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
-#TODO: Разобратся с конфигом /etc/phpmyadmin/config-db.php  Когда он генерируется? Какой пароль устанавливается при установке noninteractive ?
 s_pma_password=$(gen_pass)
-mysql -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};" #TODO: Установить пароль такой как в config-db.php или в конфиг записать новый.
-mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-mysql -e "flush privileges"
-mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
+mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
+mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+mysql -uroot -p${db_password} -e "flush privileges"
+mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
+
+#sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php TODO: Uncomment after commit to SVN
 
 #Add option AcceptFilter to config Apache
 echo -e "
-AcceptFilter http none" >> /etc/apache2/apache2.conf #TODO: Поискать как сконфигурировать apache без использования echo
+AcceptFilter http none" >> /etc/apache2/apache2.conf
 
 #Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
@@ -436,16 +436,16 @@ mysql -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
 a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 #Creating databases
 for project in trunk stable; do
-  mysql -e "create database ${project}_wl_main;"
-  mysql -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_wl_geo;"
-  mysql -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_wl_control;"
-  mysql -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_test_main;"
-  mysql -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_test_geo;"
-  mysql -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_wl_control;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_test_main;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 done
 
 mysql -e "flush privileges;"
@@ -474,7 +474,7 @@ if [ "$checkout" = 'yes' ]; then
   checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/checkout/reservationspot.com/servers/stable" #project
 fi
 
-wget -O ${templates}/windows/install.bat "https://raw.githubusercontent.com/Kasp42/koins-install/trunk/templates/windows/install.bat" #TODO: Delete when merged
+wget -O ${templates}/windows/install.bat "https://raw.githubusercontent.com/Kasp42/koins-install/trunk/templates/windows/install.bat" #TODO: Delete when merged and commit to SVN
 
 sed -e "
 s;{host_trunk};${host_trunk};g
@@ -580,6 +580,9 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   echo "Update test DB for ${site}"
   php ${options}/a-cli.php db.update a #Test
 
+  echo "Update messages for ${site}"
+  php ${options}/cli.php cms.message.update
+
   writable=${unix_workspace}/.htprivate/${site}/writable
   mkdir -p ${writable}/templates/system
   for template in $(php ${options}/cli.php cms.template.list); do
@@ -598,13 +601,13 @@ service apache2 restart
 service mysql restart
 service memcached restart
 
-#TODO: Подумать что сюда надо еще добавить
-# * Что для запуска сервисом использовать команду sh ~/server.sh с под рута или echo 'Password' | sudo --prompt="" -S sh /root/server.sh
 echo -e "${Green}
 Installation finished successfully.
-Created domains:
-* ${host_trunk}
-* ${host_stable}
+
+Created domains(rules have been added to the Windows hosts):
+
+    ${host_trunk}
+    ${host_stable}
 
 Programmer's page(PRG):
 
@@ -620,25 +623,22 @@ PHPMyAdmin:
     password: ${db_password}
 
 MySQL create databases:"
+
 for project in trunk stable; do
-    echo -e "* ${project}_wl_main
-* ${project}_wl_geo
-* ${project}_wl_control
-* ${project}_test_main
-* ${project}_test_geo
+    echo -e "    ${project}_wl_main
+    ${project}_wl_geo
+    ${project}_wl_control
+    ${project}_test_main
+    ${project}_test_geo
 "
 done
-echo -e "Rules have been added to the Windows hosts.
 
-Project checkout  on the path ${win_workspace}
+echo -e "Created script:
 
-Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key
-Configs for Subversion created for PHPStorm 2018 in %AppData%/Subversion
-For work Subversion in PHPStorm 2018 you need downloads 'Subversion for Windows <=1.7.9' and 'Putty'
-Subversion: https://sourceforge.net/projects/win32svn/files/1.7.9/apache22/Setup-Subversion-1.7.9.msi/download
+    server.sh - For start or restart all service. Use: sh /root/server.sh
+    dump.sh - For dump database. Use sh /root/dump.sh
 
-1. VCS -> Browse VCS Repository -> Browse Subversion Repository
-2. Add new repository: 'svn+libs://libs.svn.1024.info'
-${NC}" #TODO: Перенести эту часть инструкции в статью.
+Project checkout on the path: ${win_workspace}
+Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key"
 
 exit 0
