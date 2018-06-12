@@ -18,6 +18,9 @@ export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
 software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1"
 
+now="$(date +'%d_%m_%Y_%H_%M')"
+LOG_FILE="/root/install_${now}.log"
+
 subversion_17="http://launchpadlibrarian.net/161750374/subversion_1.7.14-1ubuntu2_amd64.deb" #Subversion 1.7 because SVN 1.8 not supported symlinks
 libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd64.deb" #Dependence for Subversion 1.7
 
@@ -94,6 +97,8 @@ help() {
   Use form for generate install command: http://output.jsbin.com/feguzef"
   exit 1
 }
+
+exec 3>&1 1>>${LOG_FILE} 2>&1
 
 if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
@@ -363,7 +368,6 @@ tpm_old_passphrase=$(mktemp -p /tmp)
 tmp_new_passphrase=$(mktemp -p /tmp)
 printf ${passphrase} > ${tpm_old_passphrase}
 puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase}
-crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
 rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
 echo "[OK]"
@@ -484,6 +488,7 @@ while [ ! -L "${unix_workspace}/wl.stable/project" ];
 do
   sleep 2
 done
+crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                  Setting default files                   #
@@ -515,7 +520,6 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   cp ${templates}/options/a/cli.php ${unix_workspace}/.htprivate/${site}/options/a/cli.php
 done
 
-#TODO: Подумать о более разумной реализации заполнения шаблоннов.
 for site in $(ls ${unix_workspace}/.htprivate); do
   [ ${site} == ${host_trunk} ] && project="trunk" || project="stable"
   [ ${project} = "trunk" ] && ADDR_URL_SERVER=${host_trunk} || ADDR_URL_SERVER=${host_stable}
@@ -539,6 +543,7 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   s;%bot_password%;${bot_password};g
   s;%prg_login%;${prg_login};g
   s;%prg_password%;${prg_password};g
+  s;%ADDR_URL_SERVER%;${ADDR_URL_SERVER};g
   s;%PATH_PUBLIC%;${PATH_PUBLIC};g
   " ${templates}/options/addr.php > "${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/options/addr.php"
 
