@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # © Vladislav Kobzev, Apr 2018, kp42@ya.ru
 # A script for install LAMP on Ubuntu, checkout and setup project.
 #----------------------------------------------------------#
