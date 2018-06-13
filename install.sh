@@ -18,8 +18,8 @@ export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
 software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1"
 
-now="$(date +'%d_%m_%Y_%H_%M')"
-LOG_FILE="/root/install_${now}.log"
+#now="$(date +'%d_%m_%Y_%H_%M')"
+#LOG_FILE="/root/install_${now}.log"
 
 subversion_17="http://launchpadlibrarian.net/161750374/subversion_1.7.14-1ubuntu2_amd64.deb" #Subversion 1.7 because SVN 1.8 not supported symlinks
 libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd64.deb" #Dependence for Subversion 1.7
@@ -98,7 +98,7 @@ help() {
   exit 1
 }
 
-exec 3>&1 1>>${LOG_FILE} 2>&1
+#exec 3>&1 1>>${LOG_FILE} 2>&1
 
 if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
