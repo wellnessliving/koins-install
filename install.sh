@@ -98,7 +98,7 @@ help() {
   exit 1
 }
 
-exec 3>&1 1>>${LOG_FILE} 2>&1
+#exec 3>&1 1>>${LOG_FILE} 2>&1
 
 if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
