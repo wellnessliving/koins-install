@@ -500,6 +500,7 @@ wget -O ${templates}/windows/install.bat "https://raw.githubusercontent.com/Kasp
 sed -e "
 s;{host_trunk};${host_trunk};g
 s;{host_stable};${host_stable};g
+s;{workspace};${win_workspace};g
 " ${templates}/windows/install.bat > "${unix_workspace}/install.bat"
 
 # Creating link
