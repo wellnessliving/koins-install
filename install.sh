@@ -336,8 +336,9 @@ echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
 #Need set mysql root password before install package.
-echo "mysql-server mysql-server/root_password password ${db_password}" | sudo debconf-set-selections
-echo "mysql-server mysql-server/root_password_again password ${db_password}" | sudo debconf-set-selections
+#TODO Что-то плохо работает установка пароля на root в noninteractive режиме
+#echo "mysql-server mysql-server/root_password password ${db_password}" | sudo debconf-set-selections
+#echo "mysql-server mysql-server/root_password_again password ${db_password}" | sudo debconf-set-selections
 
 apt-get -y install $software
 check_result $? "apt-get install failed"
@@ -402,10 +403,14 @@ crudini --set /etc/wsl.conf automount options '"metadata"'
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
 s_pma_password=$(gen_pass)
-mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
-mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-mysql -uroot -p${db_password} -e "flush privileges"
-mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
+mysql -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
+mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+mysql -e "flush privileges"
+mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
+#mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
+#mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+#mysql -uroot -p${db_password} -e "flush privileges"
+#mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
 
 #sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php TODO: Uncomment after commit to SVN
 
@@ -441,16 +446,27 @@ mysql -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
 a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 #Creating databases
 for project in trunk stable; do
-  mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_wl_control;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_test_main;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_wl_main;"
+  mysql -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_wl_geo;"
+  mysql -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_wl_control;"
+  mysql -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_test_main;"
+  mysql -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
+  mysql -e "create database ${project}_test_geo;"
+  mysql -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
+
+  #mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
+  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
+  #mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
+  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
+  #mysql -uroot -p${db_password} -e "create database ${project}_wl_control;"
+  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
+  #mysql -uroot -p${db_password} -e "create database ${project}_test_main;"
+  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
+  #mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
+  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 done
 
 mysql -e "flush privileges;"
