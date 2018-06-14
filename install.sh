@@ -364,7 +364,7 @@ service apache2 start
 service mysql start
 service memcached start
 
-svn auth
+svn info
 printf "Configuring SVN: "
 crudini --set /root/.subversion/config tunnels libs "ssh svn@libs.svn.1024.info -p 35469 -i /root/.ssh/libs.pub"
 cp -rf /root/.subversion ${unix_workspace}/Subversion
@@ -403,7 +403,7 @@ crudini --set /etc/wsl.conf automount options '"metadata"'
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
 s_pma_password=$(gen_pass)
-mysql -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
+mysql -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
 mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
 mysql -e "flush privileges"
 mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
