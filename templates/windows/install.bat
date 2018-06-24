@@ -102,8 +102,9 @@ if %ERRORLEVEL% neq 0 (
 ) else (
   echo Putty successfully installed
 )
+color
+copy NUL install.bat.done
 
-color 02
 echo Symlinks created.
 
 rem Go to folder with Putty and start plink.exe for save key.
