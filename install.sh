@@ -375,8 +375,7 @@ crudini --set /etc/my.cnf client port "35072"
 crudini --set /etc/my.cnf mysqld port "35072"
 crudini --set /etc/my.cnf mysqld max_connections "100"
 service mysql start
-/usr/bin/mysql_secure_installation
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p${db_password}
 
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
