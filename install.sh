@@ -361,7 +361,6 @@ echo -e "${Purple}#----------------------------------------------------------#
 
 #Start all service
 service apache2 start
-service mysql start
 service memcached start
 
 svn info
@@ -377,6 +376,13 @@ rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
 echo "[OK]"
 service ssh restart
+
+crudini --set /etc/my.cnf client port "35072"
+crudini --set /etc/my.cnf mysqld port "35072"
+crudini --set /etc/my.cnf mysqld max_connections "100"
+service mysql start
+/usr/bin/mysql_secure_installation
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root
 
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
@@ -468,7 +474,7 @@ for project in trunk stable; do
   #mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
   #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 done
-
+mysqladmin -u root password ${db_password}
 mysql -e "flush privileges;"
 
 if [ "$checkout" = 'yes' ]; then
