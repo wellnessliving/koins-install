@@ -189,6 +189,21 @@ if [ ! -n "${email}" ]; then
 fi
 echo "[OK]"
 
+printf "Checking set argument --db-login: "
+if [ ! -n "${db_login}" ]; then
+  check_result 1 "DB login not set or empty. Try 'bash $0 --help' for more information."
+fi
+if [ "${db_login}" == "root" ]; then
+  check_result 1 "DB login must not be root. Try 'bash $0 --help' for more information."
+fi
+echo "[OK]"
+
+printf "Checking set argument --db-password: "
+if [ ! -n "${db_password}" ]; then
+  check_result 1 "DB password not set or empty. Try 'bash $0 --help' for more information."
+fi
+echo "[OK]"
+
 unix_workspace=$(echo "${workspace}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
 win_workspace=$(echo "${unix_workspace}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
 
@@ -404,16 +419,12 @@ crudini --set /etc/wsl.conf automount options '"metadata"'
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
 s_pma_password=$(gen_pass)
-#mysql -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
-#mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-#mysql -e "flush privileges"
-#mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
 mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
 mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
 mysql -uroot -p${db_password} -e "flush privileges"
 mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
 
-#sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php TODO: Uncomment after commit to SVN
+sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php
 
 #Add option AcceptFilter to config Apache and restart apache2
 echo -e "
@@ -448,17 +459,6 @@ mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identifi
 a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 #Creating databases
 for project in trunk stable; do
-#  mysql -e "create database ${project}_wl_main;"
-#  mysql -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
-#  mysql -e "create database ${project}_wl_geo;"
-#  mysql -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
-#  mysql -e "create database ${project}_wl_control;"
-#  mysql -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
-#  mysql -e "create database ${project}_test_main;"
-#  mysql -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
-#  mysql -e "create database ${project}_test_geo;"
-#  mysql -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
-
   mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
   mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
   mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
@@ -470,7 +470,7 @@ for project in trunk stable; do
   mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
   mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 done
-mysql -e "flush privileges;"
+mysql -uroot -p${db_password} -e "flush privileges;"
 
 if [ "$checkout" = 'yes' ]; then
   echo -e "${Purple}#----------------------------------------------------------#
@@ -602,7 +602,7 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   echo "Update main DB for ${site}"
   php ${options}/cli.php db.update #Main
   echo "Update test DB for ${site}"
-  php ${options}/a-cli.php db.update a #Test
+  php ${options}/a/cli.php db.update a #Test
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
