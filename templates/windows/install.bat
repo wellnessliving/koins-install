@@ -112,7 +112,7 @@ echo When you see:
 echo ( success ( 2 2 ( ) ( edit-pipeline svndiff1 absent-entries commit-revprops depth log-revprops atomic-revprops partial-replay inherited-props ephemeral-txnprops file-revs-reverse ) ) )
 echo Click Ctrl+C
 cd "%ProgramFiles%\PuTTY\"
-plink.exe -P 35469 -l svn -i %workspace%\keys\libs.ppk libs.svn.1024.info
+plink.exe -P 35469 -l svn -i {workspace}\keys\libs.ppk libs.svn.1024.info
 
 pause
 del "%~f0"
