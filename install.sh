@@ -351,9 +351,6 @@ echo -e "${Purple}#----------------------------------------------------------#
 service apache2 start
 service memcached start
 
-#set password for mysql user root
-mysqladmin -u root password ${db_password}
-
 #Configuring svn on WSL
 svn info
 printf "Configuring SVN: "
@@ -375,6 +372,11 @@ crudini --set /etc/my.cnf client port "35072"
 crudini --set /etc/my.cnf mysqld port "35072"
 crudini --set /etc/my.cnf mysqld max_connections "100"
 service mysql start
+
+#set password for mysql user root
+mysqladmin -u root password ${db_password}
+
+#Load timezone to mysql
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p${db_password}
 
 echo "Checkouting templates files for configuring system"
