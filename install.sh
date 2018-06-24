@@ -594,15 +594,32 @@ done
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Update Database                      #
 #----------------------------------------------------------#${NC}"
+max_attempt=7
+i_attempt=0
 #Update DB
 for site in $(ls ${unix_workspace}/.htprivate); do
   options=${unix_workspace}/.htprivate/${site}/options
 
-  #TODO: Добавить счетчик попыток и обнавлять базу до тех пор пока не обновится или кол-во попыток не превысит норму.
   echo "Update main DB for ${site}"
-  php ${options}/cli.php db.update #Main
+  while [ ! -f "${unix_workspace}/install.bat.done" ];
+  do
+    php ${options}/cli.php db.update #Main
+    if [ "$?" -eq 0 ] || [ ${i_attempt} -ge ${max_attempt} ]; then
+      break
+    fi
+    ((i_attempt++))
+  done
+
   echo "Update test DB for ${site}"
-  php ${options}/a/cli.php db.update a #Test
+
+  while [ ! -f "${unix_workspace}/install.bat.done" ];
+  do
+    php ${options}/a/cli.php db.update a #Test
+    if [ "$?" -eq 0 ] || [ ${i_attempt} -ge ${max_attempt} ]; then
+      break
+    fi
+    ((i_attempt++))
+  done
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
