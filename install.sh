@@ -601,25 +601,27 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   options=${unix_workspace}/.htprivate/${site}/options
 
   echo "Update main DB for ${site}"
-  while [ ! -f "${unix_workspace}/install.bat.done" ];
+  while [ ${i_attempt} -lt ${max_attempt} ];
   do
     php ${options}/cli.php db.update #Main
-    if [ "$?" -eq 0 ] || [ ${i_attempt} -ge ${max_attempt} ]; then
+    if [ "$?" -eq 0 ]; then
       break
     fi
     ((i_attempt++))
   done
+  i_attempt=0
 
   echo "Update test DB for ${site}"
 
-  while [ ! -f "${unix_workspace}/install.bat.done" ];
+   while [ ${i_attempt} -lt ${max_attempt} ];
   do
     php ${options}/a/cli.php db.update a #Test
-    if [ "$?" -eq 0 ] || [ ${i_attempt} -ge ${max_attempt} ]; then
+    if [ "$?" -eq 0 ]; then
       break
     fi
     ((i_attempt++))
   done
+  i_attempt=0
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
