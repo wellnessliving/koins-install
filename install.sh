@@ -408,7 +408,7 @@ s_pma_password=$(gen_pass)
 #mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
 #mysql -e "flush privileges"
 #mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
-mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
+mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
 mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
 mysql -uroot -p${db_password} -e "flush privileges"
 mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
