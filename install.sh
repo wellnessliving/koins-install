@@ -380,6 +380,7 @@ printf ${passphrase} > ${tpm_old_passphrase}
 puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase}
 rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
+crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
 echo "[OK]"
 service ssh restart
 
@@ -512,7 +513,6 @@ do
   sleep 2
 done
 rm -f ${unix_workspace}/install.bat.done
-crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                  Setting default files                   #
@@ -677,7 +677,7 @@ done
 echo -e "Created script:
 
     server.sh - For start or restart all service. Use: sh /root/server.sh
-    dump.sh - For dump database. Use sh /root/dump.sh
+    dump.sh - For dump database. Use: sh /root/dump.sh
 
 Project checkout on the path: ${win_workspace}
 Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key${NC}"
