@@ -328,11 +328,6 @@ check_result $? 'apt-get upgrade failed'
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
-#Need set mysql root password before install package.
-#TODO Что-то плохо работает установка пароля на root в noninteractive режиме
-#echo "mysql-server mysql-server/root_password password ${db_password}" | sudo debconf-set-selections
-#echo "mysql-server mysql-server/root_password_again password ${db_password}" | sudo debconf-set-selections
-
 apt-get -y install $software
 check_result $? "apt-get install failed"
 
@@ -356,9 +351,15 @@ echo -e "${Purple}#----------------------------------------------------------#
 service apache2 start
 service memcached start
 
+#set password for mysql user root
+mysqladmin -u root password ${db_password}
+
+#Configuring svn on WSL
 svn info
 printf "Configuring SVN: "
 crudini --set /root/.subversion/config tunnels libs "ssh svn@libs.svn.1024.info -p 35469 -i /root/.ssh/libs.pub"
+
+#Configure svn on Windows
 cp -rf /root/.subversion ${unix_workspace}/Subversion
 cp -rf /root/.ssh/libs.key ${unix_workspace}/keys/libs.key
 tpm_old_passphrase=$(mktemp -p /tmp)
@@ -402,20 +403,21 @@ crudini --set /etc/wsl.conf automount options '"metadata"'
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
 s_pma_password=$(gen_pass)
-mysql -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
-mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-mysql -e "flush privileges"
-mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
-#mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
-#mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-#mysql -uroot -p${db_password} -e "flush privileges"
-#mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
+#mysql -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
+#mysql -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+#mysql -e "flush privileges"
+#mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql
+mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by ${s_pma_password};"
+mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+mysql -uroot -p${db_password} -e "flush privileges"
+mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
 
 #sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php TODO: Uncomment after commit to SVN
 
-#Add option AcceptFilter to config Apache
+#Add option AcceptFilter to config Apache and restart apache2
 echo -e "
 AcceptFilter http none" >> /etc/apache2/apache2.conf
+service apache2 restart
 
 #Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
@@ -440,34 +442,33 @@ sed -e "s;%server_alias%;${host_stable};g" -e "s;%document_root%;${document_root
 a2ensite "${host_stable}.conf"
 
 #Create new DB user
-mysql -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
+mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
 
 a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 #Creating databases
 for project in trunk stable; do
-  mysql -e "create database ${project}_wl_main;"
-  mysql -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_wl_geo;"
-  mysql -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_wl_control;"
-  mysql -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_test_main;"
-  mysql -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
-  mysql -e "create database ${project}_test_geo;"
-  mysql -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
+#  mysql -e "create database ${project}_wl_main;"
+#  mysql -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
+#  mysql -e "create database ${project}_wl_geo;"
+#  mysql -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
+#  mysql -e "create database ${project}_wl_control;"
+#  mysql -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
+#  mysql -e "create database ${project}_test_main;"
+#  mysql -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
+#  mysql -e "create database ${project}_test_geo;"
+#  mysql -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 
-  #mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
-  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
-  #mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
-  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
-  #mysql -uroot -p${db_password} -e "create database ${project}_wl_control;"
-  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
-  #mysql -uroot -p${db_password} -e "create database ${project}_test_main;"
-  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
-  #mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
-  #mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_wl_control;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_test_main;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
 done
-mysqladmin -u root password ${db_password}
 mysql -e "flush privileges;"
 
 if [ "$checkout" = 'yes' ]; then
@@ -505,10 +506,11 @@ s;{workspace};${win_workspace};g
 # Creating link
 echo -e "Open the workspace folder: '${Yellow}${win_workspace}${NC}' and run file '${Yellow}install.bat${NC}' as admin."
 echo -e "Wait for run file..."
-while [ ! -L "${unix_workspace}/wl.stable/project" ];
+while [ ! -f "${unix_workspace}/install.bat.done" ];
 do
   sleep 2
 done
+rm -f ${unix_workspace}/install.bat.done
 crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
 
 echo -e "${Purple}#----------------------------------------------------------#
@@ -660,6 +662,6 @@ echo -e "Created script:
     dump.sh - For dump database. Use sh /root/dump.sh
 
 Project checkout on the path: ${win_workspace}
-Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key"
+Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key${NC}"
 
 exit 0
