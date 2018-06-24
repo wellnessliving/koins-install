@@ -192,9 +192,6 @@ echo "[OK]"
 unix_workspace=$(echo "${workspace}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
 win_workspace=$(echo "${unix_workspace}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
 
-echo ${unix_workspace}
-echo ${win_workspace}
-
 if [ $(echo "${unix_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
   unix_workspace=${unix_workspace::-1}
 fi
@@ -228,7 +225,6 @@ else
 fi
 echo "[OK]"
 
-echo ${key}
 unix_key=$(echo "${key}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
 win_key=$(echo "${unix_key}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
 
@@ -239,9 +235,6 @@ fi
 if [ $(echo "${win_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
   win_key=${win_key::-1}
 fi
-
-echo ${unix_key}
-echo ${win_key}
 
 printf "Checking set argument --key: "
 if [ -n "${unix_key}" ]; then
