@@ -377,7 +377,7 @@ service mysql start
 mysqladmin -u root password ${db_password}
 
 #Load timezone to mysql
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p${db_password}
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p${db_password} mysql
 
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
