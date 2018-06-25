@@ -87,6 +87,7 @@ help() {
   -l, --prg-login           Login for PRG                  default: admin
   -m, --prg-password        Password for PRG               default: 1
   -g, --checkout            Checkout projects     [yes|no] default: yes
+  -x, --xdebug              Install xDebug        [yes|no] default: no
   -w, --workspace           Path to workspace              default: /mnt/c/Workspace
   -t, --trunk               Hostname for trunk             default: wellnessliving.local
   -s, --stable              Hostname for stable            default: stable.wellnessliving.local
@@ -118,6 +119,7 @@ for arg; do
     --prg-login)        args="${args}-l " ;;
     --prg-password)     args="${args}-m " ;;
     --checkout)         args="${args}-g " ;;
+    --xdebug)           args="${args}-x " ;;
     --workspace)        args="${args}-w " ;;
     --trunk)            args="${args}-t " ;;
     --stable)           args="${args}-s " ;;
@@ -130,7 +132,7 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "k:p:b:a:e:s:d:c:l:m:g:w:t:fh" Option; do
+while getopts "k:p:b:a:e:s:d:c:l:m:g:x:w:t:fh" Option; do
   case ${Option} in
     k) key=$OPTARG ;;           # Path to key for SVN
     p) passphrase=$OPTARG ;;    # Passphrase for key
@@ -142,6 +144,7 @@ while getopts "k:p:b:a:e:s:d:c:l:m:g:w:t:fh" Option; do
     l) prg_login=$OPTARG ;;     # Login for PRG
     m) prg_password=$OPTARG ;;  # Password for PRG
     g) checkout=$OPTARG ;;      # Checkout projects
+    x) xdebug=$OPTARG ;;        # Checkout projects
     w) workspace=$OPTARG ;;     # Path to workspace
     t) host_trunk=$OPTARG ;;    # Hostname for trunk
     s) host_stable=$OPTARG ;;   # Hostname for stable
@@ -157,6 +160,7 @@ set_default_value 'db_password' 'lkchpy91'
 set_default_value 'prg_login' 'admin'
 set_default_value 'prg_password' '1'
 set_default_value 'checkout' 'yes'
+set_default_value 'xdebug' 'no'
 set_default_value 'workspace' '/mnt/c/Workspace'
 set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
@@ -347,6 +351,11 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install $software
 check_result $? "apt-get install failed"
 
+#Install xdebug
+if [ "$xdebug" == "yes" ]; then
+  apt-get -y install php-xdebug openssh-server
+fi
+
 dpkg -i $(curl -O -s -w '%{filename_effective}' ${libsvn1_17})
 dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
 
@@ -366,6 +375,29 @@ echo -e "${Purple}#----------------------------------------------------------#
 #Start all service
 service apache2 start
 service memcached start
+
+#Configure xdebug
+if [ "$xdebug" == "yes" ]; then
+  apt-get -y install php-xdebug openssh-server
+
+  user_name=$(echo $(ls /home/)|tr -d '\n')
+  #TODO karma-147: change option in file /etc/ssh/sshd_config
+  #Установить PermitRootLogin no
+  #Следом добавить AllowUsers ${user_name}
+  #Включить PasswordAuthentication yes
+  #Отключить UsePrivilegeSeparation no
+  service ssh --full-restart
+
+  echo "zend_extension=xdebug.so
+xdebug.default_enable=0
+xdebug.remote_enable=1
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9001
+xdebug.idekey=PHPSTORM
+xdebug.max_nesting_level=1000" > /etc/php/7.1/apache2/conf.d/20-xdebug.ini
+
+  service apache2 restart
+fi
 
 #Configuring svn on WSL
 svn info
@@ -595,7 +627,7 @@ done
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Update Database                      #
 #----------------------------------------------------------#${NC}"
-max_attempt=7
+max_attempt=5
 i_attempt=0
 #Update DB
 for site in $(ls ${unix_workspace}/.htprivate); do
