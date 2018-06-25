@@ -306,6 +306,7 @@ fi
 printf "Install packages:\n* "
 echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' #Replace space to newline
 echo "Checkout projects: ${checkout}"
+#echo "Install xDebug: ${xdebug}"
 echo "Workspace: ${win_workspace}"
 echo "Login for PRG: ${prg_login}"
 echo "Password for PRG: ${prg_password}"
@@ -361,10 +362,17 @@ dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
 
 DIALOG=${DIALOG=dialog}
 
+#TODO karma-147: Uncomment all lines after complete task karma-147
+#TODO karma-147: Вставить ссылку на API получения информации о пользователе.
 #curl -s 'link to Studio.API for get user information' -o user.json
+#TODO karma-147: Добавить проверку что успешно получены данные. Что-то вроде этого:
+#status=$(python -c "import sys, json; print json.load(open('user.json', 'r'))['s_status']")
 #email=$(python -c "import sys, json; print json.load(open('user.json', 'r'))['s_mail']")
 
+#TODO karma-147: Вставить ссылку на API получения ключа.
 #curl -s 'link to Studio.API for get repository information' -o repository.json
+#TODO karma-147: Добавить проверку что успешно получены данные. Что-то вроде этого:
+#status=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['s_status']")
 #key=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['key']")
 #passphrase=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['passphrase']")
 
@@ -381,7 +389,7 @@ if [ "$xdebug" == "yes" ]; then
   apt-get -y install php-xdebug openssh-server
 
   user_name=$(echo $(ls /home/)|tr -d '\n')
-  #TODO karma-147: change option in file /etc/ssh/sshd_config
+  #TODO karma-147: Разобраться как поменять опции в файле /etc/ssh/sshd_config
   #Установить PermitRootLogin no
   #Следом добавить AllowUsers ${user_name}
   #Включить PasswordAuthentication yes
@@ -530,8 +538,6 @@ if [ "$checkout" = 'yes' ]; then
   checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/checkout/reservationspot.com/servers/stable" #project
 fi
 
-wget -O ${templates}/windows/install.bat "https://raw.githubusercontent.com/Kasp42/koins-install/trunk/templates/windows/install.bat" #TODO: Delete when merged and commit to SVN
-
 sed -e "
 s;{host_trunk};${host_trunk};g
 s;{host_stable};${host_stable};g
@@ -636,6 +642,7 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   echo "Update main DB for ${site}"
   while [ ${i_attempt} -lt ${max_attempt} ];
   do
+    #TODO karma-147: Разобраться с ошибкой Error parsing result of memory_limit()
     php ${options}/cli.php db.update #Main
     if [ "$?" -eq 0 ]; then
       break
@@ -643,6 +650,7 @@ for site in $(ls ${unix_workspace}/.htprivate); do
     ((i_attempt++))
   done
 
+  #TODO karma-147: Разобратьяс почему не хочет обновлять и зависает
   #echo "Update test DB for ${site}"
   #php ${options}/a/cli.php db.update a #Test
 
