@@ -214,6 +214,7 @@ fi
 if [ $(echo "${win_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
   win_workspace=${win_workspace::-1}
 fi
+win_workspace_slash=$(echo "${win_workspace}" | sed -e 's|\\|\\\\|g')
 
 printf "Checking path workspace: "
 if [ -d "${unix_workspace:0:6}" ]; then #workspace=/mnt/c/Workspace   ${workspace:0:6}=> /mnt/c
@@ -380,7 +381,7 @@ printf ${passphrase} > ${tpm_old_passphrase}
 puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase}
 rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
-crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace}\\keys\\libs.ppk libs.svn.1024.info"
+crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace_slash}\\\\keys\\\\libs.ppk libs.svn.1024.info"
 echo "[OK]"
 service ssh restart
 
@@ -502,7 +503,7 @@ wget -O ${templates}/windows/install.bat "https://raw.githubusercontent.com/Kasp
 sed -e "
 s;{host_trunk};${host_trunk};g
 s;{host_stable};${host_stable};g
-s;{workspace};${win_workspace};g
+s;{workspace};${win_workspace_slash};g
 " ${templates}/windows/install.bat > "${unix_workspace}/install.bat"
 
 # Creating link
@@ -609,19 +610,9 @@ for site in $(ls ${unix_workspace}/.htprivate); do
     fi
     ((i_attempt++))
   done
-  i_attempt=0
 
   echo "Update test DB for ${site}"
-
-   while [ ${i_attempt} -lt ${max_attempt} ];
-  do
-    php ${options}/a/cli.php db.update a #Test
-    if [ "$?" -eq 0 ]; then
-      break
-    fi
-    ((i_attempt++))
-  done
-  i_attempt=0
+  php ${options}/a/cli.php db.update a #Test
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
