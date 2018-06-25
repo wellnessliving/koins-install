@@ -611,8 +611,8 @@ for site in $(ls ${unix_workspace}/.htprivate); do
     ((i_attempt++))
   done
 
-  echo "Update test DB for ${site}"
-  php ${options}/a/cli.php db.update a #Test
+  #echo "Update test DB for ${site}"
+  #php ${options}/a/cli.php db.update a #Test
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
