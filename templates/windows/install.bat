@@ -30,11 +30,6 @@ echo Creating Symlinks...
 @setlocal enableextensions
 @cd /d "%~dp0"
 
-rem Move config for SVN to %AppData%
-mkdir "%AppData%/Subversion"
-xcopy /E /Y Subversion "%AppData%"
-rd /S /Q Subversion
-
 rem Create symlinks for trunk
 mklink /d .\wl.trunk\core ..\checkout\core\trunk
 mklink /d .\wl.trunk\namespace.Core ..\checkout\namespace\Core\trunk
@@ -82,6 +77,11 @@ if %ERRORLEVEL% equ 1063 (
   )
 )
 
+rem Move config for SVN to %AppData%
+mkdir "%AppData%/Subversion"
+xcopy /E /Y Subversion "%AppData%"
+rd /S /Q Subversion
+
 :PUTTY
 color 06
 echo When installing PuTTY, do not change the installation path.
@@ -112,7 +112,7 @@ echo When you see:
 echo ( success ( 2 2 ( ) ( edit-pipeline svndiff1 absent-entries commit-revprops depth log-revprops atomic-revprops partial-replay inherited-props ephemeral-txnprops file-revs-reverse ) ) )
 echo Click Ctrl+C
 cd "%ProgramFiles%\PuTTY\"
-plink.exe -P 35469 -l svn -i {workspace}\keys\libs.ppk libs.svn.1024.info
+plink.exe -P 35469 -l svn -i {workspace}\\keys\\libs.ppk libs.svn.1024.info
 
 pause
 del "%~f0"
