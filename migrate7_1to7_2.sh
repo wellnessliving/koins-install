@@ -37,6 +37,7 @@ rm -f ${tmpfile}
 a2dismod php7.1
 a2enmod php7.2
 
+package_list=$(mktemp -p /tmp)
 dpkg --get-selections > ${package_list}
 if [ ! -z "$(grep php-xdebug ${package_list})" ]; then
   echo "zend_extension=xdebug.so
@@ -47,6 +48,8 @@ xdebug.remote_port=9001
 xdebug.idekey=PHPSTORM
 xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
 fi
+
+rm -f ${package_list}
 
 apt-get -y purge php7.1* # Remove PHP 7.1
 
