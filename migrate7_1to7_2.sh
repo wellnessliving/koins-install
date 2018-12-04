@@ -7,7 +7,7 @@ if [ "x$(id -u)" != 'x0' ]; then
 fi
 
 package_list=$(mktemp -p /tmp)
-
+dpkg --get-selections > ${package_list}
 if [ ! -z "$(grep php7.1 ${package_list})" ]; then
   echo "PHP 7.1 is not installed."
   exit 1
