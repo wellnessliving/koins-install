@@ -1,6 +1,6 @@
 #!/bin/bash
 # © Vladislav Kobzev, Apr 2018, kp42@ya.ru
-# A script for install LAMP on Ubuntu, checkout and setup project.
+# A script for installing LAMP on Ubuntu, checkout and setup project.
 #----------------------------------------------------------#
 #                  Variables&Functions                     #
 #----------------------------------------------------------#
@@ -16,7 +16,7 @@ Purple='\033[0;35m'       # Purple
 
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
-software="mc mcedit apache2 mysql-server php7.1 php7.1-bcmath php7.1-xml php7.1-curl php7.1-gd php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-soap php7.1-tidy php7.1-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1"
+software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1 jq"
 
 now="$(date +'%d_%m_%Y_%H_%M')"
 LOG_FILE="/root/install_${now}.log"
@@ -26,29 +26,29 @@ libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd6
 
 # Defining return code check function
 check_result(){
-    if [ "$1" -ne 0 ]; then
-        echo -e "${Red} Error: $2 ${NC}"
-        exit "$1"
-    fi
+  if [ "$1" -ne 0 ]; then
+    echo -e "${Red} Error: $2 ${NC}"
+    exit "$1"
+  fi
 }
 
 # Defining function to set default value
 set_default_value() {
-    eval variable=\$$1
-    if [ -z "$variable" ]; then
-        eval $1=$2
-    fi
+  eval variable=\$$1
+  if [ -z "$variable" ]; then
+    eval $1=$2
+  fi
 }
 
 # Defining password-gen function
 gen_pass() {
-    MATRIX='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    LENGTH=16
-    while [ ${n:=1} -le ${LENGTH} ]; do
-        PASS="$PASS${MATRIX:$(($RANDOM%${#MATRIX})):1}"
-        let n+=1
-    done
-    echo "$PASS"
+  MATRIX='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  LENGTH=16
+  while [ ${n:=1} -le ${LENGTH} ]; do
+    PASS="$PASS${MATRIX:$(($RANDOM%${#MATRIX})):1}"
+    let n+=1
+  done
+  echo "$PASS"
 }
 
 checkout_dialog()
@@ -95,7 +95,7 @@ help() {
   -h, --help                Print this help
 
   Example simple: bash $0 --key /path/to/key --passphrase PassPhrase --bot-password BotLogin --bot-login BotPassword --email you@email.com
-  Use form for generate install command: http://output.jsbin.com/feguzef"
+  Use form to generate install command: http://output.jsbin.com/feguzef"
   exit 1
 }
 
@@ -187,12 +187,6 @@ if [ ! -n "${bot_password}" ]; then
 fi
 echo "[OK]"
 
-printf "Checking set argument --email: "
-if [ ! -n "${email}" ]; then
-  check_result 1 "Email not set. Try 'bash $0 --help' for more information."
-fi
-echo "[OK]"
-
 printf "Checking set argument --db-login: "
 if [ ! -n "${db_login}" ]; then
   check_result 1 "DB login not set or empty. Try 'bash $0 --help' for more information."
@@ -245,40 +239,6 @@ else
 fi
 echo "[OK]"
 
-unix_key=$(echo "${key}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
-win_key=$(echo "${unix_key}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
-
-if [ $(echo "${unix_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
-  unix_key=${unix_key::-1}
-fi
-
-if [ $(echo "${win_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
-  win_key=${win_key::-1}
-fi
-
-printf "Checking set argument --key: "
-if [ -n "${unix_key}" ]; then
-  if [ ! -f ${unix_key} ]; then
-    check_result 1 "No such key file"
-  fi
-  echo "[OK]"
-  printf "Checking set argument --passphrase: "
-  if [ -n "${passphrase}" ]; then
-    echo "[OK]"
-    echo "Decrypting key..."
-    mkdir -p /root/.ssh
-    cp ${unix_key} /root/.ssh/libs.key
-    chmod 600 /root/.ssh/libs.key
-    openssl rsa -in /root/.ssh/libs.key -out /root/.ssh/libs.pub -passin pass:${passphrase}
-    check_result $? 'Decrypt key error'
-    chmod 600 /root/.ssh/libs.pub
-  else
-    check_result 1 "Passphrase for key not set. Try 'bash $0 --help' for more information."
-  fi
-else
-  check_result 1 "Key not set."
-fi
-
 echo "Checking installed packages..."
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
@@ -328,7 +288,7 @@ printf "Creating file structure: "
 mkdir -p ${unix_workspace}/{checkout,keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
 
 for site in $(ls ${unix_workspace}/.htprivate); do
-  mkdir -p ${unix_workspace}/.htprivate/${site}/{options/a,writable/{cache,debug,log,php,sql,tmp,var/selemium,templates/app}}
+  mkdir -p ${unix_workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var/selemium}}
 done
 echo "[OK]"
 
@@ -362,19 +322,89 @@ dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
 
 DIALOG=${DIALOG=dialog}
 
-#TODO karma-147: Uncomment all lines after complete task karma-147
-#TODO karma-147: Вставить ссылку на API получения информации о пользователе.
-#curl -s 'link to Studio.API for get user information' -o user.json
-#TODO karma-147: Добавить проверку что успешно получены данные. Что-то вроде этого:
-#status=$(python -c "import sys, json; print json.load(open('user.json', 'r'))['s_status']")
-#email=$(python -c "import sys, json; print json.load(open('user.json', 'r'))['s_mail']")
+tmp_repository_file=$(mktemp -p /tmp)
+curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Key.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}&s_repository=libs" -o ${tmp_repository_file}
 
-#TODO karma-147: Вставить ссылку на API получения ключа.
-#curl -s 'link to Studio.API for get repository information' -o repository.json
-#TODO karma-147: Добавить проверку что успешно получены данные. Что-то вроде этого:
-#status=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['s_status']")
-#key=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['key']")
-#passphrase=$(python -c "import sys, json; print json.load(open('repository.json', 'r'))['passphrase']")
+status=`jq -M -r '.status' ${tmp_repository_file}`
+
+if [ "$status" != 'ok' ]; then
+  message=`jq -M -r '.message' ${tmp_repository_file}`
+  echo "Error getting repository key: ${message}"
+  echo "Status: ${status}"
+  echo ${tmp_repository_file}
+  exit 1
+fi
+
+private_key=`jq -M '.s_private' ${tmp_repository_file}`
+passphrase=`jq -M '.s_password' ${tmp_repository_file}`
+
+tmp_repository_key=$(mktemp -p /tmp)
+tmp_repository_passphrase=$(mktemp -p /tmp)
+
+echo ${private_key} > $tmp_repository_key
+sed -i 's/\\n/\n/g' $tmp_repository_key
+sed -i 's/"//g' $tmp_repository_key
+
+echo ${passphrase} > $tmp_repository_passphrase
+sed -i 's/"//g' $tmp_repository_passphrase
+
+cp ${tmp_repository_key} ${unix_workspace}/keys/libs.key
+key=${unix_workspace}/keys/libs.key
+passphrase=$(cat ${tmp_repository_passphrase})
+
+rm -f ${tmp_repository_key}
+rm -f ${tmp_repository_passphrase}
+rm -f ${tmp_repository_file}
+
+unix_key=$(echo "${key}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
+win_key=$(echo "${unix_key}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
+
+if [ $(echo "${unix_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
+  unix_key=${unix_key::-1}
+fi
+
+if [ $(echo "${win_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
+  win_key=${win_key::-1}
+fi
+
+printf "Checking set argument --key: "
+if [ -n "${unix_key}" ]; then
+  if [ ! -f ${unix_key} ]; then
+    check_result 1 "No such key file"
+  fi
+  echo "[OK]"
+  printf "Checking set argument --passphrase: "
+  if [ -n "${passphrase}" ]; then
+    echo "[OK]"
+    echo "Decrypting key..."
+    mkdir -p /root/.ssh
+    cp ${unix_key} /root/.ssh/libs.key
+    chmod 600 /root/.ssh/libs.key
+    openssl rsa -in /root/.ssh/libs.key -out /root/.ssh/libs.pub -passin pass:${passphrase}
+    check_result $? 'Decrypt key error'
+    chmod 600 /root/.ssh/libs.pub
+  else
+    check_result 1 "Passphrase for key not set. Try 'bash $0 --help' for more information."
+  fi
+else
+  check_result 1 "Key not set."
+fi
+
+tmp_user_file=$(mktemp -p /tmp)
+curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Detail/Detail.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}" -o ${tmp_user_file}
+
+status=`jq -M -r '.status' ${tmp_user_file}`
+
+if [ "$status" != 'ok' ]; then
+  message=`jq -M -r '.message' ${tmp_user_file}`
+  echo "Error getting repository key: ${message}"
+  echo "Status: ${status}"
+  echo ${tmp_user_file}
+  exit 1
+fi
+
+email=`jq -M -r '.text_mail' ${tmp_user_file}`
+rm -f ${tmp_user_file}
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
@@ -387,13 +417,19 @@ service memcached start
 #Configure xdebug
 if [ "$xdebug" == "yes" ]; then
   apt-get -y install php-xdebug openssh-server
+  dpkg-reconfigure openssh-server
+
+  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
 
   user_name=$(echo $(ls /home/)|tr -d '\n')
-  #TODO karma-147: Разобраться как поменять опции в файле /etc/ssh/sshd_config
-  #Установить PermitRootLogin no
-  #Следом добавить AllowUsers ${user_name}
-  #Включить PasswordAuthentication yes
-  #Отключить UsePrivilegeSeparation no
+  sed -i '/^PermitRootLogin/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PermitRootLogin`
+  sed -i -e "s;^PermitRootLogin .*$;PermitRootLogin no\nAllowUsers ${user_name};g" /etc/ssh/sshd_config # Set `PermitRootLogin no` and add `AllowUsers`
+
+  sed -i '/^PasswordAuthentication/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PasswordAuthentication`
+  sed -i -e "s;^PasswordAuthentication .*$;PasswordAuthentication yes;g" /etc/ssh/sshd_config # Set `PasswordAuthentication yes`
+
+  sed -i '/^UsePrivilegeSeparation/s/^#//g' /etc/ssh/sshd_config # Uncomment line `UsePrivilegeSeparation`
+  sed -i -e "s;^UsePrivilegeSeparation .*$;UsePrivilegeSeparation no;g" /etc/ssh/sshd_config # Set `UsePrivilegeSeparation no`
   service ssh --full-restart
 
   echo "zend_extension=xdebug.so
@@ -402,7 +438,7 @@ xdebug.remote_enable=1
 xdebug.remote_host=127.0.0.1
 xdebug.remote_port=9001
 xdebug.idekey=PHPSTORM
-xdebug.max_nesting_level=1000" > /etc/php/7.1/apache2/conf.d/20-xdebug.ini
+xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
 
   service apache2 restart
 fi
@@ -451,12 +487,17 @@ fi
 
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
-if [ ! -z "$(grep php7.2-cli ${tmpfile})" ]; then
-  apt-get purge php7.2-cli -y
+if [ ! -z "$(grep php7.3-cli ${tmpfile})" ]; then
+  apt-get purge php7.3-cli -y
 fi
+
 rm -f ${tmpfile}
 
 crudini --set /etc/wsl.conf automount options '"metadata"'
+
+echo "Configuring PHP..."
+crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
 
 echo "Configuring phpMyAdmin..."
 ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
@@ -520,7 +561,6 @@ if [ "$checkout" = 'yes' ]; then
 #----------------------------------------------------------#${NC}"
 
   #Shared
-  svn co svn+libs://libs.svn.1024.info/shared ${unix_workspace}/checkout/shared
   checkout_dialog "shared" "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/checkout/shared"
 
   #Trunk
@@ -580,7 +620,6 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   cp ${templates}/options/options.php ${unix_workspace}/.htprivate/${site}/options/options.php
   cp ${templates}/options/inc.php ${unix_workspace}/.htprivate/${site}/options/inc.php
   cp ${templates}/options/cli.php ${unix_workspace}/.htprivate/${site}/options/cli.php
-  cp ${templates}/options/a/cli.php ${unix_workspace}/.htprivate/${site}/options/a/cli.php
 done
 
 for site in $(ls ${unix_workspace}/.htprivate); do
@@ -628,12 +667,12 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   #.config/amazon.php
   cp ${templates}/.config/amazon.php "${path_config}/amazon.php"
 done
-
+cp -a ${templates}/windows/selenium/ ${unix_workspace}
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Update Database                      #
 #----------------------------------------------------------#${NC}"
-max_attempt=5
+max_attempt=10
 i_attempt=0
 #Update DB
 for site in $(ls ${unix_workspace}/.htprivate); do
@@ -642,26 +681,26 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   echo "Update main DB for ${site}"
   while [ ${i_attempt} -lt ${max_attempt} ];
   do
-    #TODO karma-147: Разобраться с ошибкой Error parsing result of memory_limit()
     php ${options}/cli.php db.update #Main
     if [ "$?" -eq 0 ]; then
       break
     fi
-    ((i_attempt++))
+    i_attempt=$((i_attempt+1))
   done
 
-  #TODO karma-147: Разобратьяс почему не хочет обновлять и зависает
-  #echo "Update test DB for ${site}"
-  #php ${options}/a/cli.php db.update a #Test
+  i_attempt=0
+  echo "Update test DB for ${site}"
+  while [ ${i_attempt} -lt ${max_attempt} ];
+  do
+    php ${options}/cli.php db.update a #Test
+    if [ "$?" -eq 0 ]; then
+      break
+    fi
+    i_attempt=$((i_attempt+1))
+  done
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
-
-  writable=${unix_workspace}/.htprivate/${site}/writable
-  mkdir -p ${writable}/templates/system
-  for template in $(php ${options}/cli.php cms.template.list); do
-    mkdir -p ${writable}/templates/${template}
-  done;
 done
 
 #Add service to start system
