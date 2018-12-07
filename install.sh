@@ -77,11 +77,8 @@ checkout_dialog()
 # Defining help function
 help() {
   echo -e "Usage: $0 [OPTIONS]
-  -k, --key                 Path to key for SVN            required
-  -p, --passphrase          Passphrase for key             required
   -b, --bot-login           Bot login                      required
   -a, --bot-password        Bot password                   required
-  -e, --email               Email                          required
   -d, --db-login            Login for DB                   default: koins
   -c, --db-password         Password for DB                default: lkchpy91
   -l, --prg-login           Login for PRG                  default: admin
@@ -109,11 +106,8 @@ fi
 for arg; do
   delimiter=""
   case "$arg" in
-    --key)              args="${args}-k " ;;
-    --passphrase)       args="${args}-p " ;;
     --bot-login)        args="${args}-b " ;;
     --bot-password)     args="${args}-a " ;;
-    --email)            args="${args}-e " ;;
     --db-login)         args="${args}-d " ;;
     --db-password)      args="${args}-c " ;;
     --prg-login)        args="${args}-l " ;;
@@ -132,13 +126,10 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "k:p:b:a:e:s:d:c:l:m:g:x:w:t:fh" Option; do
+while getopts "b:a:s:d:c:l:m:g:x:w:t:fh" Option; do
   case ${Option} in
-    k) key=$OPTARG ;;           # Path to key for SVN
-    p) passphrase=$OPTARG ;;    # Passphrase for key
     b) bot_login=$OPTARG ;;     # Bot login
     a) bot_password=$OPTARG ;;  # Bot password
-    e) email=$OPTARG ;;         # Email
     d) db_login=$OPTARG ;;      # Login for DB
     c) db_password=$OPTARG ;;   # Password for DB
     l) prg_login=$OPTARG ;;     # Login for PRG
@@ -266,13 +257,12 @@ fi
 printf "Install packages:\n* "
 echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' #Replace space to newline
 echo "Checkout projects: ${checkout}"
-#echo "Install xDebug: ${xdebug}"
+echo "Install xDebug: ${xdebug}"
 echo "Workspace: ${win_workspace}"
 echo "Login for PRG: ${prg_login}"
 echo "Password for PRG: ${prg_password}"
 echo "Login for DB: ${db_login}"
 echo "Password for DB: ${db_password}"
-echo "Email: ${email}"
 echo "Host for trunk: ${host_trunk}"
 echo "Host for stable: ${host_stable}"
 echo
@@ -311,11 +301,6 @@ echo -e "${Purple}#----------------------------------------------------------#
 #----------------------------------------------------------#${NC}"
 apt-get -y install $software
 check_result $? "apt-get install failed"
-
-#Install xdebug
-if [ "$xdebug" == "yes" ]; then
-  apt-get -y install php-xdebug openssh-server
-fi
 
 dpkg -i $(curl -O -s -w '%{filename_effective}' ${libsvn1_17})
 dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
@@ -672,7 +657,7 @@ cp -a ${templates}/windows/selenium/ ${unix_workspace}
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Update Database                      #
 #----------------------------------------------------------#${NC}"
-max_attempt=10
+max_attempt=5
 i_attempt=0
 #Update DB
 for site in $(ls ${unix_workspace}/.htprivate); do
