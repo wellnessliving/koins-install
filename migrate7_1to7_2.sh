@@ -6,26 +6,12 @@ if [ "x$(id -u)" != 'x0' ]; then
   exit 1
 fi
 
-package_list=$(mktemp -p /tmp)
-dpkg --get-selections > ${package_list}
-if [ ! -z "$(grep php7.1 ${package_list})" ]; then
-  echo "PHP 7.1 is not installed."
-  exit 1
-fi
-
-if [ ! -z "$(grep php7.2 ${package_list})" ]; then
-  echo "PHP 7.2 is already installed."
-  exit 1
-fi
-
 add-apt-repository ppa:ondrej/php
 apt update
 
-software="php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip"
+software="php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-xdebug"
 
 apt-get -y install $software
-
-rm -f ${package_list}
 
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
