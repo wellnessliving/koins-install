@@ -9,7 +9,7 @@ fi
 add-apt-repository ppa:ondrej/php
 apt update
 
-software="php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-xdebug"
+software="php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip"
 
 apt-get -y install $software
 
