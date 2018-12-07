@@ -683,6 +683,7 @@ for site in $(ls ${unix_workspace}/.htprivate); do
     fi
     i_attempt=$((i_attempt+1))
   done
+  i_attempt=0
 
   echo "Update messages for ${site}"
   php ${options}/cli.php cms.message.update
