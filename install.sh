@@ -275,10 +275,10 @@ if [ "$answer" != 'y' ] && [ "$answer" != 'Y'  ]; then
 fi
 
 printf "Creating file structure: "
-mkdir -p ${unix_workspace}/{checkout,keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
+mkdir -p ${unix_workspace}/{keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
 
 for site in $(ls ${unix_workspace}/.htprivate); do
-  mkdir -p ${unix_workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}}
+  mkdir -p ${unix_workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var/selemium}}
 done
 echo "[OK]"
 
@@ -458,13 +458,13 @@ mysqladmin -u root password ${db_password}
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p${db_password} mysql
 
 echo "Checkouting templates files for configuring system"
-svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
+svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
 
 #path to templates
-templates=${unix_workspace}/checkout/reservationspot.com/install/templates
+templates=${unix_workspace}/install/templates
 
 if [ ! -d "$templates" ]; then
-  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/checkout/reservationspot.com/install
+  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
   if [ ! -d "$templates" ]; then
     check_result 1 "Error while checkouting templates"
   fi
@@ -546,21 +546,21 @@ if [ "$checkout" = 'yes' ]; then
 #----------------------------------------------------------#${NC}"
 
   #Shared
-  checkout_dialog "shared" "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/checkout/shared"
+  checkout_dialog "shared" "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
 
   #Trunk
-  checkout_dialog "[trunk]core" "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/checkout/core/trunk" #Core
-  checkout_dialog "[trunk]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/checkout/namespace/Core/trunk" #namespace.Core
-  checkout_dialog "[trunk]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/checkout/namespace/Social/trunk" #namespace.Social
-  checkout_dialog "[trunk]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/checkout/namespace/Wl/trunk" #namespace.Wl
-  checkout_dialog "[trunk]project" "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/checkout/reservationspot.com/trunk" #project
+  checkout_dialog "[trunk]core" "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
+  checkout_dialog "[trunk]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
+  checkout_dialog "[trunk]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" #namespace.Social
+  checkout_dialog "[trunk]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" #namespace.Wl
+  checkout_dialog "[trunk]project" "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
 
   #Stable
-  checkout_dialog "[stable]core" "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/checkout/core/servers/stable.wellnessliving.com" #Core
-  checkout_dialog "[stable]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/checkout/namespace/Core/servers/wl-stable" #namespace.Core
-  checkout_dialog "[stable]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/checkout/namespace/Social/servers/wl-stable" #namespace.Social
-  checkout_dialog "[stable]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/checkout/namespace/Wl/servers/stable" #namespace.Wl
-  checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/checkout/reservationspot.com/servers/stable" #project
+  checkout_dialog "[stable]core" "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
+  checkout_dialog "[stable]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
+  checkout_dialog "[stable]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" #namespace.Social
+  checkout_dialog "[stable]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" #namespace.Wl
+  checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" #project
 fi
 
 sed -e "
