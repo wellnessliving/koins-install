@@ -26,23 +26,8 @@ if "%ERRORLEVEL%"=="0" (
   goto CHECK_PHPSTORM
 )
 
-echo Creating Symlinks...
 @setlocal enableextensions
 @cd /d "%~dp0"
-
-rem Create symlinks for trunk
-mklink /d .\wl.trunk\core ..\checkout\core\trunk
-mklink /d .\wl.trunk\namespace.Core ..\checkout\namespace\Core\trunk
-mklink /d .\wl.trunk\namespace.Social ..\checkout\namespace\Social\trunk
-mklink /d .\wl.trunk\namespace.Wl ..\checkout\namespace\Wl\trunk
-mklink /d .\wl.trunk\project ..\checkout\reservationspot.com\trunk\
-
-rem Create symlinks for stable
-mklink /d .\wl.stable\core ..\checkout\core\servers\stable.wellnessliving.com
-mklink /d .\wl.stable\namespace.Core ..\checkout\namespace\Core\servers\wl-stable
-mklink /d .\wl.stable\namespace.Social ..\checkout\namespace\Social\servers\wl-stable
-mklink /d .\wl.stable\namespace.Wl ..\checkout\namespace\Wl\servers\stable
-mklink /d .\wl.stable\project ..\checkout\reservationspot.com\servers\stable
 
 echo Modifying hosts...
 set NEWLINE=^& echo.
@@ -63,7 +48,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 :SUBVERSION
-start /wait checkout/reservationspot.com/install/templates/windows/Setup-Subversion-1.7.9.msi
+start /wait install/templates/windows/Setup-Subversion-1.7.9.msi
 if %ERRORLEVEL% equ 1063 (
   echo Subversion already installed
 ) else (
@@ -88,7 +73,7 @@ echo When installing PuTTY, do not change the installation path.
 color
 pause
 
-start /wait checkout/reservationspot.com/install/templates/windows/putty-64bit-0.70-installer.msi
+start /wait install/templates/windows/putty-64bit-0.70-installer.msi
 if %ERRORLEVEL% neq 0 (
   if %ERRORLEVEL% equ 1602 (
     color 06
@@ -107,7 +92,7 @@ copy NUL install.bat.done
 
 echo Symlinks created.
 
-rem Go to folder with Putty and start plink.exe for save key.
+rem Go to folder with Putty and start plink.exe to save key.
 echo When you see:
 echo ( success ( 2 2 ( ) ( edit-pipeline svndiff1 absent-entries commit-revprops depth log-revprops atomic-revprops partial-replay inherited-props ephemeral-txnprops file-revs-reverse ) ) )
 echo Click Ctrl+C
