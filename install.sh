@@ -278,7 +278,7 @@ printf "Creating file structure: "
 mkdir -p ${unix_workspace}/{keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
 
 for site in $(ls ${unix_workspace}/.htprivate); do
-  mkdir -p ${unix_workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var/selemium}}
+  mkdir -p ${unix_workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}}
 done
 echo "[OK]"
 
