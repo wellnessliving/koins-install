@@ -16,17 +16,11 @@ Purple='\033[0;35m'       # Purple
 
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
-software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls dialog putty-tools libserf-1-1 jq"
-
-now="$(date +'%d_%m_%Y_%H_%M')"
-LOG_FILE="/root/install_${now}.log"
-
-subversion_17="http://launchpadlibrarian.net/161750374/subversion_1.7.14-1ubuntu2_amd64.deb" #Subversion 1.7 because SVN 1.8 not supported symlinks
-libsvn1_17="http://launchpadlibrarian.net/161750375/libsvn1_1.7.14-1ubuntu2_amd64.deb" #Dependence for Subversion 1.7
+software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion"
 
 # Defining return code check function
 check_result(){
-  if [ "$1" -ne 0 ]; then
+  if [[ "$1" -ne 0 ]]; then
     echo -e "${Red} Error: $2 ${NC}"
     exit "$1"
   fi
@@ -35,7 +29,7 @@ check_result(){
 # Defining function to set default value
 set_default_value() {
   eval variable=\$$1
-  if [ -z "$variable" ]; then
+  if [[ -z "$variable" ]]; then
     eval $1=$2
   fi
 }
@@ -44,38 +38,15 @@ set_default_value() {
 gen_pass() {
   MATRIX='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
   LENGTH=16
-  while [ ${n:=1} -le ${LENGTH} ]; do
+  while [[ ${n:=1} -le ${LENGTH} ]]; do
     PASS="$PASS${MATRIX:$(($RANDOM%${#MATRIX})):1}"
     let n+=1
   done
   echo "$PASS"
 }
 
-checkout_dialog()
-{
-  local title=$1
-  local source=$2
-  local destination=$3
-  ${DIALOG}  --keep-tite --backtitle "Subversion checkouting" --title "${title}" --gauge "Getting total file count... It will take some time." 7 120 < <(
-    n=$(svn info -R ${source} | grep "URL: " | uniq | wc -l)
-    i=1
-    while read line filename
-      do
-      COUNT=$(( 100*(++i)/n))
-      if [[ ${filename} = *"out revision"* ]]; then
-        COUNT=100
-      fi
-      echo "XXX"
-      echo "$COUNT"
-      echo "filename: $filename"
-      echo "XXX"
-
-    done < <(svn co ${source} ${destination})
-  )
-}
-
 # Defining help function
-help() {
+help_message() {
   echo -e "Usage: $0 [OPTIONS]
   -b, --bot-login           Bot login                      required
   -a, --bot-password        Bot password                   required
@@ -88,15 +59,15 @@ help() {
   -w, --workspace           Path to workspace              default: /mnt/c/Workspace
   -t, --trunk               Hostname for trunk             default: wellnessliving.local
   -s, --stable              Hostname for stable            default: stable.wellnessliving.local
+  -p, --production          Hostname for production
+  -k, --studio              Hostname for studio
   -f, --force               Force installing
   -h, --help                Print this help
 
-  Example simple: bash $0 --key /path/to/key --passphrase PassPhrase --bot-password BotLogin --bot-login BotPassword --email you@email.com
+  Example simple: bash $0 -bot-login BotPassword --bot-password BotLogin
   Use form to generate install command: http://output.jsbin.com/feguzef"
   exit 1
 }
-
-#exec 3>&1 1>>${LOG_FILE} 2>&1
 
 if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
@@ -117,6 +88,8 @@ for arg; do
     --workspace)        args="${args}-w " ;;
     --trunk)            args="${args}-t " ;;
     --stable)           args="${args}-s " ;;
+    --production)       args="${args}-p " ;;
+    --studio)           args="${args}-k " ;;
     --force)            args="${args}-f " ;;
     --help)             args="${args}-h " ;;
     *)                  [[ "${arg:0:1}" == "-" ]] || delimiter="\""
@@ -126,22 +99,24 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "b:a:s:d:c:l:m:g:x:w:t:fh" Option; do
+while getopts "b:a:s:k:p:d:c:l:m:g:x:w:t:fh" Option; do
   case ${Option} in
-    b) bot_login=$OPTARG ;;     # Bot login
-    a) bot_password=$OPTARG ;;  # Bot password
-    d) db_login=$OPTARG ;;      # Login for DB
-    c) db_password=$OPTARG ;;   # Password for DB
-    l) prg_login=$OPTARG ;;     # Login for PRG
-    m) prg_password=$OPTARG ;;  # Password for PRG
-    g) checkout=$OPTARG ;;      # Checkout projects
-    x) xdebug=$OPTARG ;;        # Checkout projects
-    w) workspace=$OPTARG ;;     # Path to workspace
-    t) host_trunk=$OPTARG ;;    # Hostname for trunk
-    s) host_stable=$OPTARG ;;   # Hostname for stable
-    f) force='yes' ;;           # Force installation
-    h) help ;;                  # Help
-    *) help ;;                  # Print help (default)
+    b) bot_login=$OPTARG ;;        # Bot login
+    a) bot_password=$OPTARG ;;     # Bot password
+    d) db_login=$OPTARG ;;         # Login for DB
+    c) db_password=$OPTARG ;;      # Password for DB
+    l) prg_login=$OPTARG ;;        # Login for PRG
+    m) prg_password=$OPTARG ;;     # Password for PRG
+    g) checkout=$OPTARG ;;         # Checkout projects
+    x) xdebug=$OPTARG ;;           # Checkout projects
+    w) workspace=$OPTARG ;;        # Path to workspace
+    t) host_trunk=$OPTARG ;;       # Hostname for trunk
+    s) host_stable=$OPTARG ;;      # Hostname for stable
+    p) host_production=$OPTARG ;;  # Hostname for production
+    k) host_studio=$OPTARG ;;      # Hostname for studio
+    f) force='yes' ;;              # Force installation
+    h) help_message ;;             # Help
+    *) help_message ;;             # Print help (default)
   esac
 done
 
@@ -157,38 +132,46 @@ set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
 
 printf "Checking root permissions: "
-if [ "x$(id -u)" != 'x0' ]; then
+if [[ "x$(id -u)" != 'x0' ]]; then
   check_result 1 "Script can be run executed only by root"
 fi
 echo "[OK]"
 
-if [ "${host_trunk}" == "${host_stable}" ]; then
-  check_result 1 "Host for trunk and host for stable should not be equal."
+if [[ "${host_trunk}" == "${host_stable}" ]] || [[ "${host_trunk}" == "${host_production}" ]] || [[ "${host_trunk}" == "${host_studio}" ]]; then
+  check_result 1 "You should be use different hostname each site."
+fi
+
+if [[ "${host_stable}" == "${host_production}" ]] || [[ "${host_stable}" == "${host_studio}" ]]; then
+  check_result 1 "You should be use different hostname each site."
+fi
+
+if [[ "${host_production}" == "${host_studio}" ]]; then
+  check_result 1 "You should be use different hostname each site."
 fi
 
 printf "Checking set argument --bot-login: "
-if [ ! -n "${bot_login}" ]; then
+if [[ ! -n "${bot_login}" ]]; then
   check_result 1 "Bot login not set. Try 'bash $0 --help' for more information."
 fi
 echo "[OK]"
 
 printf "Checking set argument --bot-password: "
-if [ ! -n "${bot_password}" ]; then
+if [[ ! -n "${bot_password}" ]]; then
   check_result 1 "Bot password not set. Try 'bash $0 --help' for more information."
 fi
 echo "[OK]"
 
 printf "Checking set argument --db-login: "
-if [ ! -n "${db_login}" ]; then
+if [[ ! -n "${db_login}" ]]; then
   check_result 1 "DB login not set or empty. Try 'bash $0 --help' for more information."
 fi
-if [ "${db_login}" == "root" ]; then
+if [[ "${db_login}" == "root" ]]; then
   check_result 1 "DB login must not be root. Try 'bash $0 --help' for more information."
 fi
 echo "[OK]"
 
 printf "Checking set argument --db-password: "
-if [ ! -n "${db_password}" ]; then
+if [[ ! -n "${db_password}" ]]; then
   check_result 1 "DB password not set or empty. Try 'bash $0 --help' for more information."
 fi
 echo "[OK]"
@@ -196,27 +179,28 @@ echo "[OK]"
 unix_workspace=$(echo "${workspace}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
 win_workspace=$(echo "${unix_workspace}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
 
-if [ $(echo "${unix_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
+if [[ $(echo ${unix_workspace: -1}) == "/" ]]; then
   unix_workspace=${unix_workspace::-1}
 fi
 
-if [ $(echo "${win_workspace}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
+if [[ $(echo ${win_workspace: -1}) == "\\" ]]; then
   win_workspace=${win_workspace::-1}
 fi
 win_workspace_slash=$(echo "${win_workspace}" | sed -e 's|\\|\\\\|g')
 
 printf "Checking path workspace: "
-if [ -d "${unix_workspace:0:6}" ]; then #workspace=/mnt/c/Workspace   ${workspace:0:6}=> /mnt/c
+if [[ -d "${unix_workspace:0:6}" ]]; then #workspace=/mnt/c/Workspace   ${workspace:0:6}=> /mnt/c
   mkdir -p -v ${unix_workspace}
-  if [ ! -z "$(ls -A ${unix_workspace})" ]; then
-    if [ "$checkout" == "yes" ]; then
-      if [ -z "$force" ]; then
+  if [[ ! -z "$(ls -A ${unix_workspace})" ]]; then
+    if [[ "$checkout" == "yes" ]]; then
+      if [[ -z "$force" ]]; then
         echo -e "${Red} Directory ${win_workspace} not empty. Please cleanup folder ${win_workspace} ${NC} or use argument --force for automatic cleanup"
         exit 1
       fi
+      echo -e "${Red}Force installing${NC}"
       # Asking for confirmation to proceed
       read -p 'Would you like to clean up workspace folder [y/n]: ' answer
-      if [ "$answer" != 'n' ] && [ "$answer" != 'n'  ]; then
+      if [[ "$answer" != 'y' ]] && [[ "$answer" != 'Y'  ]]; then
         echo -e 'Goodbye'
         exit 1
       fi
@@ -234,14 +218,14 @@ echo "Checking installed packages..."
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
 for pkg in mysql-server apache2 php7.1; do
-  if [ ! -z "$(grep ${pkg} ${tmpfile})" ]; then
+  if [[ ! -z "$(grep ${pkg} ${tmpfile})" ]]; then
     conflicts="$pkg $conflicts"
   fi
 done
 rm -f ${tmpfile}
 
 #Conflict checking
-if [ ! -z "$conflicts" ] && [ -z "$force" ]; then
+if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]]; then
   echo -e "${Yellow} !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!"
   echo
   echo -e "Following packages are already installed:"
@@ -265,25 +249,52 @@ echo "Login for DB: ${db_login}"
 echo "Password for DB: ${db_password}"
 echo "Host for trunk: ${host_trunk}"
 echo "Host for stable: ${host_stable}"
+echo "Host for production: ${host_production}"
+echo "Host for studio: ${host_studio}"
 echo
 
 # Asking for confirmation to proceed
 read -p 'Would you like to continue [y/n]: ' answer
-if [ "$answer" != 'y' ] && [ "$answer" != 'Y'  ]; then
+if [[ "$answer" != 'y' ]] && [[ "$answer" != 'Y'  ]]; then
   echo -e 'Goodbye'
   exit 1
 fi
 
-printf "Creating file structure: "
-mkdir -p ${unix_workspace}/{keys,.htprivate/{${host_trunk},${host_stable}},wl.trunk,wl.stable,public_html/{a/drive,static}}
+a_site="wl.trunk wl.stable"
 
-for site in $(ls ${unix_workspace}/.htprivate); do
-  mkdir -p ${unix_workspace}/.htprivate/${site}/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}}
+printf "Creating file structure: "
+
+#Folders for production
+if [[ ! -z "$host_production" ]]; then
+  a_site+=" wl.production"
+fi
+
+#Folders for studio
+if [[ ! -z "$host_studio" ]]; then
+  a_site+=" studio.trunk"
+fi
+
+mkdir -p ${unix_workspace}/keys
+
+for project in ${a_site}; do
+  mkdir -p ${unix_workspace}/${project}/{.htprivate/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}},public_html/{a/drive,static}}
 done
+
 echo "[OK]"
 
 echo "Adding php repository..."
 add-apt-repository ppa:ondrej/php -y
+
+# Temporary commented because can not install mysql 8
+# echo "Adding mysql 8 repository..."
+# wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
+# dpkg -i mysql-apt-config_0.8.10-1_all.deb
+
+# Add because without this command show warning:
+# Warning: apt-key should not be used in scripts (called from postinst maintainerscript of the package mysql-apt-config)
+# See: https://askubuntu.com/questions/1120363/mysql-ppa-invalid-signature
+# See: https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
+# apt-key adv --keyserver keys.gnupg.net --recv-keys 5072E1F5
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                  Update system packages                 #
@@ -299,20 +310,15 @@ check_result $? 'apt-get upgrade failed'
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
-apt-get -y install $software
+apt-get -y install ${software}
 check_result $? "apt-get install failed"
-
-dpkg -i $(curl -O -s -w '%{filename_effective}' ${libsvn1_17})
-dpkg -i $(curl -O -s -w '%{filename_effective}' ${subversion_17})
-
-DIALOG=${DIALOG=dialog}
 
 tmp_repository_file=$(mktemp -p /tmp)
 curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Key.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}&s_repository=libs" -o ${tmp_repository_file}
 
 status=`jq -M -r '.status' ${tmp_repository_file}`
 
-if [ "$status" != 'ok' ]; then
+if [[ "$status" != 'ok' ]]; then
   message=`jq -M -r '.message' ${tmp_repository_file}`
   echo "Error getting repository key: ${message}"
   echo "Status: ${status}"
@@ -326,12 +332,12 @@ passphrase=`jq -M '.s_password' ${tmp_repository_file}`
 tmp_repository_key=$(mktemp -p /tmp)
 tmp_repository_passphrase=$(mktemp -p /tmp)
 
-echo ${private_key} > $tmp_repository_key
-sed -i 's/\\n/\n/g' $tmp_repository_key
-sed -i 's/"//g' $tmp_repository_key
+echo ${private_key} > ${tmp_repository_key}
+sed -i 's/\\n/\n/g' ${tmp_repository_key}
+sed -i 's/"//g' ${tmp_repository_key}
 
-echo ${passphrase} > $tmp_repository_passphrase
-sed -i 's/"//g' $tmp_repository_passphrase
+echo ${passphrase} > ${tmp_repository_passphrase}
+sed -i 's/"//g' ${tmp_repository_passphrase}
 
 cp ${tmp_repository_key} ${unix_workspace}/keys/libs.key
 key=${unix_workspace}/keys/libs.key
@@ -344,22 +350,22 @@ rm -f ${tmp_repository_file}
 unix_key=$(echo "${key}" | sed -e 's|\\|/|g' -e 's|^\([A-Za-z]\)\:/\(.*\)|/mnt/\L\1\E/\2|')
 win_key=$(echo "${unix_key}" | sed -e 's|^/mnt/\([A-Za-z]\)/\(.*\)|\U\1:\E/\2|' -e 's|/|\\|g')
 
-if [ $(echo "${unix_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "/" ]; then
+if [[ $(echo ${unix_key: -1}) == "/" ]]; then
   unix_key=${unix_key::-1}
 fi
 
-if [ $(echo "${win_key}" | sed 's/^.*\(.\{1\}\)$/\1/') = "\\" ]; then
+if [[ $(echo ${win_key: -1}) == "\\" ]]; then
   win_key=${win_key::-1}
 fi
 
 printf "Checking set argument --key: "
-if [ -n "${unix_key}" ]; then
-  if [ ! -f ${unix_key} ]; then
+if [[ -n "${unix_key}" ]]; then
+  if [[ ! -f ${unix_key} ]]; then
     check_result 1 "No such key file"
   fi
   echo "[OK]"
   printf "Checking set argument --passphrase: "
-  if [ -n "${passphrase}" ]; then
+  if [[ -n "${passphrase}" ]]; then
     echo "[OK]"
     echo "Decrypting key..."
     mkdir -p /root/.ssh
@@ -380,7 +386,7 @@ curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Detail/Detail.json' -
 
 status=`jq -M -r '.status' ${tmp_user_file}`
 
-if [ "$status" != 'ok' ]; then
+if [[ "$status" != 'ok' ]]; then
   message=`jq -M -r '.message' ${tmp_user_file}`
   echo "Error getting repository key: ${message}"
   echo "Status: ${status}"
@@ -395,12 +401,16 @@ echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
 
+#Add option AcceptFilter to config Apache and restart apache2
+echo -e "
+AcceptFilter http none" >> /etc/apache2/apache2.conf
+
 #Start all service
 service apache2 start
 service memcached start
 
 #Configure xdebug
-if [ "$xdebug" == "yes" ]; then
+if [[ "$xdebug" == "yes" ]]; then
   apt-get -y install php-xdebug openssh-server
   dpkg-reconfigure openssh-server
 
@@ -463,16 +473,16 @@ svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspac
 #path to templates
 templates=${unix_workspace}/install/templates
 
-if [ ! -d "$templates" ]; then
+if [[ ! -d "$templates" ]]; then
   svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
-  if [ ! -d "$templates" ]; then
+  if [[ ! -d "$templates" ]]; then
     check_result 1 "Error while checkouting templates"
   fi
 fi
 
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
-if [ ! -z "$(grep php7.3-cli ${tmpfile})" ]; then
+if [[ ! -z "$(grep php7.3-cli ${tmpfile})" ]]; then
   apt-get purge php7.3-cli -y
 fi
 
@@ -494,16 +504,21 @@ mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables
 
 sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php
 
-#Add option AcceptFilter to config Apache and restart apache2
-echo -e "
-AcceptFilter http none" >> /etc/apache2/apache2.conf
-service apache2 restart
-
 #Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
 
-#Create script to dump DB
-sed -e "s;%workspace%;${unix_workspace};g" ${templates}/sh/dump.sh > /root/dump.sh
+#Create script to dump DB and restore db.
+sed -e "
+s;%workspace%;${unix_workspace};g
+s;%mysql_user%;${db_login};g
+s;%mysql_password%;${db_password};g
+" ${templates}/sh/dump.sh > /root/dump.sh
+
+sed -e "
+s;%workspace%;${unix_workspace};g
+s;%mysql_user%;${db_login};g
+s;%mysql_password%;${db_password};g
+" ${templates}/sh/restore.sh > /root/restore.sh
 crudini --set ~/.my.conf mysqldump user root
 crudini --set ~/.my.conf mysqldump password "${db_password}"
 
@@ -513,66 +528,94 @@ a2enconf phpmyadmin
 
 #Setting config apache for site
 PATH_APACHE="/etc/apache2/sites-available"
-document_root=${unix_workspace}/public_html
 
-sed -e "s;%server_alias%;${host_trunk};g" -e "s;%document_root%;${document_root};g" ${templates}/apache2/site.conf > "${PATH_APACHE}/${host_trunk}.conf"
-a2ensite "${host_trunk}.conf"
+for project in ${a_site}; do
+  document_root=${unix_workspace}/${project}/public_html
 
-sed -e "s;%server_alias%;${host_stable};g" -e "s;%document_root%;${document_root};g" ${templates}/apache2/site.conf > "${PATH_APACHE}/${host_stable}.conf"
-a2ensite "${host_stable}.conf"
+  if [[ "$project" == "wl.trunk" ]]; then
+    host=${host_trunk}
+  elif [[ "$project" == "wl.stable" ]]; then
+    host=${host_stable}
+  elif [[ "$project" == "wl.production" ]]; then
+    host=${host_production}
+  elif [[ "$project" == "studio.trunk" ]]; then
+    host=${host_studio}
+  fi
+
+  sed -e "s;%server_alias%;${host};g" -e "s;%document_root%;${document_root};g" ${templates}/apache2/site.conf > "${PATH_APACHE}/${host}.conf"
+  a2ensite "${host}.conf"
+done
 
 #Create new DB user
 mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
 
 a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+
+mysql -uroot -p${db_password} -e "create database a_geo;"
+mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+
 #Creating databases
-for project in trunk stable; do
-  mysql -uroot -p${db_password} -e "create database ${project}_wl_main;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_main.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_wl_geo;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_geo.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_wl_control;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_wl_control.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_test_main;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_main.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "create database ${project}_test_geo;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_test_geo.* to '${db_login}'@'localhost';"
+for project in ${a_site}; do
+  project=$(echo "$project" | sed -r 's/\./_/g')
+  for db_name in main control test_main test_geo; do
+    mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
+    mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
+  done
 done
 mysql -uroot -p${db_password} -e "flush privileges;"
 
-if [ "$checkout" = 'yes' ]; then
+if [[ "$checkout" = 'yes' ]]; then
   echo -e "${Purple}#----------------------------------------------------------#
 #                    Checkout projects                     #
 #----------------------------------------------------------#${NC}"
 
   #Shared
-  checkout_dialog "shared" "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
+  svn co "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
 
   #Trunk
-  checkout_dialog "[trunk]core" "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
-  checkout_dialog "[trunk]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
-  checkout_dialog "[trunk]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" #namespace.Social
-  checkout_dialog "[trunk]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" #namespace.Wl
-  checkout_dialog "[trunk]project" "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
+  svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
+  svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
+  svn co "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" #namespace.Social
+  svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" #namespace.Wl
+  svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
 
   #Stable
-  checkout_dialog "[stable]core" "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
-  checkout_dialog "[stable]namespace.Core" "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
-  checkout_dialog "[stable]namespace.Social" "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" #namespace.Social
-  checkout_dialog "[stable]namespace.Wl" "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" #namespace.Wl
-  checkout_dialog "[stable]project" "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" #project
+  svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
+  svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
+  svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" #namespace.Social
+  svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" #namespace.Wl
+  svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" #project
+
+  if [[ ! -z "$host_production" ]]; then
+    #Production
+    svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" #Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-production" "${unix_workspace}/wl.production/namespace.Core" #namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-production" "${unix_workspace}/wl.production/namespace.Social" #namespace.Social
+    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${unix_workspace}/wl.production/namespace.Wl" #namespace.Wl
+    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${unix_workspace}/wl.production/project" #project
+  fi
+
+  if [[ ! -z "$host_studio" ]]; then
+    #Studio
+    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/studio.trunk/core" #Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" #namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" #namespace.Studio
+    svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" #project
+  fi
 fi
 
 sed -e "
 s;{host_trunk};${host_trunk};g
 s;{host_stable};${host_stable};g
+s;{host_production};${host_production};g
+s;{host_studio};${host_studio};g
 s;{workspace};${win_workspace_slash};g
 " ${templates}/windows/install.bat > "${unix_workspace}/install.bat"
 
 # Creating link
 echo -e "Open the workspace folder: '${Yellow}${win_workspace}${NC}' and run file '${Yellow}install.bat${NC}' as admin."
 echo -e "Wait for run file..."
-while [ ! -f "${unix_workspace}/install.bat.done" ];
+while [[ ! -f "${unix_workspace}/install.bat.done" ]];
 do
   sleep 2
 done
@@ -582,47 +625,62 @@ echo -e "${Purple}#----------------------------------------------------------#
 #                  Setting default files                   #
 #----------------------------------------------------------#${NC}"
 
-path_htprivate="${unix_workspace}/.htprivate/"
+for project in ${a_site}; do
+  path_htprivate="${unix_workspace}/${project}/.htprivate"
 
-#public_html/index.php
-sed -e "
-s;%path_htprivate%;${path_htprivate};g
-s;%host_trunk%;${host_trunk};g
-s;%host_stable%;${host_stable};g
-" ${templates}/public_html/index.php > "${unix_workspace}/public_html/index.php"
+  ALL_MAIN="rs"
+  s_addr_template=${templates}/options/addr.wl.php
+  s_db_template=${templates}/options/db.wl.php
+  s_config_template=${templates}/.config/a.test.wl.php
+  if [[ "$project" == "wl.trunk" ]]; then
+    host=${host_trunk}
+    CLASS_INITIALIZE="\\\Wl\\\Config\\\ConfigTrunkDeveloper"
+  elif [[ "$project" == "wl.stable" ]]; then
+    host=${host_stable}
+    CLASS_INITIALIZE="\\\Wl\\\Config\\\ConfigStableDeveloper"
+  elif [[ "$project" == "wl.production" ]]; then
+    host=${host_production}
+    CLASS_INITIALIZE="\\\Wl\\\Config\\\ConfigProductionDeveloper"
+  elif [[ "$project" == "studio.trunk" ]]; then
+    host=${host_studio}
+    ALL_MAIN="studio"
+    s_addr_template=${templates}/options/addr.studio.php
+    s_config_template=${templates}/.config/a.test.studio.php
+    s_db_template=${templates}/options/db.studio.php
+  fi
 
-#public_html/.htaccess
-sed -e "
-s;%workspace%;${unix_workspace};g
-s;%host_trunk%;${host_trunk};g
-" ${templates}/public_html/.htaccess > "${unix_workspace}/public_html/.htaccess"
+  #public_html/index.php
+  sed -e "
+  s;%path_htprivate%;${path_htprivate};g
+  " ${templates}/public_html/index.php > "${unix_workspace}/${project}/public_html/index.php"
 
-#public_html/favicon.ico
-cp ${templates}/public_html/favicon.ico "${unix_workspace}/public_html/favicon.ico"
+  #public_html/.htaccess
+  sed -e "
+  s;%workspace%;${unix_workspace};g
+  s;%project%;${project};g
+  " ${templates}/public_html/.htaccess > "${unix_workspace}/${project}/public_html/.htaccess"
 
-#Options
-for site in $(ls ${unix_workspace}/.htprivate); do
-  cp ${templates}/options/options.php ${unix_workspace}/.htprivate/${site}/options/options.php
-  cp ${templates}/options/inc.php ${unix_workspace}/.htprivate/${site}/options/inc.php
-  cp ${templates}/options/cli.php ${unix_workspace}/.htprivate/${site}/options/cli.php
-done
+  #public_html/favicon.ico
+  cp ${templates}/public_html/favicon.ico "${unix_workspace}/${project}/public_html/favicon.ico"
 
-for site in $(ls ${unix_workspace}/.htprivate); do
-  [ ${site} == ${host_trunk} ] && project="trunk" || project="stable"
-  [ ${project} = "trunk" ] && ADDR_URL_SERVER=${host_trunk} || ADDR_URL_SERVER=${host_stable}
+  cp ${templates}/options/options.php ${unix_workspace}/${project}/.htprivate/options/options.php
+  cp ${templates}/options/inc.php ${unix_workspace}/${project}/.htprivate/options/inc.php
+  cp ${templates}/options/cli.php ${unix_workspace}/${project}/.htprivate/options/cli.php
 
-  ADDR_PATH_TOP="${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/"
-  ADDR_PATH_WORKSPACE="${unix_workspace}/wl.${project}/"
+  ADDR_PATH_TOP="${path_htprivate}/"
+  ADDR_PATH_WORKSPACE="${unix_workspace}/${project}/"
   A_TEST_XML_XSD="${unix_workspace}/shared/xsd/"
   ADDR_SECRET=$(gen_pass)
-  PATH_PUBLIC="${unix_workspace}/public_html/"
-  path_config=${ADDR_PATH_WORKSPACE}/project/.config
+  PATH_PUBLIC="${unix_workspace}/${project}/public_html/"
+  path_config=${unix_workspace}/${project}/project/.config
   mkdir -p -v ${path_config}
 
   #options/addr.php
   sed -e "
+  s;%ALL_MAIN%;${ALL_MAIN};g
   s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
   s;%ADDR_PATH_WORKSPACE%;${ADDR_PATH_WORKSPACE};g
+  s;%CLASS_INITIALIZE%;${CLASS_INITIALIZE};g
   s;%A_TEST_XML_XSD%;${A_TEST_XML_XSD};g
   s;%ADDR_SECRET%;${ADDR_SECRET};g
   s;%email%;${email};g
@@ -630,28 +688,32 @@ for site in $(ls ${unix_workspace}/.htprivate); do
   s;%bot_password%;${bot_password};g
   s;%prg_login%;${prg_login};g
   s;%prg_password%;${prg_password};g
-  s;%ADDR_URL_SERVER%;${ADDR_URL_SERVER};g
+  s;%ADDR_URL_SERVER%;${host};g
   s;%PATH_PUBLIC%;${PATH_PUBLIC};g
-  " ${templates}/options/addr.php > "${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/options/addr.php"
+  " ${s_addr_template} > "${path_htprivate}/options/addr.php"
+
+
+  project_db=$(echo "$project" | sed -r 's/\./_/g')
 
   #options/db.php
   sed -e "
   s;%db_login%;${db_login};g
   s;%db_password%;${db_password};g
-  s;%project%;${project};g
-  " ${templates}/options/db.php > "${unix_workspace}/.htprivate/${ADDR_URL_SERVER}/options/db.php"
+  s;%project%;${project_db};g
+  " ${s_db_template} > "${path_htprivate}/options/db.php"
 
   #.config/a.test.php
   sed -e "
   s;%db_login%;${db_login};g
   s;%db_password%;${db_password};g
-  s;%project%;${project};g
+  s;%project%;${project_db};g
   s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
-  " ${templates}/.config/a.test.php > "${path_config}/a.test.php"
+  " ${s_config_template} > "${path_config}/a.test.php"
 
   #.config/amazon.php
   cp ${templates}/.config/amazon.php "${path_config}/amazon.php"
 done
+
 cp -a ${templates}/windows/selenium/ ${unix_workspace}
 
 echo -e "${Purple}#----------------------------------------------------------#
@@ -660,33 +722,40 @@ echo -e "${Purple}#----------------------------------------------------------#
 max_attempt=5
 i_attempt=0
 #Update DB
-for site in $(ls ${unix_workspace}/.htprivate); do
-  options=${unix_workspace}/.htprivate/${site}/options
+for project in ${a_site}; do
+  options=${unix_workspace}/${project}/.htprivate/options
 
-  echo "Update main DB for ${site}"
-  while [ ${i_attempt} -lt ${max_attempt} ];
+  echo "Clearing cache for ${project}"
+  php ${options}/cli.php cms.cache.clear
+  rm -rf ${unix_workspace}/${project}/.htprivate/writable/cache
+
+  echo "Update main DB for ${project}"
+  while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
     php ${options}/cli.php db.update #Main
-    if [ "$?" -eq 0 ]; then
+    if [[ "$?" -eq 0 ]]; then
       break
     fi
     i_attempt=$((i_attempt+1))
   done
 
   i_attempt=0
-  echo "Update test DB for ${site}"
-  while [ ${i_attempt} -lt ${max_attempt} ];
+  echo "Update test DB for ${project}"
+  while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
     php ${options}/cli.php db.update a #Test
-    if [ "$?" -eq 0 ]; then
+    if [[ "$?" -eq 0 ]]; then
       break
     fi
     i_attempt=$((i_attempt+1))
   done
   i_attempt=0
 
-  echo "Update messages for ${site}"
+  echo "Update messages for ${project}"
   php ${options}/cli.php cms.message.update
+
+  echo "Generating CSS and JS...";
+  php ${unix_workspace}/install/static.php ${unix_workspace}/${project}/.htprivate
 done
 
 #Add service to start system
@@ -703,34 +772,17 @@ service memcached restart
 echo -e "${Green}
 Installation finished successfully.
 
-Created domains(rules have been added to the Windows hosts):
-
-    ${host_trunk}
-    ${host_stable}
-
 Programmer's page(PRG):
 
-    http://${host_trunk}/prg
-    http://${host_stable}/prg
-    username: ${prg_login}
-    password: ${prg_password}
+    PRG username: ${prg_login}
+    PRG password: ${prg_password}
 
 PHPMyAdmin:
 
     http://localhost/phpmyadmin
     username: ${db_login}
     password: ${db_password}
-
-MySQL create databases:"
-
-for project in trunk stable; do
-    echo -e "    ${project}_wl_main
-    ${project}_wl_geo
-    ${project}_wl_control
-    ${project}_test_main
-    ${project}_test_geo
 "
-done
 
 echo -e "Created script:
 
