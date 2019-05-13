@@ -754,8 +754,8 @@ for project in ${a_site}; do
   echo "Update messages for ${project}"
   php ${options}/cli.php cms.message.update
 
-  echo "Generating CSS and JS...";
-  php ${unix_workspace}/install/static.php ${unix_workspace}/${project}/.htprivate
+#  echo "Generating CSS and JS...";
+#  php ${unix_workspace}/install/static.php ${unix_workspace}/${project}/.htprivate
 done
 
 #Add service to start system
