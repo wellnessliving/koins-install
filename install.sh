@@ -137,9 +137,9 @@ if [[ "x$(id -u)" != 'x0' ]]; then
 fi
 echo "[OK]"
 
-if [[ "${host_trunk}" == "${host_stable}" ]] || [[ "${host_trunk}" == "${host_production}" ]] || [[ "${host_trunk}" == "${host_studio}" ]]; then
-  check_result 1 "You should be use different hostname each site."
-fi
+# if [[ "${host_trunk}" == "${host_stable}" ]] || [[ "${host_trunk}" == "${host_production}" ]] || [[ "${host_trunk}" == "${host_studio}" ]]; then
+#   check_result 1 "You should be use different hostname each site."
+# fi
 
 # if [[ "${host_stable}" == "${host_production}" ]] || [[ "${host_stable}" == "${host_studio}" ]]; then
 #   check_result 1 "You should be use different hostname each site."
