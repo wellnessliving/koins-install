@@ -138,15 +138,15 @@ fi
 echo "[OK]"
 
 if [[ "${host_trunk}" == "${host_stable}" ]] || [[ "${host_trunk}" == "${host_production}" ]] || [[ "${host_trunk}" == "${host_studio}" ]]; then
-  check_result 1 "You must use different hostname for each site."
+  check_result 1 "You must use different hostnames for each site."
 fi
 
 if [[ "${host_stable}" == "${host_production}" ]] || [[ "${host_stable}" == "${host_studio}" ]]; then
-  check_result 1 "You must use different hostname for each site."
+  check_result 1 "You must use different hostnames for each site."
 fi
 
 if [[ ! -z "$host_production" ]] && [[ ! -z "$host_studio" ]] && [[ "${host_production}" == "${host_studio}" ]]; then
-  check_result 1 "You must use different hostname for each site."
+  check_result 1 "You must use different hostnames for each site."
 fi
 
 printf "Checking set argument --bot-login: "
