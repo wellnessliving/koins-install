@@ -149,13 +149,6 @@ if [[ ! -z "$host_production" ]] && [[ ! -z "$host_studio" ]] && [[ "${host_prod
   check_result 1 "You must use different hostname for each site."
 fi
 
-echo ${host_trunk}
-echo ${host_stable}
-echo ${host_production}
-echo ${host_studio}
-
-exit;
-
 printf "Checking set argument --bot-login: "
 if [[ ! -n "${bot_login}" ]]; then
   check_result 1 "Bot login not set. Try 'bash $0 --help' for more information."
