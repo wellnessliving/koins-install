@@ -480,6 +480,8 @@ if [[ ! -d "$templates" ]]; then
   fi
 fi
 
+git clone https://github.com/wellnessliving/wl-sdk.git ${unix_workspace}/wl-sdk
+
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
 if [[ ! -z "$(grep php7.3-cli ${tmpfile})" ]]; then
@@ -680,6 +682,7 @@ for project in ${a_site}; do
   s;%ALL_MAIN%;${ALL_MAIN};g
   s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
   s;%ADDR_PATH_WORKSPACE%;${ADDR_PATH_WORKSPACE};g
+  s;%WORKSPACE%;${unix_workspace};g
   s;%CLASS_INITIALIZE%;${CLASS_INITIALIZE};g
   s;%A_TEST_XML_XSD%;${A_TEST_XML_XSD};g
   s;%ADDR_SECRET%;${ADDR_SECRET};g
