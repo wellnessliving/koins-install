@@ -90,6 +90,7 @@ for arg; do
     --stable)           args="${args}-s " ;;
     --production)       args="${args}-p " ;;
     --studio)           args="${args}-k " ;;
+    --fresh-install)    args="${args}-n " ;;
     --force)            args="${args}-f " ;;
     --help)             args="${args}-h " ;;
     *)                  [[ "${arg:0:1}" == "-" ]] || delimiter="\""
@@ -99,7 +100,7 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "b:a:s:k:p:d:c:l:m:g:x:w:t:fh" Option; do
+while getopts "b:a:s:k:p:d:c:n:l:m:g:x:w:t:fh" Option; do
   case ${Option} in
     b) bot_login=$OPTARG ;;        # Bot login
     a) bot_password=$OPTARG ;;     # Bot password
@@ -114,6 +115,7 @@ while getopts "b:a:s:k:p:d:c:l:m:g:x:w:t:fh" Option; do
     s) host_stable=$OPTARG ;;      # Hostname for stable
     p) host_production=$OPTARG ;;  # Hostname for production
     k) host_studio=$OPTARG ;;      # Hostname for studio
+    n) fresh_install=$OPTARG ;;    # Fresh install
     f) force='yes' ;;              # Force installation
     h) help_message ;;             # Help
     *) help_message ;;             # Print help (default)
@@ -126,6 +128,7 @@ set_default_value 'db_password' 'lkchpy91'
 set_default_value 'prg_login' 'admin'
 set_default_value 'prg_password' '1'
 set_default_value 'checkout' 'yes'
+set_default_value 'fresh_install' 'yes'
 set_default_value 'xdebug' 'no'
 set_default_value 'workspace' '/mnt/c/Workspace'
 set_default_value 'host_trunk' 'wellnessliving.local'
@@ -225,7 +228,7 @@ done
 rm -f ${tmpfile}
 
 #Conflict checking
-if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]]; then
+if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]] && [[ "$fresh_install" == "yes" ]]; then
   echo -e "${Yellow} !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!"
   echo
   echo -e "Following packages are already installed:"
@@ -238,10 +241,13 @@ if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]]; then
   check_result 1 "System should be installed on clean server."
 fi
 
-printf "Install packages:\n* "
-echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' #Replace space to newline
+if [[ "$fresh_install" == "yes" ]]; then
+  printf "Install packages:\n* "
+  echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' #Replace space to newline
+  echo "Install xDebug: ${xdebug}"
+fi
+
 echo "Checkout projects: ${checkout}"
-echo "Install xDebug: ${xdebug}"
 echo "Workspace: ${win_workspace}"
 echo "Login for PRG: ${prg_login}"
 echo "Password for PRG: ${prg_password}"
@@ -260,9 +266,18 @@ if [[ "$answer" != 'y' ]] && [[ "$answer" != 'Y'  ]]; then
   exit 1
 fi
 
-a_site="wl.trunk wl.stable"
+a_site=""
 
-printf "Creating file structure: "
+
+#Folders for production
+if [[ ! -z "$host_trunk" ]]; then
+  a_site+=" wl.trunk"
+fi
+
+#Folders for studio
+if [[ ! -z "$host_stable" ]]; then
+  a_site+=" wl.stable"
+fi
 
 #Folders for production
 if [[ ! -z "$host_production" ]]; then
@@ -274,6 +289,12 @@ if [[ ! -z "$host_studio" ]]; then
   a_site+=" studio.trunk"
 fi
 
+if [[ ! -n "${a_site}" ]]; then
+  check_result 1 "You must select at least one site."
+fi
+
+printf "Creating file structure: "
+
 mkdir -p ${unix_workspace}/keys
 
 for project in ${a_site}; do
@@ -282,30 +303,32 @@ done
 
 echo "[OK]"
 
-echo "Adding php repository..."
-add-apt-repository ppa:ondrej/php -y
+if [[ "$fresh_install" == "yes" ]]; then
+  echo "Adding php repository..."
+  add-apt-repository ppa:ondrej/php -y
 
-# Temporary commented because can not install mysql 8
-# echo "Adding mysql 8 repository..."
-# wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-# dpkg -i mysql-apt-config_0.8.10-1_all.deb
+  # Temporary commented because can not install mysql 8
+  # echo "Adding mysql 8 repository..."
+  # wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
+  # dpkg -i mysql-apt-config_0.8.10-1_all.deb
 
-# Add because without this command show warning:
-# Warning: apt-key should not be used in scripts (called from postinst maintainerscript of the package mysql-apt-config)
-# See: https://askubuntu.com/questions/1120363/mysql-ppa-invalid-signature
-# See: https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
-# apt-key adv --keyserver keys.gnupg.net --recv-keys 5072E1F5
+  # Add because without this command show warning:
+  # Warning: apt-key should not be used in scripts (called from postinst maintainerscript of the package mysql-apt-config)
+  # See: https://askubuntu.com/questions/1120363/mysql-ppa-invalid-signature
+  # See: https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
+  # apt-key adv --keyserver keys.gnupg.net --recv-keys 5072E1F5
 
-echo -e "${Purple}#----------------------------------------------------------#
-#                  Update system packages                 #
-#----------------------------------------------------------#${NC}"
-apt-get update
+  echo -e "${Purple}#----------------------------------------------------------#
+  #                  Update system packages                 #
+  #----------------------------------------------------------#${NC}"
+  apt-get update
 
-echo -e "${Purple}#----------------------------------------------------------#
-#                      Upgrade system                      #
-#----------------------------------------------------------#${NC}"
-apt-get -y upgrade
-check_result $? 'apt-get upgrade failed'
+  echo -e "${Purple}#----------------------------------------------------------#
+  #                      Upgrade system                      #
+  #----------------------------------------------------------#${NC}"
+  apt-get -y upgrade
+  check_result $? 'apt-get upgrade failed'
+fi
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
@@ -397,45 +420,47 @@ fi
 email=`jq -M -r '.text_mail' ${tmp_user_file}`
 rm -f ${tmp_user_file}
 
+#Start all service
+service memcached start
+service apache2 start
+
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
 
-#Add option AcceptFilter to config Apache and restart apache2
-echo -e "
-AcceptFilter http none" >> /etc/apache2/apache2.conf
+if [[ "$fresh_install" == "yes" ]]; then
+  #Add option AcceptFilter to config Apache and restart apache2
+  echo -e "
+  AcceptFilter http none" >> /etc/apache2/apache2.conf
 
-#Start all service
-service apache2 start
-service memcached start
+  #Configure xdebug
+  if [[ "$xdebug" == "yes" ]]; then
+    apt-get -y install php-xdebug openssh-server
+    dpkg-reconfigure openssh-server
 
-#Configure xdebug
-if [[ "$xdebug" == "yes" ]]; then
-  apt-get -y install php-xdebug openssh-server
-  dpkg-reconfigure openssh-server
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
 
-  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
+    user_name=$(echo $(ls /home/)|tr -d '\n')
+    sed -i '/^PermitRootLogin/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PermitRootLogin`
+    sed -i -e "s;^PermitRootLogin .*$;PermitRootLogin no\nAllowUsers ${user_name};g" /etc/ssh/sshd_config # Set `PermitRootLogin no` and add `AllowUsers`
 
-  user_name=$(echo $(ls /home/)|tr -d '\n')
-  sed -i '/^PermitRootLogin/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PermitRootLogin`
-  sed -i -e "s;^PermitRootLogin .*$;PermitRootLogin no\nAllowUsers ${user_name};g" /etc/ssh/sshd_config # Set `PermitRootLogin no` and add `AllowUsers`
+    sed -i '/^PasswordAuthentication/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PasswordAuthentication`
+    sed -i -e "s;^PasswordAuthentication .*$;PasswordAuthentication yes;g" /etc/ssh/sshd_config # Set `PasswordAuthentication yes`
 
-  sed -i '/^PasswordAuthentication/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PasswordAuthentication`
-  sed -i -e "s;^PasswordAuthentication .*$;PasswordAuthentication yes;g" /etc/ssh/sshd_config # Set `PasswordAuthentication yes`
+    sed -i '/^UsePrivilegeSeparation/s/^#//g' /etc/ssh/sshd_config # Uncomment line `UsePrivilegeSeparation`
+    sed -i -e "s;^UsePrivilegeSeparation .*$;UsePrivilegeSeparation no;g" /etc/ssh/sshd_config # Set `UsePrivilegeSeparation no`
+    service ssh --full-restart
 
-  sed -i '/^UsePrivilegeSeparation/s/^#//g' /etc/ssh/sshd_config # Uncomment line `UsePrivilegeSeparation`
-  sed -i -e "s;^UsePrivilegeSeparation .*$;UsePrivilegeSeparation no;g" /etc/ssh/sshd_config # Set `UsePrivilegeSeparation no`
-  service ssh --full-restart
+    echo "zend_extension=xdebug.so
+  xdebug.default_enable=0
+  xdebug.remote_enable=1
+  xdebug.remote_host=127.0.0.1
+  xdebug.remote_port=9001
+  xdebug.idekey=PHPSTORM
+  xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
 
-  echo "zend_extension=xdebug.so
-xdebug.default_enable=0
-xdebug.remote_enable=1
-xdebug.remote_host=127.0.0.1
-xdebug.remote_port=9001
-xdebug.idekey=PHPSTORM
-xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
-
-  service apache2 restart
+    service apache2 restart
+  fi
 fi
 
 #Configuring svn on WSL
@@ -456,9 +481,6 @@ crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 354
 echo "[OK]"
 service ssh restart
 
-crudini --set /etc/my.cnf client port "35072"
-crudini --set /etc/my.cnf mysqld port "35072"
-crudini --set /etc/my.cnf mysqld max_connections "100"
 service mysql start
 
 #set password for mysql user root
@@ -496,38 +518,6 @@ echo "Configuring PHP..."
 crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
 crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
 
-echo "Configuring phpMyAdmin..."
-ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
-s_pma_password=$(gen_pass)
-mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
-mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-mysql -uroot -p${db_password} -e "flush privileges"
-mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
-
-sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php
-
-#Create script to run services
-cp ${templates}/sh/server.sh /root/server.sh
-
-#Create script to dump DB and restore db.
-sed -e "
-s;%workspace%;${unix_workspace};g
-s;%mysql_user%;${db_login};g
-s;%mysql_password%;${db_password};g
-" ${templates}/sh/dump.sh > /root/dump.sh
-
-sed -e "
-s;%workspace%;${unix_workspace};g
-s;%mysql_user%;${db_login};g
-s;%mysql_password%;${db_password};g
-" ${templates}/sh/restore.sh > /root/restore.sh
-crudini --set ~/.my.conf mysqldump user root
-crudini --set ~/.my.conf mysqldump password "${db_password}"
-
-# a2enmod & a2enconf
-a2enmod rewrite
-a2enconf phpmyadmin
-
 #Setting config apache for site
 PATH_APACHE="/etc/apache2/sites-available"
 
@@ -548,23 +538,57 @@ for project in ${a_site}; do
   a2ensite "${host}.conf"
 done
 
-#Create new DB user
-mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
+if [[ "$fresh_install" == "yes" ]]; then
+  echo "Configuring phpMyAdmin..."
+  ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
+  s_pma_password=$(gen_pass)
+  mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
+  mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
+  mysql -uroot -p${db_password} -e "flush privileges"
+  mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
 
-a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+  sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php
 
-mysql -uroot -p${db_password} -e "create database a_geo;"
-mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+  #Create script to run services
+  cp ${templates}/sh/server.sh /root/server.sh
 
-#Creating databases
-for project in ${a_site}; do
-  project=$(echo "$project" | sed -r 's/\./_/g')
-  for db_name in main control test_main test_geo; do
-    mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
-    mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
+  #Create script to dump DB and restore db.
+  sed -e "
+  s;%workspace%;${unix_workspace};g
+  s;%mysql_user%;${db_login};g
+  s;%mysql_password%;${db_password};g
+  " ${templates}/sh/dump.sh > /root/dump.sh
+
+  sed -e "
+  s;%workspace%;${unix_workspace};g
+  s;%mysql_user%;${db_login};g
+  s;%mysql_password%;${db_password};g
+  " ${templates}/sh/restore.sh > /root/restore.sh
+  crudini --set ~/.my.conf mysqldump user root
+  crudini --set ~/.my.conf mysqldump password "${db_password}"
+
+  # a2enmod & a2enconf
+  a2enmod rewrite
+  a2enconf phpmyadmin
+
+  #Create new DB user
+  mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
+
+  a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+
+  mysql -uroot -p${db_password} -e "create database a_geo;"
+  mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+
+  #Creating databases
+  for project in ${a_site}; do
+    project=$(echo "$project" | sed -r 's/\./_/g')
+    for db_name in main control test_main test_geo; do
+      mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
+      mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
+    done
   done
-done
-mysql -uroot -p${db_password} -e "flush privileges;"
+  mysql -uroot -p${db_password} -e "flush privileges;"
+fi
 
 if [[ "$checkout" = 'yes' ]]; then
   echo -e "${Purple}#----------------------------------------------------------#
@@ -574,12 +598,15 @@ if [[ "$checkout" = 'yes' ]]; then
   #Shared
   svn co "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
 
-  #Trunk
-  svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
-  svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
-  svn co "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" #namespace.Social
-  svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" #namespace.Wl
-  svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
+
+  if [[ ! -z "$host_production" ]]; then
+    #Trunk
+    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" #namespace.Social
+    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" #namespace.Wl
+    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
+  fi
 
   #Stable
   svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
@@ -694,7 +721,6 @@ for project in ${a_site}; do
   s;%ADDR_URL_SERVER%;${host};g
   s;%PATH_PUBLIC%;${PATH_PUBLIC};g
   " ${s_addr_template} > "${path_htprivate}/options/addr.php"
-
 
   project_db=$(echo "$project" | sed -r 's/\./_/g')
 
