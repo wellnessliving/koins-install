@@ -100,7 +100,7 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "b:a:s:k:p:d:c:l:m:g:x:w:t:fh" Option; do
+while getopts "b:a:s:k:p:d:c:n:l:m:g:x:w:t:fh" Option; do
   case ${Option} in
     b) bot_login=$OPTARG ;;        # Bot login
     a) bot_password=$OPTARG ;;     # Bot password
