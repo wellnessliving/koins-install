@@ -131,8 +131,8 @@ set_default_value 'checkout' 'yes'
 set_default_value 'fresh_install' 'yes'
 set_default_value 'xdebug' 'no'
 set_default_value 'workspace' '/mnt/c/Workspace'
-set_default_value 'host_trunk' 'wellnessliving.local'
-set_default_value 'host_stable' 'stable.wellnessliving.local'
+#set_default_value 'host_trunk' 'wellnessliving.local'
+#set_default_value 'host_stable' 'stable.wellnessliving.local'
 
 printf "Checking root permissions: "
 if [[ "x$(id -u)" != 'x0' ]]; then
@@ -140,17 +140,17 @@ if [[ "x$(id -u)" != 'x0' ]]; then
 fi
 echo "[OK]"
 
-if [[ "${host_trunk}" == "${host_stable}" ]] || [[ "${host_trunk}" == "${host_production}" ]] || [[ "${host_trunk}" == "${host_studio}" ]]; then
-  check_result 1 "You must use different hostnames for each site."
-fi
+#if [[ "${host_trunk}" == "${host_stable}" ]] || [[ "${host_trunk}" == "${host_production}" ]] || [[ "${host_trunk}" == "${host_studio}" ]]; then
+#  check_result 1 "You must use different hostnames for each site."
+#fi
 
-if [[ "${host_stable}" == "${host_production}" ]] || [[ "${host_stable}" == "${host_studio}" ]]; then
-  check_result 1 "You must use different hostnames for each site."
-fi
+#if [[ "${host_stable}" == "${host_production}" ]] || [[ "${host_stable}" == "${host_studio}" ]]; then
+#  check_result 1 "You must use different hostnames for each site."
+#fi
 
-if [[ ! -z "$host_production" ]] && [[ ! -z "$host_studio" ]] && [[ "${host_production}" == "${host_studio}" ]]; then
-  check_result 1 "You must use different hostnames for each site."
-fi
+#if [[ ! -z "$host_production" ]] && [[ ! -z "$host_studio" ]] && [[ "${host_production}" == "${host_studio}" ]]; then
+#  check_result 1 "You must use different hostnames for each site."
+#fi
 
 printf "Checking set argument --bot-login: "
 if [[ ! -n "${bot_login}" ]]; then
