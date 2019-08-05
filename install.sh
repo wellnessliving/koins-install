@@ -694,7 +694,7 @@ for project in ${a_site}; do
   #public_html/favicon.ico
   cp ${templates}/public_html/favicon.ico "${unix_workspace}/${project}/public_html/favicon.ico"
 
-  cp ${templates}/options/options.php ${unix_workspace}/${project}/.htprivate/options/options.php
+  cp ${s_options_template} ${unix_workspace}/${project}/.htprivate/options/options.php
   cp ${templates}/options/inc.php ${unix_workspace}/${project}/.htprivate/options/inc.php
   cp ${templates}/options/cli.php ${unix_workspace}/${project}/.htprivate/options/cli.php
 
