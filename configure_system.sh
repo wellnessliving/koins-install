@@ -23,9 +23,6 @@ crudini --set /etc/php/7.2/cli/php.ini PHP apc.entries_hint "524288"
 crudini --set /etc/php/7.2/apache2/php.ini PHP apc.gc_ttl "600"
 crudini --set /etc/php/7.2/cli/php.ini PHP apc.gc_ttl "600"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP apc.mmap_file_mask "0"
-crudini --set /etc/php/7.2/cli/php.ini PHP apc.mmap_file_mask "0"
-
 crudini --set /etc/php/7.2/apache2/php.ini PHP apc.shm_size "512M"
 crudini --set /etc/php/7.2/cli/php.ini PHP apc.shm_size "512M"
 
