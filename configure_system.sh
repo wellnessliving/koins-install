@@ -7,8 +7,11 @@ cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.tmp
 sed -i 's/skip\-external\-locking/skip-external-locking=/g' mysqld /etc/mysql/mysql.conf.d/mysqld.cnf
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld sql_mode ""
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld character_set_server "binary"
+crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld default_time_zone "UTC"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld log_bin_trust_function_creators "ON"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld max_allowed_packet "104857600"
+crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_timeout "60"
+crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_trx_commit "0"
 
 # Configuring PHP
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
@@ -65,6 +68,5 @@ crudini --set /etc/php/7.2/cli/php.ini PHP post_max_size "64M"
 crudini --set /etc/php/7.2/apache2/php.ini PHP upload_max_filesize "64M"
 crudini --set /etc/php/7.2/cli/php.ini PHP upload_max_filesize "64M"
 
-
 service mysql restart
-setvice apache2 restart
+service apache2 restart
