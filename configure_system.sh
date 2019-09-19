@@ -2,7 +2,7 @@
 
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
 
-# Configuring mysql
+echo Configuring mysql
 cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.tmp
 sed -i 's/skip\-external\-locking/skip-external-locking=/g' mysqld /etc/mysql/mysql.conf.d/mysqld.cnf
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld sql_mode ""
@@ -13,7 +13,7 @@ crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld max_allowed_packet "1048
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_timeout "60"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_trx_commit "0"
 
-# Configuring PHP
+echo Configuring PHP
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
 crudini --set /etc/php/7.2/cli/php.ini PHP allow_url_fopen "1"
 
