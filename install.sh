@@ -670,7 +670,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
   fi
 
-  if [[ ! -z "$host_trunk" ]]; then
+  if [[ ! -z "$host_stable" ]]; then
     #Stable
     svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
     svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
