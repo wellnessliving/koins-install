@@ -661,8 +661,7 @@ if [[ "$checkout" = 'yes' ]]; then
   #Shared
   svn co "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
 
-
-  if [[ ! -z "$host_production" ]]; then
+  if [[ ! -z "$host_trunk" ]]; then
     #Trunk
     svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
     svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
@@ -671,12 +670,14 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
   fi
 
-  #Stable
-  svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
-  svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
-  svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" #namespace.Social
-  svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" #namespace.Wl
-  svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" #project
+  if [[ ! -z "$host_trunk" ]]; then
+    #Stable
+    svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" #namespace.Social
+    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" #namespace.Wl
+    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" #project
+  fi
 
   if [[ ! -z "$host_production" ]]; then
     #Production
