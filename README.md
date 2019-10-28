@@ -1,4 +1,4 @@
-# Installing project for WSL Ubuntu 16.04
+# Installing project for WSL Ubuntu 18.04
 
 This installer does the following:
 * Install packages:
