@@ -1,0 +1,43 @@
+======================================================================================================================
+							Install Selenium server and start testing on Linux
+======================================================================================================================
+
+1. Скачать версию драйвера под браузер chrome, нужную версию можно узнать на странице:
+	https://sites.google.com/a/chromium.org/chromedriver/downloads
+
+2. Распаковываем драйвер и исполняем следующие команды:
+	sudo mv chromedriver /usr/bin/chromedriver
+	sudo chmod +x /usr/bin/chromedriver
+	sudo chown root:root /usr/bin/chromedriver
+
+3. Качаем последний сервер selenium:
+	https://www.seleniumhq.org/download/
+
+4. Распаковываем драйвер и исполняем следующие команды:
+	sudo mv selenium-server-standalone-3.141.59.jar /usr/bin/selenium-server.jar
+	sudo chmod +x /usr/bin/selenium-server.jar
+	sudo chown root:root /usr/bin/selenium-server.jar
+
+5.Запуск сервера с запуском браузера
+	Chrome - 
+		java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar /usr/bin/selenium-server.jar
+	Firefox - 
+		java -Dwebdriver.gecko.driver=/usr/bin/geckodriver -jar /usr/bin/selenium-server.jar
+
+6.Запуск сервера без запуска браузера
+	Chrome - 
+		xvfb-run java -Dwebdriver.chrome.driver=/usr/bin/chromedriver -jar /usr/bin/selenium-server.jar
+	Firefox - 
+		xvfb-run java -Dwebdriver.gecko.driver=/usr/bin/geckodriver -jar /usr/bin/selenium-server.jar
+	
+
+--------------------------------------------------------------------------------------------------------------------
+// Developers settings in .htprivate/options/addr.php
+	Firefox - 
+		define('A_TEST_SELENIUM_BROWSER',3);
+	Chrome - 
+		define('A_TEST_SELENIUM_BROWSER',2);
+
+##Only local connections are allowed. Можно указать список с какий IP адресов резрешено запускать тесты на сервере.
+	-Dwebdriver.chrome.whitelistedIps="localhost,127.0.0.1,192.168.*.*"
+--------------------------------------------------------------------------------------------------------------------
