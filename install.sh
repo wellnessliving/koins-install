@@ -201,14 +201,6 @@ if [[ -d "${unix_workspace:0:6}" ]]; then #workspace=/mnt/c/Workspace   ${worksp
         exit 1
       fi
       echo -e "${Red}Force installing${NC}"
-      # Asking for confirmation to proceed
-      read -p 'Would you like to clean up workspace folder [y/n]: ' answer
-      if [[ "$answer" != 'y' ]] && [[ "$answer" != 'Y'  ]]; then
-        echo -e 'Goodbye'
-        exit 1
-      fi
-      echo -e "${Red}Remove workspace folder...${NC}"
-      rm -rf ${unix_workspace}
     fi
   fi
 else
@@ -296,6 +288,7 @@ fi
 printf "Creating file structure: "
 
 mkdir -p ${unix_workspace}/keys
+mkdir -p ${unix_workspace}/less/3.9.0
 
 for project in ${a_site}; do
   mkdir -p ${unix_workspace}/${project}/{.htprivate/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}},public_html/{a/drive,static}}
@@ -335,6 +328,8 @@ echo -e "${Purple}#----------------------------------------------------------#
 #----------------------------------------------------------#${NC}"
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
+
+cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
 tmp_repository_file=$(mktemp -p /tmp)
 curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Key.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}&s_repository=libs" -o ${tmp_repository_file}
