@@ -16,7 +16,7 @@ Purple='\033[0;35m'       # Purple
 
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
-software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion"
+software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs"
 
 # Defining return code check function
 check_result(){
