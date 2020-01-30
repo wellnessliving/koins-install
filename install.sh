@@ -212,7 +212,7 @@ echo "[OK]"
 echo "Checking installed packages..."
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
-for pkg in mysql-server apache2 php7.1; do
+for pkg in mysql-server apache2 php7.2; do
   if [[ ! -z "$(grep ${pkg} ${tmpfile})" ]]; then
     conflicts="$pkg $conflicts"
   fi
