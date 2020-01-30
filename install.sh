@@ -640,7 +640,7 @@ if [[ "$fresh_install" == "yes" ]]; then
   #Creating databases
   for project in ${a_site}; do
     project=$(echo "$project" | sed -r 's/\./_/g')
-    for db_name in main control test_main test_geo; do
+    for db_name in main control shard_business_0 shard_business_1 test_main test_geo test_shard_business_0 test_shard_business_1; do
       mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
       mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
     done
