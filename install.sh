@@ -631,11 +631,13 @@ if [[ "$fresh_install" == "yes" ]]; then
 
   #Create new DB user
   mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
+  mysql -uroot -p${db_password} -e "create user '${db_login}_read'@'localhost' identified BY '${db_password}';"
 
   a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 
   mysql -uroot -p${db_password} -e "create database a_geo;"
   mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+  mysql -uroot -p${db_password} -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 
   #Creating databases
   for project in ${a_site}; do
@@ -643,6 +645,7 @@ if [[ "$fresh_install" == "yes" ]]; then
     for db_name in main control shard_business_0 shard_business_1 test_main test_geo test_shard_business_0 test_shard_business_1; do
       mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
       mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
+      mysql -uroot -p${db_password} -e "grant select on ${project}_${db_name}.* to '${db_login}_read'@'localhost';"
     done
   done
   mysql -uroot -p${db_password} -e "flush privileges;"
