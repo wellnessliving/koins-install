@@ -338,10 +338,14 @@ check_result $? "apt-get install failed"
 wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.14-1_all.deb
 dpkg -i mysql-apt-config_0.8.14-1_all.deb
 
-# Select MySql 8.0
-debconf-set-selections <<< "mysql-apt-config/select-server select mysql-8.0"
+apt update
+apt -y install mysql-server
 
+debconf-set-selections <<< "mysql-apt-config/select-server select mysql-8.0"
 dpkg -i mysql-apt-config_0.8.14-1_all.deb
+
+apt update
+apt -y install mysql-server
 
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
