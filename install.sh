@@ -16,7 +16,7 @@ Purple='\033[0;35m'       # Purple
 
 #export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
-software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached phpmyadmin crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs"
+software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs"
 
 # Defining return code check function
 check_result(){
@@ -605,16 +605,6 @@ for project in ${a_site}; do
 done
 
 if [[ "$fresh_install" == "yes" ]]; then
-  echo "Configuring phpMyAdmin..."
-  ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-available/phpmyadmin.conf
-  s_pma_password=$(gen_pass)
-  mysql -uroot -p${db_password} -e "create user 'phpmyadmin'@'localhost' identified by '${s_pma_password}';"
-  mysql -uroot -p${db_password} -e "grant all privileges on *.* to 'phpmyadmin'@'localhost';"
-  mysql -uroot -p${db_password} -e "flush privileges"
-  mysql -uroot -p${db_password} < /usr/share/doc/phpmyadmin/examples/create_tables.sql
-
-  sed -e "s;%s_pma_password%;${s_pma_password};g" "${templates}/phpmyadmin/config-db.php" > /etc/phpmyadmin/config-db.php
-
   #Create script to run services
   cp ${templates}/sh/server.sh /root/server.sh
 
@@ -635,7 +625,6 @@ if [[ "$fresh_install" == "yes" ]]; then
 
   # a2enmod & a2enconf
   a2enmod rewrite
-  a2enconf phpmyadmin
 
   #Create new DB user
   mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
@@ -881,9 +870,7 @@ Programmer's page(PRG):
     PRG username: ${prg_login}
     PRG password: ${prg_password}
 
-PHPMyAdmin:
-
-    http://localhost/phpmyadmin
+MySql:
     username: ${db_login}
     password: ${db_password}
 "
