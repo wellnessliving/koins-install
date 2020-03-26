@@ -341,7 +341,7 @@ dpkg -i mysql-apt-config_0.8.14-1_all.deb
 apt update
 apt -y install mysql-server
 
-debconf-set-selections <<< "mysql-apt-config/select-server select mysql-8.0"
+debconf-set-selections <<< "mysql-apt-config mysql-apt-config/select-server select mysql-8.0"
 dpkg -i mysql-apt-config_0.8.14-1_all.deb
 
 apt update
