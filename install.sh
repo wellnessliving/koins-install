@@ -347,6 +347,8 @@ dpkg -i mysql-apt-config_0.8.14-1_all.deb
 apt update
 apt -y install mysql-server
 
+sed -i -e "s;share/mysql/;share/mysql-8.0/;g" /etc/init.d/mysql
+
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
 tmp_repository_file=$(mktemp -p /tmp)
