@@ -326,6 +326,8 @@ fi
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
+debconf-set-selections <<< "mysql-server mysql-server/root_password password ${db_password}"
+
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
@@ -546,6 +548,9 @@ crudini --set /etc/php/7.2/cli/php.ini PHP post_max_size "64M"
 
 crudini --set /etc/php/7.2/apache2/php.ini PHP upload_max_filesize "64M"
 crudini --set /etc/php/7.2/cli/php.ini PHP upload_max_filesize "64M"
+
+service apache2 restart
+service mysql restart
 
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
@@ -851,7 +856,8 @@ for project in ${a_site}; do
 #  php ${unix_workspace}/install/static.php ${unix_workspace}/${project}/.htprivate
 done
 
-rm -rf ${unix_workspace}/install
+# TODO karma-281: Uncomment this line.
+# rm -rf ${unix_workspace}/install
 
 #Add service to start system
 #Maybe not work on WSL
