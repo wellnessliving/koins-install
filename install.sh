@@ -329,7 +329,7 @@ echo -e "${Purple}#----------------------------------------------------------#
 
 # Setting default values for installing packages.
 debconf-set-selections <<< "mysql-server mysql-server/root_password password ${db_password}"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password rootpw"
+debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${db_password}"
 
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
