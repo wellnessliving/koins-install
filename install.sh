@@ -499,6 +499,15 @@ echo "[OK]"
 service ssh restart
 
 echo "Configuring MySql"
+
+# Set password for mysql user root
+mysqladmin -u root password ${db_password}
+
+service mysql start
+
+#Load timezone to mysql
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
+
 cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.tmp
 sed -i 's/skip\-external\-locking/skip-external-locking=/g' /etc/mysql/mysql.conf.d/mysqld.cnf
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld sql_mode ""
@@ -508,9 +517,6 @@ crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld log_bin_trust_function_c
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld max_allowed_packet "104857600"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_timeout "60"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_trx_commit "0"
-
-cp /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf.tmp
-echo "[mysqld_safe]" > /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf
 
 echo "Configuring PHP"
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
@@ -565,13 +571,7 @@ crudini --set /etc/php/7.2/apache2/php.ini PHP upload_max_filesize "64M"
 crudini --set /etc/php/7.2/cli/php.ini PHP upload_max_filesize "64M"
 
 service apache2 restart
-service mysql start
-
-# Set password for mysql user root
-mysqladmin -u root password ${db_password}
-
-#Load timezone to mysql
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p${db_password} mysql
+service mysql restart
 
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
