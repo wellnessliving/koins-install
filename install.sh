@@ -334,17 +334,19 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
-# Download MySql 8.0
+# Download MySql 8.0 and install package.
 wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.14-1_all.deb
 dpkg -i mysql-apt-config_0.8.14-1_all.deb
 
+# Update list of package and install MySql 5.7
 apt update
 apt -y install mysql-server
 
 debconf-set-selections <<< "mysql-apt-config mysql-apt-config/select-server select mysql-8.0"
 dpkg -i mysql-apt-config_0.8.14-1_all.deb
-
 apt update
+
+debconf-set-selections <<< "mysql-community-server mysql-server/default-auth-override select Use Legacy Authentication Method (Retain MySQL 5.x Compatibility)"
 apt -y install mysql-server
 
 sed -i -e "s;share/mysql/;share/mysql-8.0/;g" /etc/init.d/mysql
