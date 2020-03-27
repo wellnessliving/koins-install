@@ -500,10 +500,10 @@ service ssh restart
 
 echo "Configuring MySql"
 
+service mysql start
+
 # Set password for mysql user root
 mysqladmin -u root password ${db_password}
-
-service mysql start
 
 #Load timezone to mysql
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
