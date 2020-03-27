@@ -510,8 +510,7 @@ crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_time
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_trx_commit "0"
 
 cp /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf.tmp
-sed -i -e "s;^log-syslog;log-syslog=;g" /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf
-crudini --del /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf mysqld_safe syslog
+echo "[mysqld_safe]" > /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf
 
 echo "Configuring PHP"
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
