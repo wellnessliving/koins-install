@@ -500,6 +500,9 @@ service ssh restart
 
 echo "Configuring MySql"
 
+cp /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf.tmp
+echo "[mysqld_safe]" > /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf
+
 service mysql start
 
 # Set password for mysql user root
@@ -510,6 +513,7 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
 
 cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.tmp
 sed -i 's/skip\-external\-locking/skip-external-locking=/g' /etc/mysql/mysql.conf.d/mysqld.cnf
+
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld sql_mode ""
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld character_set_server "binary"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld default_time_zone "UTC"
