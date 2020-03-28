@@ -521,6 +521,7 @@ crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld log_bin_trust_function_c
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld max_allowed_packet "104857600"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_timeout "60"
 crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_trx_commit "0"
+crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld default_authentication_plugin "mysql_native_password"
 
 echo "Configuring PHP"
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
