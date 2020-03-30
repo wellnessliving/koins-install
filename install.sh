@@ -16,7 +16,7 @@ Purple='\033[0;35m'       # Purple
 
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 #Need for decode json
-software="mc mcedit apache2 mysql-server php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs"
+software="mc mcedit apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs"
 
 # Defining return code check function
 check_result(){
@@ -300,25 +300,14 @@ if [[ "$fresh_install" == "yes" ]]; then
   echo "Adding php repository..."
   add-apt-repository ppa:ondrej/php -y
 
-  # Temporary commented because can not install mysql 8
-  # echo "Adding mysql 8 repository..."
-  # wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb
-  # dpkg -i mysql-apt-config_0.8.10-1_all.deb
-
-  # Add because without this command show warning:
-  # Warning: apt-key should not be used in scripts (called from postinst maintainerscript of the package mysql-apt-config)
-  # See: https://askubuntu.com/questions/1120363/mysql-ppa-invalid-signature
-  # See: https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
-  # apt-key adv --keyserver keys.gnupg.net --recv-keys 5072E1F5
-
   echo -e "${Purple}#----------------------------------------------------------#
-  #                  Update system packages                 #
-  #----------------------------------------------------------#${NC}"
+#                  Update system packages                 #
+#----------------------------------------------------------#${NC}"
   apt-get update
 
   echo -e "${Purple}#----------------------------------------------------------#
-  #                      Upgrade system                      #
-  #----------------------------------------------------------#${NC}"
+#                      Upgrade system                      #
+#----------------------------------------------------------#${NC}"
   apt-get -y upgrade
   check_result $? 'apt-get upgrade failed'
 fi
@@ -326,30 +315,33 @@ fi
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Install packages                     #
 #----------------------------------------------------------#${NC}"
-
-# Setting default values for installing packages.
-# debconf-set-selections <<< "mysql-server mysql-server/root_password password ${db_password}"
-# debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${db_password}"
-
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
-# Download MySql 8.0 and install package.
-wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.14-1_all.deb
-dpkg -i mysql-apt-config_0.8.14-1_all.deb
+# Download MySql 8.0.16 sources
+wget -c https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz
 
-# Update list of package and install MySql 5.7
-apt update
-apt -y install mysql-server
+# Extract all files from archive.
+mkdir -p /usr/local/sql
+tar xf mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz -C /usr/local/sql
 
-debconf-set-selections <<< "mysql-apt-config mysql-apt-config/select-server select mysql-8.0"
-dpkg -i mysql-apt-config_0.8.14-1_all.deb
-apt update
+# Installing MySql
+SQL_BIN="mysql-8.0.16-linux-glibc2.12-x86_64"
 
-debconf-set-selections <<< "mysql-community-server mysql-server/default-auth-override select Use Legacy Authentication Method (Retain MySQL 5.x Compatibility)"
-apt -y install mysql-server
+groupadd mysql
+useradd -r -g mysql -s /bin/false mysql
+cd /usr/local
+ln -s /usr/local/sql/${SQL_BIN} /usr/local/mysql
+chmod 750 -R /usr/local/sql/${SQL_BIN}
+chown mysql:mysql -R /usr/local/sql/${SQL_BIN}
+cd mysql
+bin/mysqld --initialize-insecure --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql
+chown mysql:mysql -R /usr/local/sql/${SQL_BIN}
 
-sed -i -e "s;share/mysql/;share/mysql-8.0/;g" /etc/init.d/mysql
+# Creating mysql service and command
+export PATH=$PATH:/usr/local/mysql/bin
+
+ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
@@ -500,28 +492,21 @@ service ssh restart
 
 echo "Configuring MySql"
 
-cp /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf.tmp
-echo "[mysqld_safe]" > /etc/mysql/mysql.conf.d/mysqld_safe_syslog.cnf
-
 service mysql start
 
-# Set password for mysql user root
-mysqladmin -u root password ${db_password}
-
-#Load timezone to mysql
+# Load timezone to mysql
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
 
-cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.tmp
-sed -i 's/skip\-external\-locking/skip-external-locking=/g' /etc/mysql/mysql.conf.d/mysqld.cnf
+mkdir -p /etc/mysql/conf.d
 
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld sql_mode ""
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld character_set_server "binary"
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld default_time_zone "UTC"
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld log_bin_trust_function_creators "ON"
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld max_allowed_packet "104857600"
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_timeout "60"
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld innodb_flush_log_at_trx_commit "0"
-crudini --set /etc/mysql/mysql.conf.d/mysqld.cnf mysqld default_authentication_plugin "mysql_native_password"
+crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
+crudini --set /etc/mysql/my.cnf mysqld character_set_server "binary"
+crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
+crudini --set /etc/mysql/my.cnf mysqld log_bin_trust_function_creators "ON"
+crudini --set /etc/mysql/my.cnf mysqld max_allowed_packet "104857600"
+crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"
+crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
+crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
 
 echo "Configuring PHP"
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
@@ -601,6 +586,8 @@ fi
 
 rm -f ${tmpfile}
 
+cp ${templates}/sh/.bash_profile /root/.bash_profile
+
 crudini --set /etc/wsl.conf automount options '"metadata"'
 
 echo "Configuring PHP..."
@@ -650,8 +637,8 @@ if [[ "$fresh_install" == "yes" ]]; then
   a2enmod rewrite
 
   #Create new DB user
-  mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified BY '${db_password}';"
-  mysql -uroot -p${db_password} -e "create user '${db_login}_read'@'localhost' identified BY '${db_password}';"
+  mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
+  mysql -uroot -p${db_password} -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
 
   a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 
