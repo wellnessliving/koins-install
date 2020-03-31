@@ -312,9 +312,10 @@ check_result $? "apt-get install failed"
 # Download MySql 8.0.16 sources
 wget -c https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz
 
-# Extract all files from archive.
+# Extract all files from archive and delete archive.
 mkdir -p /usr/local/sql
 tar xf mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz -C /usr/local/sql
+rm -rf mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz
 
 # Installing MySql
 SQL_BIN="mysql-8.0.16-linux-glibc2.12-x86_64"
