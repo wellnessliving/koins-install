@@ -629,14 +629,14 @@ crudini --set ~/.my.conf mysqldump password "${db_password}"
 a2enmod rewrite
 
 # Create new DB user
-mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
-mysql -uroot -p${db_password} -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
+mysql -uroot -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
+mysql -uroot -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
 
 a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 
-mysql -uroot -p${db_password} -e "create database a_geo;"
-mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
-mysql -uroot -p${db_password} -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
+mysql -uroot -e "create database a_geo;"
+mysql -uroot -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+mysql -uroot -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 
 # Creating databases
 for project in ${a_site}; do
@@ -649,12 +649,12 @@ for project in ${a_site}; do
   fi
 
   for db_name in ${a_db_list}; do
-    mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
-    mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
-    mysql -uroot -p${db_password} -e "grant select on ${project}_${db_name}.* to '${db_login}_read'@'localhost';"
+    mysql -uroot -e "create database ${project}_${db_name};"
+    mysql -uroot -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
+    mysql -uroot -e "grant select on ${project}_${db_name}.* to '${db_login}_read'@'localhost';"
   done
 done
-mysql -uroot -p${db_password} -e "flush privileges;"
+mysql -uroot -e "flush privileges;"
 
 if [[ "$checkout" = 'yes' ]]; then
   echo -e "${Purple}#----------------------------------------------------------#
