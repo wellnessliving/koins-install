@@ -645,7 +645,7 @@ for project in ${a_site}; do
 
   s_prefix=$(echo "$project" | sed -r 's/_[a-z_]+//g')
   if [[ ${s_prefix} == "wl" ]]; then
-    a_db_list+="shard_business_0 shard_business_1 test_shard_business_0 test_shard_business_1"
+    a_db_list+=" shard_business_0 shard_business_1 test_shard_business_0 test_shard_business_1"
   fi
 
   for db_name in ${a_db_list}; do
