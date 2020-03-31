@@ -486,6 +486,7 @@ service ssh restart
 echo "Configuring MySql"
 
 mkdir -p /etc/mysql/conf.d
+chmod 444 /etc/mysql/my.cnf
 
 crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
 crudini --set /etc/mysql/my.cnf mysqld character_set_server "binary"
@@ -503,8 +504,6 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
 
 service mysql restart
-
-chmod 444 /etc/mysql/my.cnf
 
 echo "Configuring PHP"
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
@@ -823,6 +822,7 @@ for project in ${a_site}; do
   echo "Clearing cache for ${project}"
   php ${options}/cli.php cms.cache.clear
   rm -rf ${unix_workspace}/${project}/.htprivate/writable/cache
+  echo
 
   echo "Update main DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
@@ -833,6 +833,7 @@ for project in ${a_site}; do
     fi
     i_attempt=$((i_attempt+1))
   done
+  echo
 
   i_attempt=0
   echo "Update test DB for ${project}"
@@ -845,10 +846,14 @@ for project in ${a_site}; do
     i_attempt=$((i_attempt+1))
   done
   i_attempt=0
+  echo
 
   echo "Update messages for ${project}"
   php ${options}/cli.php cms.message.update
+  echo
+  echo
 done
+
 
 rm -rf /root/install
 
