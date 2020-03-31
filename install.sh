@@ -4,18 +4,18 @@
 #----------------------------------------------------------#
 #                  Variables&Functions                     #
 #----------------------------------------------------------#
-#COLORS
+# COLORS
 # Reset color
-NC='\033[0m'              # Text Reset
+NC='\033[0m' # Text Reset
 
 # Regular Colors
-Red='\033[0;31m'          # Red
-Green='\033[0;32m'        # Green
-Yellow='\033[0;33m'       # Yellow
-Purple='\033[0;35m'       # Purple
+Red='\033[0;31m' # Red
+Green='\033[0;32m' # Green
+Yellow='\033[0;33m' # Yellow
+Purple='\033[0;35m' # Purple
 
 export DEBIAN_FRONTEND=noninteractive
-export PYTHONIOENCODING=utf8 #Need for decode json
+export PYTHONIOENCODING=utf8 # Need for decode json
 software="mc mcedit apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
 
 # Defining return code check function
@@ -55,7 +55,7 @@ help_message() {
   -l, --prg-login           Login for PRG                  default: admin
   -m, --prg-password        Password for PRG               default: 1
   -g, --checkout            Checkout projects     [yes|no] default: yes
-  -x, --xdebug              Install xDebug        [yes|no] default: no
+  -x, --xdebug              Install xDebug        [yes|no] default: yes
   -w, --workspace           Path to workspace              default: /mnt/c/Workspace
   -t, --trunk               Hostname for trunk             default: wellnessliving.local
   -s, --stable              Hostname for stable            default: stable.wellnessliving.local
@@ -90,7 +90,6 @@ for arg; do
     --stable)           args="${args}-s " ;;
     --production)       args="${args}-p " ;;
     --studio)           args="${args}-k " ;;
-    --fresh-install)    args="${args}-n " ;;
     --force)            args="${args}-f " ;;
     --help)             args="${args}-h " ;;
     *)                  [[ "${arg:0:1}" == "-" ]] || delimiter="\""
@@ -100,7 +99,7 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "b:a:s:k:p:d:c:n:l:m:g:x:w:t:fh" Option; do
+while getopts "b:a:s:k:p:d:c:l:m:g:x:w:t:fh" Option; do
   case ${Option} in
     b) bot_login=$OPTARG ;;        # Bot login
     a) bot_password=$OPTARG ;;     # Bot password
@@ -115,21 +114,19 @@ while getopts "b:a:s:k:p:d:c:n:l:m:g:x:w:t:fh" Option; do
     s) host_stable=$OPTARG ;;      # Hostname for stable
     p) host_production=$OPTARG ;;  # Hostname for production
     k) host_studio=$OPTARG ;;      # Hostname for studio
-    n) fresh_install=$OPTARG ;;    # Fresh install
     f) force='yes' ;;              # Force installation
     h) help_message ;;             # Help
     *) help_message ;;             # Print help (default)
   esac
 done
 
-#Seting default value for arguments
+# Setting default value for arguments
 set_default_value 'db_login' 'koins'
 set_default_value 'db_password' 'lkchpy91'
 set_default_value 'prg_login' 'admin'
 set_default_value 'prg_password' '1'
 set_default_value 'checkout' 'yes'
-set_default_value 'fresh_install' 'yes'
-set_default_value 'xdebug' 'no'
+set_default_value 'xdebug' 'yes'
 set_default_value 'workspace' '/mnt/c/Workspace'
 set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
@@ -192,7 +189,7 @@ fi
 win_workspace_slash=$(echo "${win_workspace}" | sed -e 's|\\|\\\\|g')
 
 printf "Checking path workspace: "
-if [[ -d "${unix_workspace:0:6}" ]]; then #workspace=/mnt/c/Workspace   ${workspace:0:6}=> /mnt/c
+if [[ -d "${unix_workspace:0:6}" ]]; then # workspace=/mnt/c/Workspace   ${workspace:0:6}=> /mnt/c
   mkdir -p -v ${unix_workspace}
   if [[ ! -z "$(ls -A ${unix_workspace})" ]]; then
     if [[ "$checkout" == "yes" ]]; then
@@ -219,8 +216,8 @@ for pkg in mysql-server apache2 php7.2; do
 done
 rm -f ${tmpfile}
 
-#Conflict checking
-if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]] && [[ "$fresh_install" == "yes" ]]; then
+# Conflict checking
+if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]]; then
   echo -e "${Yellow} !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!"
   echo
   echo -e "Following packages are already installed:"
@@ -233,12 +230,9 @@ if [[ ! -z "$conflicts" ]] && [[ -z "$force" ]] && [[ "$fresh_install" == "yes" 
   check_result 1 "System should be installed on clean server."
 fi
 
-if [[ "$fresh_install" == "yes" ]]; then
-  printf "Install packages:\n* "
-  echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' #Replace space to newline
-  echo "Install xDebug: ${xdebug}"
-fi
-
+printf "Install packages:\n* "
+echo ${software} | sed -E -e 's/[[:blank:]]+/\n* /g' # Replace space to newline
+echo "Install xDebug: ${xdebug}"
 echo "Checkout projects: ${checkout}"
 echo "Workspace: ${win_workspace}"
 echo "Login for PRG: ${prg_login}"
@@ -260,23 +254,22 @@ fi
 
 a_site=""
 
-
-#Folders for production
+# Folders for production
 if [[ ! -z "$host_trunk" ]]; then
   a_site+=" wl.trunk"
 fi
 
-#Folders for studio
+# Folders for studio
 if [[ ! -z "$host_stable" ]]; then
   a_site+=" wl.stable"
 fi
 
-#Folders for production
+# Folders for production
 if [[ ! -z "$host_production" ]]; then
   a_site+=" wl.production"
 fi
 
-#Folders for studio
+# Folders for studio
 if [[ ! -z "$host_studio" ]]; then
   a_site+=" studio.trunk"
 fi
@@ -296,24 +289,22 @@ done
 
 echo "[OK]"
 
-if [[ "$fresh_install" == "yes" ]]; then
-  echo "Adding php repository..."
-  add-apt-repository ppa:ondrej/php -y
-
-  echo -e "${Purple}#----------------------------------------------------------#
-#                  Update system packages                 #
-#----------------------------------------------------------#${NC}"
-  apt-get update
-
-  echo -e "${Purple}#----------------------------------------------------------#
-#                      Upgrade system                      #
-#----------------------------------------------------------#${NC}"
-  apt-get -y upgrade
-  check_result $? 'apt-get upgrade failed'
-fi
+echo "Adding php repository..."
+add-apt-repository ppa:ondrej/php -y
 
 echo -e "${Purple}#----------------------------------------------------------#
-#                     Install packages                     #
+#                  Update system packages                 #
+#----------------------------------------------------------#${NC}"
+apt-get update
+
+echo -e "${Purple}#----------------------------------------------------------#
+#                      Upgrade system                      #
+#----------------------------------------------------------#${NC}"
+apt-get -y upgrade
+check_result $? 'apt-get upgrade failed'
+
+echo -e "${Purple}#----------------------------------------------------------#
+#             Install packages and dependencies            #
 #----------------------------------------------------------#${NC}"
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
@@ -345,6 +336,17 @@ ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
+# Remove php 7.3 if installed.
+tmpfile=$(mktemp -p /tmp)
+dpkg --get-selections > ${tmpfile}
+if [[ ! -z "$(grep php7.3-cli ${tmpfile})" ]]; then
+  apt-get purge php7.3-cli -y
+fi
+rm -f ${tmpfile}
+
+echo -e "${Purple}#----------------------------------------------------------#
+#                    Configuring system                    #
+#----------------------------------------------------------#${NC}"
 tmp_repository_file=$(mktemp -p /tmp)
 curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Key.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}&s_repository=libs" -o ${tmp_repository_file}
 
@@ -429,55 +431,45 @@ fi
 email=`jq -M -r '.text_mail' ${tmp_user_file}`
 rm -f ${tmp_user_file}
 
-#Start all service
-service memcached start
-service apache2 start
+# Add option AcceptFilter to config Apache and restart apache2
+echo -e "
+AcceptFilter http none" >> /etc/apache2/apache2.conf
 
-echo -e "${Purple}#----------------------------------------------------------#
-#                    Configuring system                    #
-#----------------------------------------------------------#${NC}"
+# Configure xdebug
+if [[ "$xdebug" == "yes" ]]; then
+  apt-get -y install php-xdebug openssh-server
+  dpkg-reconfigure openssh-server
 
-if [[ "$fresh_install" == "yes" ]]; then
-  #Add option AcceptFilter to config Apache and restart apache2
-  echo -e "
-  AcceptFilter http none" >> /etc/apache2/apache2.conf
+  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
 
-  #Configure xdebug
-  if [[ "$xdebug" == "yes" ]]; then
-    apt-get -y install php-xdebug openssh-server
-    dpkg-reconfigure openssh-server
+  user_name=$(echo $(ls /home/)|tr -d '\n')
+  sed -i '/^PermitRootLogin/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PermitRootLogin`
+  sed -i -e "s;^PermitRootLogin .*$;PermitRootLogin no\nAllowUsers ${user_name};g" /etc/ssh/sshd_config # Set `PermitRootLogin no` and add `AllowUsers`
 
-    cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
+  sed -i '/^PasswordAuthentication/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PasswordAuthentication`
+  sed -i -e "s;^PasswordAuthentication .*$;PasswordAuthentication yes;g" /etc/ssh/sshd_config # Set `PasswordAuthentication yes`
 
-    user_name=$(echo $(ls /home/)|tr -d '\n')
-    sed -i '/^PermitRootLogin/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PermitRootLogin`
-    sed -i -e "s;^PermitRootLogin .*$;PermitRootLogin no\nAllowUsers ${user_name};g" /etc/ssh/sshd_config # Set `PermitRootLogin no` and add `AllowUsers`
+  sed -i '/^UsePrivilegeSeparation/s/^#//g' /etc/ssh/sshd_config # Uncomment line `UsePrivilegeSeparation`
+  sed -i -e "s;^UsePrivilegeSeparation .*$;UsePrivilegeSeparation no;g" /etc/ssh/sshd_config # Set `UsePrivilegeSeparation no`
+  service ssh --full-restart
 
-    sed -i '/^PasswordAuthentication/s/^#//g' /etc/ssh/sshd_config # Uncomment line `PasswordAuthentication`
-    sed -i -e "s;^PasswordAuthentication .*$;PasswordAuthentication yes;g" /etc/ssh/sshd_config # Set `PasswordAuthentication yes`
+  echo "zend_extension=xdebug.so
+xdebug.default_enable=0
+xdebug.remote_enable=1
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9001
+xdebug.idekey=PHPSTORM
+xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
 
-    sed -i '/^UsePrivilegeSeparation/s/^#//g' /etc/ssh/sshd_config # Uncomment line `UsePrivilegeSeparation`
-    sed -i -e "s;^UsePrivilegeSeparation .*$;UsePrivilegeSeparation no;g" /etc/ssh/sshd_config # Set `UsePrivilegeSeparation no`
-    service ssh --full-restart
-
-    echo "zend_extension=xdebug.so
-  xdebug.default_enable=0
-  xdebug.remote_enable=1
-  xdebug.remote_host=127.0.0.1
-  xdebug.remote_port=9001
-  xdebug.idekey=PHPSTORM
-  xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
-
-    service apache2 restart
-  fi
+  service apache2 restart
 fi
 
-#Configuring svn on WSL
+# Configuring svn on WSL
 svn info
 printf "Configuring SVN: "
 crudini --set /root/.subversion/config tunnels libs "ssh svn@libs.svn.1024.info -p 35469 -i /root/.ssh/libs.pub"
 
-#Configure svn on Windows
+# Configure svn on Windows
 cp -rf /root/.subversion ${unix_workspace}/Subversion
 cp -rf /root/.ssh/libs.key ${unix_workspace}/keys/libs.key
 tpm_old_passphrase=$(mktemp -p /tmp)
@@ -507,6 +499,8 @@ crudini --set /etc/mysql/my.cnf mysqld max_allowed_packet "104857600"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
+
+chmod 444 /etc/mysql/my.cnf
 
 echo "Configuring PHP"
 crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
@@ -560,17 +554,24 @@ crudini --set /etc/php/7.2/cli/php.ini PHP post_max_size "64M"
 crudini --set /etc/php/7.2/apache2/php.ini PHP upload_max_filesize "64M"
 crudini --set /etc/php/7.2/cli/php.ini PHP upload_max_filesize "64M"
 
+crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
+
+# Restart all service
 service apache2 restart
 service mysql restart
+service memcached restart
+
+mkdir -p /root/install
 
 echo "Checkouting templates files for configuring system"
-svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
+svn co svn+libs://libs.svn.1024.info/reservationspot.com/install /root/install
 
-#path to templates
-templates=${unix_workspace}/install/templates
+# path to templates
+templates=/root/install/templates
 
 if [[ ! -d "$templates" ]]; then
-  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install
+  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install /root/install
   if [[ ! -d "$templates" ]]; then
     check_result 1 "Error while checkouting templates"
   fi
@@ -578,23 +579,11 @@ fi
 
 git clone https://github.com/wellnessliving/wl-sdk.git ${unix_workspace}/wl-sdk
 
-tmpfile=$(mktemp -p /tmp)
-dpkg --get-selections > ${tmpfile}
-if [[ ! -z "$(grep php7.3-cli ${tmpfile})" ]]; then
-  apt-get purge php7.3-cli -y
-fi
-
-rm -f ${tmpfile}
-
 cp ${templates}/sh/.bash_profile /root/.bash_profile
 
 crudini --set /etc/wsl.conf automount options '"metadata"'
 
-echo "Configuring PHP..."
-crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
-crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
-
-#Setting config apache for site
+# Setting config apache for site
 PATH_APACHE="/etc/apache2/sites-available"
 
 for project in ${a_site}; do
@@ -614,91 +603,96 @@ for project in ${a_site}; do
   a2ensite "${host}.conf"
 done
 
-if [[ "$fresh_install" == "yes" ]]; then
-  #Create script to run services
-  cp ${templates}/sh/server.sh /root/server.sh
+# Create script to run services
+cp ${templates}/sh/server.sh /root/server.sh
 
-  #Create script to dump DB and restore db.
-  sed -e "
-  s;%workspace%;${unix_workspace};g
-  s;%mysql_user%;${db_login};g
-  s;%mysql_password%;${db_password};g
-  " ${templates}/sh/dump.sh > /root/dump.sh
+# Create script to dump DB and restore db.
+sed -e "
+s;%workspace%;${unix_workspace};g
+s;%mysql_user%;${db_login};g
+s;%mysql_password%;${db_password};g
+" ${templates}/sh/dump.sh > /root/dump.sh
 
-  sed -e "
-  s;%workspace%;${unix_workspace};g
-  s;%mysql_user%;${db_login};g
-  s;%mysql_password%;${db_password};g
-  " ${templates}/sh/restore.sh > /root/restore.sh
-  crudini --set ~/.my.conf mysqldump user root
-  crudini --set ~/.my.conf mysqldump password "${db_password}"
+sed -e "
+s;%workspace%;${unix_workspace};g
+s;%mysql_user%;${db_login};g
+s;%mysql_password%;${db_password};g
+" ${templates}/sh/restore.sh > /root/restore.sh
+crudini --set ~/.my.conf mysqldump user root
+crudini --set ~/.my.conf mysqldump password "${db_password}"
 
-  # a2enmod & a2enconf
-  a2enmod rewrite
+# a2enmod & a2enconf
+a2enmod rewrite
 
-  #Create new DB user
-  mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
-  mysql -uroot -p${db_password} -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
+# Create new DB user
+mysql -uroot -p${db_password} -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
+mysql -uroot -p${db_password} -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
 
-  a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 
-  mysql -uroot -p${db_password} -e "create database a_geo;"
-  mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
-  mysql -uroot -p${db_password} -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
+mysql -uroot -p${db_password} -e "create database a_geo;"
+mysql -uroot -p${db_password} -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+mysql -uroot -p${db_password} -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 
-  #Creating databases
-  for project in ${a_site}; do
-    project=$(echo "$project" | sed -r 's/\./_/g')
-    for db_name in main control shard_business_0 shard_business_1 test_main test_geo test_shard_business_0 test_shard_business_1; do
-      mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
-      mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
-      mysql -uroot -p${db_password} -e "grant select on ${project}_${db_name}.* to '${db_login}_read'@'localhost';"
-    done
+# Creating databases
+for project in ${a_site}; do
+  project=$(echo "$project" | sed -r 's/\./_/g')
+  a_db_list="main control test_main test_geo test_shard_example_0 test_shard_example_1"
+
+  s_prefix=$(echo "$project" | sed -r 's/_[a-z_]+//g')
+  if [[ ${s_prefix} == "wl" ]]; then
+    a_db_list+="shard_business_0 shard_business_1 test_shard_business_0 test_shard_business_1"
+  fi
+
+  for db_name in ${a_db_list}; do
+    mysql -uroot -p${db_password} -e "create database ${project}_${db_name};"
+    mysql -uroot -p${db_password} -e "grant ${a_privileges} on ${project}_${db_name}.* to '${db_login}'@'localhost';"
+    mysql -uroot -p${db_password} -e "grant select on ${project}_${db_name}.* to '${db_login}_read'@'localhost';"
   done
-  mysql -uroot -p${db_password} -e "flush privileges;"
-fi
+done
+mysql -uroot -p${db_password} -e "flush privileges;"
 
 if [[ "$checkout" = 'yes' ]]; then
   echo -e "${Purple}#----------------------------------------------------------#
 #                    Checkout projects                     #
 #----------------------------------------------------------#${NC}"
 
-  #Shared
+  # Shared
   svn co "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
 
   if [[ ! -z "$host_trunk" ]]; then
-    #Trunk
-    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" #Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" #namespace.Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" #namespace.Social
-    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" #namespace.Wl
-    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" #project
+    # Trunk
+    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/wl.trunk/core" # Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/wl.trunk/namespace.Core" # namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" # namespace.Social
+    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" # namespace.Wl
+    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" # project
   fi
 
   if [[ ! -z "$host_stable" ]]; then
-    #Stable
-    svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" #Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" #namespace.Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" #namespace.Social
-    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" #namespace.Wl
-    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" #project
+    # Stable
+    svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" # Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Core" # namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" # namespace.Social
+    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" # namespace.Wl
+    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" # project
   fi
 
   if [[ ! -z "$host_production" ]]; then
-    #Production
-    svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" #Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-production" "${unix_workspace}/wl.production/namespace.Core" #namespace.Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-production" "${unix_workspace}/wl.production/namespace.Social" #namespace.Social
-    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${unix_workspace}/wl.production/namespace.Wl" #namespace.Wl
-    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${unix_workspace}/wl.production/project" #project
+    # Production
+    svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" # Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-production" "${unix_workspace}/wl.production/namespace.Core" # namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-production" "${unix_workspace}/wl.production/namespace.Social" # namespace.Social
+    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${unix_workspace}/wl.production/namespace.Wl" # namespace.Wl
+    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${unix_workspace}/wl.production/project" # project
   fi
 
   if [[ ! -z "$host_studio" ]]; then
-    #Studio
-    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/studio.trunk/core" #Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" #namespace.Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" #namespace.Studio
-    svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" #project
+    # Studio
+    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/studio.trunk/core" # Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
+    svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" # project
   fi
 fi
 
@@ -749,18 +743,18 @@ for project in ${a_site}; do
     s_options_template=${templates}/options/options.studio.php
   fi
 
-  #public_html/index.php
+  # public_html/index.php
   sed -e "
   s;%path_htprivate%;${path_htprivate};g
   " ${templates}/public_html/index.php > "${unix_workspace}/${project}/public_html/index.php"
 
-  #public_html/.htaccess
+  # public_html/.htaccess
   sed -e "
   s;%workspace%;${unix_workspace};g
   s;%project%;${project};g
   " ${templates}/public_html/.htaccess > "${unix_workspace}/${project}/public_html/.htaccess"
 
-  #public_html/favicon.ico
+  # public_html/favicon.ico
   cp ${templates}/public_html/favicon.ico "${unix_workspace}/${project}/public_html/favicon.ico"
 
   cp ${s_options_template} ${unix_workspace}/${project}/.htprivate/options/options.php
@@ -775,7 +769,7 @@ for project in ${a_site}; do
   path_config=${unix_workspace}/${project}/project/.config
   mkdir -p -v ${path_config}
 
-  #options/addr.php
+  # options/addr.php
   sed -e "
   s;%ALL_MAIN%;${ALL_MAIN};g
   s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
@@ -795,7 +789,7 @@ for project in ${a_site}; do
 
   project_db=$(echo "$project" | sed -r 's/\./_/g')
 
-  #options/db.php
+  # options/db.php
   sed -e "
   s;%db_login%;${db_login};g
   s;%db_password%;${db_password};g
@@ -809,9 +803,6 @@ for project in ${a_site}; do
   s;%project%;${project_db};g
   s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
   " ${s_config_template} > "${path_config}/a.test.php"
-
-  #.config/amazon.php
-  cp ${templates}/.config/amazon.php "${path_config}/amazon.php"
 done
 
 cp -a ${templates}/windows/selenium/ ${unix_workspace}
@@ -821,7 +812,7 @@ echo -e "${Purple}#----------------------------------------------------------#
 #----------------------------------------------------------#${NC}"
 max_attempt=5
 i_attempt=0
-#Update DB
+# Update DB
 for project in ${a_site}; do
   options=${unix_workspace}/${project}/.htprivate/options
 
@@ -832,7 +823,7 @@ for project in ${a_site}; do
   echo "Update main DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
-    php ${options}/cli.php db.update #Main
+    php ${options}/cli.php db.update # Main database
     if [[ "$?" -eq 0 ]]; then
       break
     fi
@@ -843,7 +834,7 @@ for project in ${a_site}; do
   echo "Update test DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
-    php ${options}/cli.php db.update a #Test
+    php ${options}/cli.php db.update a # Test database
     if [[ "$?" -eq 0 ]]; then
       break
     fi
@@ -853,21 +844,17 @@ for project in ${a_site}; do
 
   echo "Update messages for ${project}"
   php ${options}/cli.php cms.message.update
-
-#  echo "Generating CSS and JS...";
-#  php ${unix_workspace}/install/static.php ${unix_workspace}/${project}/.htprivate
 done
 
-# TODO karma-281: Uncomment this line.
-# rm -rf ${unix_workspace}/install
+rm -rf /root/install
 
-#Add service to start system
-#Maybe not work on WSL
+# Add service to start system
+# Maybe not work on WSL
 update-rc.d apache2 defaults
 update-rc.d mysql defaults
 update-rc.d memcached defaults
 
-#Restarl all service
+# Restart all service
 service apache2 restart
 service mysql restart
 service memcached restart
