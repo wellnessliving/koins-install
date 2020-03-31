@@ -485,21 +485,24 @@ service ssh restart
 
 echo "Configuring MySql"
 
-service mysql start
-
-# Load timezone to mysql
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
-
 mkdir -p /etc/mysql/conf.d
 
 crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
 crudini --set /etc/mysql/my.cnf mysqld character_set_server "binary"
-crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
 crudini --set /etc/mysql/my.cnf mysqld log_bin_trust_function_creators "ON"
 crudini --set /etc/mysql/my.cnf mysqld max_allowed_packet "104857600"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
+crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
+
+service mysql start
+
+# Load timezone to mysql
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
+
+service mysql restart
 
 chmod 444 /etc/mysql/my.cnf
 
