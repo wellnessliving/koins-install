@@ -565,16 +565,16 @@ service apache2 restart
 service mysql restart
 service memcached restart
 
-mkdir -p /root/install
+mkdir -p ${unix_workspace}/install_tmp
 
 echo "Checkouting templates files for configuring system"
-svn co svn+libs://libs.svn.1024.info/reservationspot.com/install /root/install
+svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install_tmp
 
 # path to templates
-templates=/root/install/templates
+templates=${unix_workspace}/install_tmp/templates
 
 if [[ ! -d "$templates" ]]; then
-  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install /root/install
+  svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install_tmp
   if [[ ! -d "$templates" ]]; then
     check_result 1 "Error while checkouting templates"
   fi
@@ -714,6 +714,7 @@ while [[ ! -f "${unix_workspace}/install.bat.done" ]];
 do
   sleep 2
 done
+rm -f ${unix_workspace}/install.bat
 rm -f ${unix_workspace}/install.bat.done
 
 echo -e "${Purple}#----------------------------------------------------------#
@@ -855,7 +856,7 @@ for project in ${a_site}; do
 done
 
 
-rm -rf /root/install
+rm -rf ${unix_workspace}/install_tmp
 
 # Add service to start system
 # Maybe not work on WSL
