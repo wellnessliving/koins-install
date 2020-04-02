@@ -486,6 +486,7 @@ service ssh restart
 echo "Configuring MySql"
 
 mkdir -p /etc/mysql/conf.d
+touch /etc/mysql/my.cnf
 chmod 444 /etc/mysql/my.cnf
 
 crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
