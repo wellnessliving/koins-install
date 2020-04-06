@@ -641,7 +641,7 @@ mysql -uroot -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 # Creating databases
 for project in ${a_site}; do
   project=$(echo "$project" | sed -r 's/\./_/g')
-  a_db_list="main control test_main test_geo test_shard_example_0 test_shard_example_1"
+  a_db_list="main control test_main test_geo test_shard_example_0 test_shard_example_1 test_create"
 
   s_prefix=$(echo "$project" | sed -r 's/_[a-z_]+//g')
   if [[ ${s_prefix} == "wl" ]]; then
