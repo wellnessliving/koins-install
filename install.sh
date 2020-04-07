@@ -324,7 +324,7 @@ groupadd mysql
 useradd -r -g mysql -s /bin/false mysql
 cd /usr/local
 ln -s /usr/local/sql/${SQL_BIN} /usr/local/mysql
-chmod 750 -R /usr/local/sql/${SQL_BIN}
+chmod 755 -R /usr/local/sql/${SQL_BIN}
 chown mysql:mysql -R /usr/local/sql/${SQL_BIN}
 cd mysql
 bin/mysqld --initialize-insecure --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql
