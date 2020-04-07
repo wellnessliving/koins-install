@@ -2,7 +2,7 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-if [ "x$(id -u)" != 'x0' ]; then
+if [[ "x$(id -u)" != 'x0' ]]; then
   echo "Script can be run executed only by root"
   echo "Use command and enter password: sudo sh $0"
   exit 1
@@ -20,28 +20,30 @@ fi
 # Update packages
 apt update
 
+apt install libaio1 libaio-dev -y
+
 package_list=$(mktemp -p /tmp)
 dpkg --get-selections > ${package_list}
-if [ ! -z "$(grep mysql-* ${package_list})" ]; then
+if [[ -z "$(grep mysql-server* ${package_list})" ]]; then
   echo "MySql is not installed."
   exit 1
 fi
 
 dpkg --get-selections > ${package_list}
-if [ -z "$(grep crudini ${package_list})" ]; then
+if [[ -z "$(grep crudini ${package_list})" ]]; then
   echo "Crudini is not installed."
   exit 1
 fi
 
 service mysql stop
 
-apt purge mysql-server mysql-client -y
+apt purge mysql-server* mysql-client* mysql-common* -y
 
 apt autoremove -y
 apt autoclean -y
 
 service mysql status
-if [ ! $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
   echo "MySql service is exist. Maybe MySql is not deleting"
   exit 1
 fi
@@ -95,9 +97,8 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
 crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
 
 touch /root/.bash_profile
-echo "" >> /root/.bash_profile
 
-echo "# .bash_profile" >> /root/.bash_profile
+echo "# .bash_profile" > /root/.bash_profile
 echo "" >> /root/.bash_profile
 echo "# Get the aliases and functions" >> /root/.bash_profile
 echo "if [ -f ~/.bashrc ]; then" >> /root/.bash_profile
@@ -109,4 +110,3 @@ echo "" >> /root/.bash_profile
 echo "PATH=\$PATH:\$HOME/bin:/usr/bin:/usr/local/mysql/bin" >> /root/.bash_profile
 
 service mysql restart
-
