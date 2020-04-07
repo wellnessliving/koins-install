@@ -49,6 +49,8 @@ if [[ $? -eq 0 ]]; then
 fi
 
 rm -rf /etc/mysql
+rm -rf /usr/local/mysql
+rm -rf /usr/local/sql
 
 # Download MySql 8.0.16 sources
 wget -c https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz
@@ -65,7 +67,7 @@ groupadd mysql
 useradd -r -g mysql -s /bin/false mysql
 cd /usr/local
 ln -s /usr/local/sql/${SQL_BIN} /usr/local/mysql
-chmod 750 -R /usr/local/sql/${SQL_BIN}
+chmod 755 -R /usr/local/sql/${SQL_BIN}
 chown mysql:mysql -R /usr/local/sql/${SQL_BIN}
 cd mysql
 bin/mysqld --initialize-insecure --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql
