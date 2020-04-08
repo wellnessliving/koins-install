@@ -331,7 +331,12 @@ bin/mysqld --initialize-insecure --basedir=/usr/local/mysql --datadir=/usr/local
 chown mysql:mysql -R /usr/local/sql/${SQL_BIN}
 
 # Creating mysql service and command
-export PATH=$PATH:/usr/local/mysql/bin
+for s_bin in /usr/local/mysql/bin/*; do
+  s_file=$(basename ${s_bin})
+  if [[ ${s_file} == *"mysql"* ]]; then
+    ln -s ${s_bin} /usr/bin/${s_file}
+  fi
+done
 
 ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
@@ -583,8 +588,6 @@ fi
 
 git clone https://github.com/wellnessliving/wl-sdk.git ${unix_workspace}/wl-sdk
 
-cp ${templates}/sh/.bash_profile /root/.bash_profile
-
 crudini --set /etc/wsl.conf automount options '"metadata"'
 
 # Setting config apache for site
@@ -609,6 +612,7 @@ done
 
 # Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
+cp ${templates}/sh/clear.sh /root/clear.sh
 
 # Create script to dump DB and restore db.
 sed -e "
