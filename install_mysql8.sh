@@ -17,18 +17,39 @@ if [[ "$answer" != 'y' ]] && [[ "$answer" != 'Y'  ]]; then
   exit 1
 fi
 
+read -p 'Write your MySql login: ' MYSQL_USER
+if [[ "${MYSQL_USER}" == "root" ]]; then
+  echo "Cannot use user: root"
+  exit 1
+fi
+
+read -p 'Write your MySql password: ' MYSQL_PASS
+db_list_all=$(mysql -B -s -u ${MYSQL_USER} --password=${MYSQL_PASS} -e 'show databases' | grep -v information_schema)
+if [[ "$?" -gt 0 ]]; then
+  echo "Incorrect login or password from MySql"
+  exit 1
+fi
+
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+
+db_list=""
+# Get the database list, exclude information_schema
+for db in ${db_list_all}; do
+  db_list+=" ${db}"
+  if [[ "${db}" == *"test"* ]] || [[ "${db}" == "a_geo" ]] || [[ "${db}" == *"control"* ]]; then
+    echo "Ignore database: ${db}"
+  else
+    echo "Dumping database: ${db}"
+    # dump each database in a separate file
+    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --ignore-table=${db}.a_log --ignore-table=${db}.core_log_deprecate --ignore-table=${db}.core_log_data --ignore-table=${db}.core_log_state --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --skip-triggers "$db" > "$tmp_dir/$db.sql"
+  fi
+done
+echo "Dump save to: ${tmp_dir}"
+
 # Update packages
 apt update
 
-apt install libaio1 libaio-dev -y
-
-package_list=$(mktemp -p /tmp)
-dpkg --get-selections > ${package_list}
-if [[ -z "$(grep crudini ${package_list})" ]]; then
-  echo "Crudini is not installed."
-  exit 1
-fi
-rm ${package_list}
+apt install libaio1 libaio-dev crudini -y
 
 service mysql stop
 
@@ -40,6 +61,7 @@ apt autoclean -y
 rm -rf /etc/mysql
 rm -rf /usr/local/mysql
 rm -rf /usr/local/sql
+rm -rf /etc/init.d/mysql
 
 # Download MySql 8.0.16 sources
 wget -c https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz
@@ -70,6 +92,9 @@ chown mysql:mysql -R /usr/local/sql/${SQL_BIN}
 for s_bin in /usr/local/mysql/bin/*; do
   s_file=$(basename ${s_bin})
   if [[ ${s_file} == *"mysql"* ]]; then
+    if [[ -f "/usr/bin/${s_file}" ]]; then
+      rm -f /usr/bin/${s_file}
+    fi
     ln -s ${s_bin} /usr/bin/${s_file}
   fi
 done
@@ -89,6 +114,7 @@ crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
 crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
+crudini --set /etc/mysql/my.cnf mysqld port "3306"
 
 service mysql start
 
@@ -98,3 +124,20 @@ crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
 
 service mysql restart
 
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+
+# Create new DB user
+mysql -uroot -e "create user '${MYSQL_USER}'@'localhost' identified with mysql_native_password by '${MYSQL_PASS}';"
+
+for db in ${db_list}; do
+  mysql -uroot -e "create database ${db};"
+  mysql -uroot -e "grant ${a_privileges} on ${db}.* to '${MYSQL_USER}'@'localhost';"
+done
+
+mysql -uroot -e "flush privileges;"
+
+for backup_file in $(ls ${tmp_dir}); do
+  echo "Import: ${backup_file}"
+  mysql -u ${MYSQL_USER} --password=${MYSQL_PASS} ${backup_file::-4} < ${tmp_dir}/${backup_file}
+  echo ""
+done
