@@ -62,6 +62,7 @@ rm -rf /etc/mysql
 rm -rf /usr/local/mysql
 rm -rf /usr/local/sql
 rm -rf /etc/init.d/mysql
+rm -rf /var/log/mysql/
 
 # Download MySql 8.0.16 sources
 wget -c https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.16-linux-glibc2.12-x86_64.tar.xz
@@ -102,6 +103,7 @@ done
 ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 # Configuring MySql
+mkdir -p /var/log/mysql/
 mkdir -p /etc/mysql/conf.d
 touch /etc/mysql/my.cnf
 chmod 444 /etc/mysql/my.cnf
@@ -115,6 +117,7 @@ crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
 crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
 crudini --set /etc/mysql/my.cnf mysqld port "3306"
+crudini --set /etc/mysql/my.cnf mysqld log "/var/log/mysql/mysql.log"
 
 service mysql start
 
