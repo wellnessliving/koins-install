@@ -24,11 +24,6 @@ if [[ "${MYSQL_USER}" == "root" ]]; then
 fi
 
 read -p 'Write your MySql password: ' MYSQL_PASS
-db_list_all=$(mysql -B -s -u ${MYSQL_USER} --password=${MYSQL_PASS} -e 'show databases' | grep -v information_schema)
-if [[ "$?" -gt 0 ]]; then
-  echo "Incorrect login or password from MySql"
-  exit 1
-fi
 
 service mysql start
 
