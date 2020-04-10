@@ -24,6 +24,11 @@ if [[ "${MYSQL_USER}" == "root" ]]; then
 fi
 
 read -p 'Write your MySql password: ' MYSQL_PASS
+db_list_all=$(mysql -B -s -u ${MYSQL_USER} --password=${MYSQL_PASS} -e 'show databases' | grep -v information_schema)
+if [[ "$?" -gt 0 ]]; then
+  echo "Incorrect login or password from MySql"
+  exit 1
+fi
 
 service mysql start
 
@@ -38,15 +43,16 @@ a_privileges="alter,create,delete,drop,index,insert,lock tables,references,selec
 # Create new DB user
 mysql -uroot -e "create user '${MYSQL_USER}'@'localhost' identified with mysql_native_password by '${MYSQL_PASS}';"
 
+db_list="a_geo studio_trunk_control studio_trunk_main studio_trunk_test_geo studio_trunk_test_main wl_stable_control wl_stable_main wl_stable_test_geo wl_stable_test_main wl_trunk_control wl_trunk_main wl_trunk_shard_business_0 wl_trunk_shard_business_1 wl_trunk_test_geo wl_trunk_test_main wl_trunk_test_shard_business_0 wl_trunk_test_shard_business_1"
+for db in ${db_list}; do
+  mysql -uroot -e "create database ${db};"
+  mysql -uroot -e "grant ${a_privileges} on ${db}.* to '${MYSQL_USER}'@'localhost';"
+done
+
 mysql -uroot -e "flush privileges;"
 
 tmp_dir="/tmp/ci-oSRqF0MhDx"
-
 for backup_file in $(ls ${tmp_dir}); do
-  db=${backup_file::-4}
-  mysql -uroot -e "create database ${db};"
-  mysql -uroot -e "grant ${a_privileges} on ${db}.* to '${MYSQL_USER}'@'localhost';"
-
   echo "Import: ${backup_file}"
   mysql -u ${MYSQL_USER} --password=${MYSQL_PASS} ${backup_file::-4} < ${tmp_dir}/${backup_file}
   echo ""
