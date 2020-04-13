@@ -30,7 +30,8 @@ if [[ "$?" -gt 0 ]]; then
   exit 1
 fi
 
-tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+backup_dir="/root/backup/$(date +%Y-%m-%d_%H_%M_%S)"
+mkdir -p ${backup_dir}
 
 db_list=""
 # Get the database list, exclude information_schema
@@ -41,10 +42,10 @@ for db in ${db_list_all}; do
   else
     echo "Dumping database: ${db}"
     # dump each database in a separate file
-    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --ignore-table=${db}.a_log --ignore-table=${db}.core_log_deprecate --ignore-table=${db}.core_log_data --ignore-table=${db}.core_log_state --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --skip-triggers "$db" > "$tmp_dir/$db.sql"
+    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --ignore-table=${db}.a_log --ignore-table=${db}.core_log_deprecate --ignore-table=${db}.core_log_data --ignore-table=${db}.core_log_state --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --skip-triggers "$db" > "$backup_dir/$db.sql"
   fi
 done
-echo "Dump save to: ${tmp_dir}"
+echo "Dump save to: ${backup_dir}"
 
 # Update packages
 apt update
@@ -104,6 +105,10 @@ ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 # Configuring MySql
 mkdir -p /var/log/mysql/
+chmod 750 -R /var/log/mysql
+chown -R mysql:mysql /var/log/mysql
+chown -R mysql:adm /var/log/mysql
+
 mkdir -p /etc/mysql/conf.d
 touch /etc/mysql/my.cnf
 chmod 444 /etc/mysql/my.cnf
@@ -117,7 +122,7 @@ crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
 crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
 crudini --set /etc/mysql/my.cnf mysqld port "3306"
-crudini --set /etc/mysql/my.cnf mysqld log "/var/log/mysql/mysql.log"
+crudini --set /etc/mysql/my.cnf mysqld log_error "/var/log/mysql/mysql.log"
 
 service mysql start
 
@@ -139,8 +144,8 @@ done
 
 mysql -uroot -e "flush privileges;"
 
-for backup_file in $(ls ${tmp_dir}); do
+for backup_file in $(ls ${backup_dir}); do
   echo "Import: ${backup_file}"
-  mysql -u ${MYSQL_USER} --password=${MYSQL_PASS} ${backup_file::-4} < ${tmp_dir}/${backup_file}
+  mysql -u ${MYSQL_USER} --password=${MYSQL_PASS} ${backup_file::-4} < ${backup_dir}/${backup_file}
   echo ""
 done
