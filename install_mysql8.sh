@@ -8,6 +8,10 @@ if [[ "x$(id -u)" != 'x0' ]]; then
   exit 1
 fi
 
+if test "$BASH" = ""; then
+  check_result 1 "You must use: bash $0"
+fi
+
 # Asking for confirmation to proceed
 echo "This script remove MySql 5.7 and install MySql 8"
 echo "All databases will be deleted!!!"
