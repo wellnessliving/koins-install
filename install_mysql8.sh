@@ -36,6 +36,7 @@ fi
 
 backup_dir="/root/backup/$(date +%Y-%m-%d_%H_%M_%S)"
 mkdir -p ${backup_dir}
+echo ${db_list_all} > "/root/backup/db_list_$(date +%Y-%m-%d_%H_%M_%S)"
 
 db_list=""
 # Get the database list, exclude information_schema
