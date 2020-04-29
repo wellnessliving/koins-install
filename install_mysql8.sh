@@ -69,6 +69,7 @@ rm -rf /usr/local/mysql
 rm -rf /usr/local/sql
 rm -rf /etc/init.d/mysql
 rm -rf /var/log/mysql/
+rm -rf /var/lib/mysql/
 
 # Download MySql 8.0.19 sources
 wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz
