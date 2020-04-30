@@ -16,7 +16,7 @@ Purple='\033[0;35m' # Purple
 
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 # Need for decode json
-software="mc mcedit apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
+software="mc mcedit apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php7.2-dev php-pear php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
 
 # Defining return code check function
 check_result(){
@@ -350,6 +350,9 @@ if [[ ! -z "$(grep php7.3-cli ${tmpfile})" ]]; then
 fi
 rm -f ${tmpfile}
 
+# Install Sync extension.
+pecl install sync
+
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
@@ -571,6 +574,11 @@ crudini --set /etc/php/7.2/cli/php.ini PHP upload_max_filesize "64M"
 
 crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
 crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
+
+touch /etc/php/7.2/mods-available/sync.ini
+echo "extension=sync.so" > /etc/php/7.2/mods-available/sync.ini
+ln -s /etc/php/7.2/mods-available/sync.ini /etc/php/7.2/apache2/conf.d/sync.ini
+ln -s /etc/php/7.2/mods-available/sync.ini /etc/php/7.2/cli/conf.d/sync.ini
 
 # Restart all service
 service apache2 restart
