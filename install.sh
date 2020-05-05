@@ -16,7 +16,11 @@ Purple='\033[0;35m' # Purple
 
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 # Need for decode json
-software="mc mcedit apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip php7.2-dev php-pear php-apcu php-memcached memcached crudini libneon27-gnutls putty-tools libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
+
+software="mc mcedit putty-tools crudini"
+software+=" apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl"
+software+=" php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip"
+software+=" php-apcu php-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
 
 # Defining return code check function
 check_result(){
@@ -342,15 +346,11 @@ ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
-# Remove php 7.3 if installed.
-tmpfile=$(mktemp -p /tmp)
-dpkg --get-selections > ${tmpfile}
-if [[ ! -z "$(grep php7.3-cli ${tmpfile})" ]]; then
-  apt-get purge php7.3-cli -y
-fi
-rm -f ${tmpfile}
+# Remove php 7.3 and php 7.4 if installed.
+apt-get purge php7.3-cli php7.4-cli -y
 
-# Install Sync extension.
+# Install Pecl and Sync extension.
+apt install php7.2-dev php-pear
 pecl install sync
 
 echo -e "${Purple}#----------------------------------------------------------#
