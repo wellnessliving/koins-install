@@ -350,7 +350,7 @@ cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 apt-get purge php7.3-cli php7.4-cli -y
 
 # Install Pecl and Sync extension.
-apt install php7.2-dev php-pear
+apt -y install php7.2-dev php-pear
 pecl install sync
 
 echo -e "${Purple}#----------------------------------------------------------#
