@@ -515,7 +515,7 @@ crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_nati
 crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
 crudini --set /etc/mysql/my.cnf mysqld log_error "/var/log/mysql/mysql.log"
 
-service mysql start
+service mysql restart
 
 # Load timezone to mysql
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
@@ -890,7 +890,7 @@ update-rc.d memcached defaults
 service apache2 restart
 service mysql restart
 service memcached restart
-service gearman-job-serve start
+service gearman-job-server start
 
 echo -e "${Green}
 Installation finished successfully.
