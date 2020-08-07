@@ -501,6 +501,7 @@ chmod 750 -R /var/log/mysql
 chown -R mysql:mysql /var/log/mysql
 chown -R mysql:adm /var/log/mysql
 
+rm -rf /etc/mysql
 mkdir -p /etc/mysql/conf.d
 touch /etc/mysql/my.cnf
 chmod 444 /etc/mysql/my.cnf
