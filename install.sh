@@ -662,11 +662,11 @@ mysql -uroot -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 # Creating databases
 for project in ${a_site}; do
   project=$(echo "$project" | sed -r 's/\./_/g')
-  a_db_list="main control test_main test_geo test_shard_example_0 test_shard_example_1 test_create"
+  a_db_list="main control test_main test_geo test_shard_example_0 test_shard_example_1 test_create xa"
 
   s_prefix=$(echo "$project" | sed -r 's/_[a-z_]+//g')
   if [[ ${s_prefix} == "wl" ]]; then
-    a_db_list+=" shard_business_0 shard_business_1 test_shard_business_0 test_shard_business_1"
+    a_db_list+=" shard_business_0 shard_business_1 test_shard_business_0 test_shard_business_1 shard_report_0 shard_report_1 text_shard_report_0 text_shard_report_1"
   fi
 
   for db_name in ${a_db_list}; do
