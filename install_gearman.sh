@@ -8,4 +8,4 @@ apt update
 
 apt -y install gearman php-gearman
 service apache2 restart
-service gearman-job-serve start
+service gearman-job-server start
