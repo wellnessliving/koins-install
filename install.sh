@@ -313,6 +313,9 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
+# Remove php 7.3 and php 7.4 if installed.
+apt-get purge php7.3-cli php7.4-cli php8.0-cli -y
+
 # Download MySql 8.0.16 sources
 wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz
 
@@ -345,9 +348,6 @@ done
 ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
-
-# Remove php 7.3 and php 7.4 if installed.
-apt-get purge php7.3-cli php7.4-cli -y
 
 # Install Pecl and Sync extension.
 apt -y install php7.2-dev php-pear
