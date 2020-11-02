@@ -313,9 +313,6 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
-# Remove php 7.3 and php 7.4 if installed.
-apt-get purge php7.3-cli php7.4-cli php8.0-cli -y
-
 # Download MySql 8.0.16 sources
 wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz
 
@@ -348,6 +345,9 @@ done
 ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
+
+# Remove php 7.3 and php 7.4 if installed.
+apt-get purge php7.3-cli php7.4-cli -y
 
 # Install Pecl and Sync extension.
 apt -y install php7.2-dev php-pear
@@ -663,11 +663,11 @@ mysql -uroot -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 # Creating databases
 for project in ${a_site}; do
   project=$(echo "$project" | sed -r 's/\./_/g')
-  a_db_list="main control test_main test_geo test_shard_example_0 test_shard_example_1 test_create xa"
+  a_db_list="main control test_main test_geo test_shard_0 test_shard_1 test_create xa"
 
   s_prefix=$(echo "$project" | sed -r 's/_[a-z_]+//g')
   if [[ ${s_prefix} == "wl" ]]; then
-    a_db_list+=" shard_business_0 shard_business_1 test_shard_business_0 test_shard_business_1 shard_report_0 shard_report_1 test_shard_report_0 test_shard_report_1"
+    a_db_list+=" shard_0 shard_1"
   fi
 
   for db_name in ${a_db_list}; do
