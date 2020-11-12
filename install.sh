@@ -654,10 +654,11 @@ a2enmod rewrite
 mysql -uroot -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
 mysql -uroot -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
 
-a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,session_variables_admin"
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
 
 mysql -uroot -e "create database a_geo;"
 mysql -uroot -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
+mysql -uroot -e "grant session_variables_admin on *.* to '${db_login}'@'localhost';"
 mysql -uroot -e "grant select on a_geo.* to '${db_login}_read'@'localhost';"
 
 # Creating databases
@@ -844,11 +845,6 @@ i_attempt=0
 # Update DB
 for project in ${a_site}; do
   options=${unix_workspace}/${project}/.htprivate/options
-
-  echo "Clearing cache for ${project}"
-  php ${options}/cli.php cms.cache.clear
-  rm -rf ${unix_workspace}/${project}/.htprivate/writable/cache
-  echo
 
   echo "Update main DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
