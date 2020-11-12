@@ -834,6 +834,8 @@ done
 
 cp -a ${templates}/windows/selenium/ ${unix_workspace}
 
+chmod 777 -R ${unix_workspace}
+
 echo -e "${Purple}#----------------------------------------------------------#
 #                     Update Database                      #
 #----------------------------------------------------------#${NC}"
