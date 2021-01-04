@@ -466,12 +466,10 @@ if [[ "$xdebug" == "yes" ]]; then
   service ssh --full-restart
 
   echo "zend_extension=xdebug.so
-xdebug.default_enable=0
-xdebug.remote_enable=1
-xdebug.remote_host=127.0.0.1
-xdebug.remote_port=9001
+xdebug.mode=debug
+xdebug.start_with_request=trigger
 xdebug.idekey=PHPSTORM
-xdebug.max_nesting_level=1000" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
+xdebug.max_nesting_level=-1" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
 
   service apache2 restart
 fi
