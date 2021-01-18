@@ -147,6 +147,7 @@ for db in ${db_list}; do
   mysql -uroot -e "create database ${db};"
   mysql -uroot -e "grant ${a_privileges} on ${db}.* to '${MYSQL_USER}'@'localhost';"
 done
+mysql -uroot -e "grant session_variables_admin on *.* to '${MYSQL_USER}'@'localhost';"
 
 mysql -uroot -e "flush privileges;"
 
