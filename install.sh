@@ -847,7 +847,7 @@ for project in ${a_site}; do
   echo "Update main DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
-    php ${options}/cli.php db.update # Main database
+    sudo -u www-data php ${options}/cli.php db.update # Main database
     if [[ "$?" -eq 0 ]]; then
       break
     fi
@@ -859,7 +859,7 @@ for project in ${a_site}; do
   echo "Update test DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
-    php ${options}/cli.php db.update a # Test database
+    sudo -u www-data php ${options}/cli.php db.update a # Test database
     if [[ "$?" -eq 0 ]]; then
       break
     fi
