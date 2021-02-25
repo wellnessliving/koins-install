@@ -869,7 +869,7 @@ for project in ${a_site}; do
   echo
 
   echo "Update messages for ${project}"
-  php ${options}/cli.php cms.message.update
+  sudo -u www-data php ${options}/cli.php cms.message.update
   echo
   echo
 done
