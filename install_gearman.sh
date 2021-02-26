@@ -1,7 +1,8 @@
 #!/bin/bash
 
 if test "$BASH" = ""; then
-  check_result 1 "You must use: bash $0"
+  echo "You must use: bash $0"
+  exit 1
 fi
 
 apt update

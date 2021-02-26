@@ -9,7 +9,8 @@ if [[ "x$(id -u)" != 'x0' ]]; then
 fi
 
 if test "$BASH" = ""; then
-  check_result 1 "You must use: bash $0"
+  echo "You must use: bash $0"
+  exit 1
 fi
 
 # Asking for confirmation to proceed

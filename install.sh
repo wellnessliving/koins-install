@@ -53,11 +53,9 @@ gen_pass() {
 help_message() {
   echo -e "Usage: $0 [OPTIONS]
   -b, --bot-login           Bot login                      required
-  -a, --bot-password        Bot password                   required
   -d, --db-login            Login for DB                   default: koins
   -c, --db-password         Password for DB                default: lkchpy91
   -l, --prg-login           Login for PRG                  default: admin
-  -m, --prg-password        Password for PRG               default: 1
   -g, --checkout            Checkout projects     [yes|no] default: yes
   -x, --xdebug              Install xDebug        [yes|no] default: yes
   -w, --workspace           Path to workspace              default: /mnt/c/Workspace
@@ -82,11 +80,9 @@ for arg; do
   delimiter=""
   case "$arg" in
     --bot-login)        args="${args}-b " ;;
-    --bot-password)     args="${args}-a " ;;
     --db-login)         args="${args}-d " ;;
     --db-password)      args="${args}-c " ;;
     --prg-login)        args="${args}-l " ;;
-    --prg-password)     args="${args}-m " ;;
     --checkout)         args="${args}-g " ;;
     --xdebug)           args="${args}-x " ;;
     --workspace)        args="${args}-w " ;;
@@ -103,14 +99,12 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "b:a:s:k:p:d:c:l:m:g:x:w:t:fh" Option; do
+while getopts "b:s:k:p:d:c:l:g:x:w:t:fh" Option; do
   case ${Option} in
     b) bot_login=$OPTARG ;;        # Bot login
-    a) bot_password=$OPTARG ;;     # Bot password
     d) db_login=$OPTARG ;;         # Login for DB
     c) db_password=$OPTARG ;;      # Password for DB
     l) prg_login=$OPTARG ;;        # Login for PRG
-    m) prg_password=$OPTARG ;;     # Password for PRG
     g) checkout=$OPTARG ;;         # Checkout projects
     x) xdebug=$OPTARG ;;           # Checkout projects
     w) workspace=$OPTARG ;;        # Path to workspace
@@ -128,7 +122,6 @@ done
 set_default_value 'db_login' 'koins'
 set_default_value 'db_password' 'lkchpy91'
 set_default_value 'prg_login' 'admin'
-set_default_value 'prg_password' '1'
 set_default_value 'checkout' 'yes'
 set_default_value 'xdebug' 'yes'
 set_default_value 'workspace' '/mnt/c/Workspace'
@@ -156,12 +149,6 @@ fi
 printf "Checking set argument --bot-login: "
 if [[ ! -n "${bot_login}" ]]; then
   check_result 1 "Bot login not set. Try 'bash $0 --help' for more information."
-fi
-echo "[OK]"
-
-printf "Checking set argument --bot-password: "
-if [[ ! -n "${bot_password}" ]]; then
-  check_result 1 "Bot password not set. Try 'bash $0 --help' for more information."
 fi
 echo "[OK]"
 
@@ -240,7 +227,6 @@ echo "Install xDebug: ${xdebug}"
 echo "Checkout projects: ${checkout}"
 echo "Workspace: ${win_workspace}"
 echo "Login for PRG: ${prg_login}"
-echo "Password for PRG: ${prg_password}"
 echo "Login for DB: ${db_login}"
 echo "Password for DB: ${db_password}"
 echo "Host for trunk: ${host_trunk}"
@@ -359,18 +345,27 @@ apt -y install gearman php-gearman
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
-tmp_repository_file=$(mktemp -p /tmp)
-curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Key.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}&s_repository=libs" -o ${tmp_repository_file}
+status=""
+while [ "$status" != "ok" ]; do
+  read -p 'Write one time password from studio: ' one_time_password
 
-status=`jq -M -r '.status' ${tmp_repository_file}`
+  tmp_repository_file=$(mktemp -p /tmp)
+  curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Key.json' -X POST --data "s_login=${bot_login}&s_user_password=${one_time_password}&s_repository=libs" -o ${tmp_repository_file}
 
-if [[ "$status" != 'ok' ]]; then
-  message=`jq -M -r '.message' ${tmp_repository_file}`
-  echo "Error getting repository key: ${message}"
-  echo "Status: ${status}"
-  echo ${tmp_repository_file}
-  exit 1
-fi
+  status=`jq -M -r '.status' ${tmp_repository_file}`
+
+  if [[ "$status" != 'ok' ]]; then
+    message=`jq -M -r '.message' ${tmp_repository_file}`
+    echo "Error getting repository key: ${message}"
+    echo "Status: ${status}"
+    echo ${tmp_repository_file}
+    echo
+    read -p 'Try again?[y/n]: ' answer
+    if [[ "$answer" = 'n' ]] || [[ "$answer" = 'N'  ]]; then
+      exit 1
+    fi
+  fi
+done
 
 private_key=`jq -M '.s_private' ${tmp_repository_file}`
 passphrase=`jq -M '.s_password' ${tmp_repository_file}`
@@ -427,20 +422,34 @@ else
   check_result 1 "Key not set."
 fi
 
-tmp_user_file=$(mktemp -p /tmp)
-curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Detail/Detail.json' -X POST --data "s_login=${bot_login}&s_bot_password=${bot_password}" -o ${tmp_user_file}
+status=""
+while [ "$status" != "ok" ]; do
+  read -p 'Write one time password from studio: ' one_time_password
+  if [[ -z "$one_time_password" ]]; then
+    continue
+  fi
 
-status=`jq -M -r '.status' ${tmp_user_file}`
+  tmp_user_file=$(mktemp -p /tmp)
 
-if [[ "$status" != 'ok' ]]; then
-  message=`jq -M -r '.message' ${tmp_user_file}`
-  echo "Error getting repository key: ${message}"
-  echo "Status: ${status}"
-  echo ${tmp_user_file}
-  exit 1
-fi
+  curl -s 'https://dev.1024.info/en-default/Studio/Personnel/Detail/Detail.json' -X POST --data "s_login=${bot_login}&s_user_password=${one_time_password}" -o ${tmp_user_file}
+
+  status=`jq -M -r '.status' ${tmp_user_file}`
+
+  if [[ "$status" != 'ok' ]]; then
+    message=`jq -M -r '.message' ${tmp_user_file}`
+    echo "Error getting repository key: ${message}"
+    echo "Status: ${status}"
+    echo ${tmp_repository_file}
+    echo
+    read -p 'Try again?[y/n]: ' answer
+    if [[ "$answer" = 'n' ]] || [[ "$answer" = 'N'  ]]; then
+      exit 1
+    fi
+  fi
+done
 
 email=`jq -M -r '.text_mail' ${tmp_user_file}`
+bot_password=`jq -M -r '.s_bot_password' ${tmp_user_file}`
 rm -f ${tmp_user_file}
 
 # Add option AcceptFilter to config Apache and restart apache2
@@ -592,8 +601,9 @@ mkdir -p ${unix_workspace}/install_tmp
 echo "Checkouting templates files for configuring system"
 svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install_tmp
 
+install_tmp=${unix_workspace}/install_tmp
 # path to templates
-templates=${unix_workspace}/install_tmp/templates
+templates=${install_tmp}/templates
 
 if [[ ! -d "$templates" ]]; then
   svn co svn+libs://libs.svn.1024.info/reservationspot.com/install ${unix_workspace}/install_tmp
@@ -743,6 +753,10 @@ echo -e "${Purple}#----------------------------------------------------------#
 #                  Setting default files                   #
 #----------------------------------------------------------#${NC}"
 
+s_geo_host=$(crudini --get ${install_tmp}/config/geo.ini connect host)
+s_geo_login=$(crudini --get ${install_tmp}/config/geo.ini connect login)
+s_geo_name=$(crudini --get ${install_tmp}/config/geo.ini connect name)
+s_geo_password=$(crudini --get ${install_tmp}/config/geo.ini connect password)
 for project in ${a_site}; do
   path_htprivate="${unix_workspace}/${project}/.htprivate"
 
@@ -808,7 +822,6 @@ for project in ${a_site}; do
   s;%bot_login%;${bot_login};g
   s;%bot_password%;${bot_password};g
   s;%prg_login%;${prg_login};g
-  s;%prg_password%;${prg_password};g
   s;%ADDR_URL_SERVER%;${host};g
   s;%PATH_PUBLIC%;${PATH_PUBLIC};g
   " ${s_addr_template} > "${path_htprivate}/options/addr.php"
@@ -820,6 +833,10 @@ for project in ${a_site}; do
   s;%db_login%;${db_login};g
   s;%db_password%;${db_password};g
   s;%project%;${project_db};g
+  s;%GEO_HOST%;${s_geo_host};g
+  s;%GEO_LOGIN%;${s_geo_login};g
+  s;%GEO_NAME%;${s_geo_name};g
+  s;%GEO_PASSWORD%;${s_geo_password};g
   " ${s_db_template} > "${path_htprivate}/options/db.php"
 
   #.config/a.test.php
@@ -843,6 +860,21 @@ i_attempt=0
 # Update DB
 for project in ${a_site}; do
   options=${unix_workspace}/${project}/.htprivate/options
+
+  is_update_ar=0
+  while [[ ${is_update_ar} -eq 0 ]];
+  do
+    echo "Creating Active Record for ${project}"
+    sudo -u www-data php ${options}/cli.php "\\Core\\Db\\Ar\\Compile\\ArCompile"
+    if [[ "$?" -eq 0 ]]; then
+      is_update_ar=1
+    else
+      read -p 'Active record is not created. Try creating again?[y/n]: ' answer
+      if [[ "$answer" = 'n' ]] || [[ "$answer" = 'N'  ]]; then
+        is_update_ar=1
+      fi
+    fi
+  done
 
   echo "Update main DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
@@ -895,7 +927,6 @@ Installation finished successfully.
 Programmer's page(PRG):
 
     PRG username: ${prg_login}
-    PRG password: ${prg_password}
 
 MySql:
     username: ${db_login}
