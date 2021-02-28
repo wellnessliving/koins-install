@@ -75,6 +75,12 @@ if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
 fi
 
+ubuntu_version=$(lsb_release -sr)
+
+if [[ "$ubuntu_version" != '18.04' ]]; then
+  check_result 1 "Script work only on Ubuntu 18.04"
+fi
+
 # Translating argument to --gnu-long-options
 for arg; do
   delimiter=""
@@ -338,6 +344,7 @@ cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 # Install Pecl and Sync extension.
 apt -y install php7.2-dev php-pear
 pecl install sync
+pecl install inotify
 
 # Install Gearman
 apt -y install gearman php-gearman
@@ -590,6 +597,11 @@ touch /etc/php/7.2/mods-available/sync.ini
 echo "extension=sync.so" > /etc/php/7.2/mods-available/sync.ini
 ln -s /etc/php/7.2/mods-available/sync.ini /etc/php/7.2/apache2/conf.d/sync.ini
 ln -s /etc/php/7.2/mods-available/sync.ini /etc/php/7.2/cli/conf.d/sync.ini
+
+touch /etc/php/7.2/mods-available/inotify.ini
+echo "extension=inotify.so" > /etc/php/7.2/mods-available/inotify.ini
+ln -s /etc/php/7.2/mods-available/inotify.ini /etc/php/7.2/apache2/conf.d/inotify.ini
+ln -s /etc/php/7.2/mods-available/inotify.ini /etc/php/7.2/cli/conf.d/inotify.ini
 
 # Restart all service
 service apache2 restart
