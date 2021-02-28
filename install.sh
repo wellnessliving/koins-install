@@ -873,6 +873,12 @@ i_attempt=0
 for project in ${a_site}; do
   options=${unix_workspace}/${project}/.htprivate/options
 
+  echo "Clearing cache for ${project}"
+  sudo -u www-data php ${options}/cli.php cms.cache.clear
+  rm -rf ${unix_workspace}/${project}/.htprivate/writable/cache
+  mkdir ${unix_workspace}/${project}/.htprivate/writable/cache``
+  echo
+
   is_update_ar=0
   while [[ ${is_update_ar} -eq 0 ]];
   do
