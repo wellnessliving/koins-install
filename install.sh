@@ -922,6 +922,9 @@ for project in ${a_site}; do
   sudo -u www-data php ${options}/cli.php cms.message.update
   echo
   echo
+
+
+chmod 777 -R ${unix_workspace}/${project}
 done
 
 
