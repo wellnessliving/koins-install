@@ -923,10 +923,8 @@ for project in ${a_site}; do
   echo
   echo
 
-
-chmod 777 -R ${unix_workspace}/${project}
+  chmod 777 -R ${unix_workspace}/${project}
 done
-
 
 rm -rf ${unix_workspace}/install_tmp
 
