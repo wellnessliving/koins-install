@@ -916,7 +916,7 @@ for project in ${a_site}; do
   echo
 
   echo "Update messages for ${project}"
-  sudo -u www-data php ${options}/cli.php cms.message.update
+  php ${options}/cli.php cms.message.update
   echo
   echo
 
