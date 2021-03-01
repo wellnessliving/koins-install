@@ -347,7 +347,7 @@ pecl install sync
 pecl install inotify
 
 # Install Gearman
-apt -y install gearman php-gearman
+apt -y install gearman php7.2-gearman
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
@@ -465,7 +465,7 @@ AcceptFilter http none" >> /etc/apache2/apache2.conf
 
 # Configure xdebug
 if [[ "$xdebug" == "yes" ]]; then
-  apt-get -y install php-xdebug openssh-server
+  apt-get -y install php7.2-xdebug openssh-server
   dpkg-reconfigure openssh-server
 
   cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
