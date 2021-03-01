@@ -923,6 +923,8 @@ for project in ${a_site}; do
   chmod 777 -R ${unix_workspace}/${project}
 done
 
+chmod -R 777 /dev/shm/
+
 rm -rf ${unix_workspace}/install_tmp
 
 # Add service to start system
