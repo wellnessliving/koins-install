@@ -880,7 +880,7 @@ for project in ${a_site}; do
   while [[ ${is_update_ar} -eq 0 ]];
   do
     echo "Creating Active Record for ${project}"
-    sudo -u www-data php ${options}/cli.php "\\Core\\Db\\Ar\\Compile\\ArCompile"
+    php ${options}/cli.php "\\Core\\Db\\Ar\\Compile\\ArCompile"
     if [[ "$?" -eq 0 ]]; then
       is_update_ar=1
     else
@@ -894,7 +894,7 @@ for project in ${a_site}; do
   echo "Update main DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
-    sudo -u www-data php ${options}/cli.php db.update # Main database
+    php ${options}/cli.php db.update # Main database
     if [[ "$?" -eq 0 ]]; then
       break
     fi
@@ -906,7 +906,7 @@ for project in ${a_site}; do
   echo "Update test DB for ${project}"
   while [[ ${i_attempt} -lt ${max_attempt} ]];
   do
-    sudo -u www-data php ${options}/cli.php db.update a # Test database
+    php ${options}/cli.php db.update a # Test database
     if [[ "$?" -eq 0 ]]; then
       break
     fi
