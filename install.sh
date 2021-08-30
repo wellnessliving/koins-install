@@ -18,9 +18,9 @@ export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 # Need for decode json
 
 software="mc mcedit putty-tools crudini"
-software+=" apache2 php7.2 php7.2-bcmath php7.2-xml php7.2-curl"
-software+=" php7.2-gd php7.2-mbstring php7.2-mysql php7.2-soap php7.2-tidy php7.2-zip"
-software+=" php7.2-apcu php7.2-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
+software+=" apache2 php8.0 php8.0-bcmath php8.0-xml php8.0-curl"
+software+=" php8.0-gd php8.0-mbstring php8.0-mysql php8.0-soap php8.0-tidy php8.0-zip"
+software+=" php8.0-apcu php8.0-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
 
 # Defining return code check function
 check_result(){
@@ -206,7 +206,7 @@ echo "[OK]"
 echo "Checking installed packages..."
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
-for pkg in mysql-server apache2 php7.2; do
+for pkg in mysql-server apache2 php8.0; do
   if [[ ! -z "$(grep ${pkg} ${tmpfile})" ]]; then
     conflicts="$pkg $conflicts"
   fi
@@ -305,9 +305,6 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
-# Remove php 7.3, 7.4 and 8.0 if installed.
-apt-get purge php7.3-cli php7.4-cli php8.0-cli -y
-
 # Download MySql 8.0.16 sources
 wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz
 
@@ -342,12 +339,12 @@ ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 
 # Install Pecl and Sync extension.
-apt -y install php7.2-dev php-pear
+apt -y install php8.0-dev php-pear
 pecl install sync
 pecl install inotify
 
 # Install Gearman
-apt -y install gearman php7.2-gearman
+apt -y install gearman php8.0-gearman
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
@@ -465,7 +462,7 @@ AcceptFilter http none" >> /etc/apache2/apache2.conf
 
 # Configure xdebug
 if [[ "$xdebug" == "yes" ]]; then
-  apt-get -y install php7.2-xdebug openssh-server
+  apt-get -y install php8.0-xdebug openssh-server
   dpkg-reconfigure openssh-server
 
   cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
@@ -485,7 +482,7 @@ if [[ "$xdebug" == "yes" ]]; then
 xdebug.mode=debug
 xdebug.start_with_request=trigger
 xdebug.idekey=PHPSTORM
-xdebug.max_nesting_level=-1" > /etc/php/7.2/apache2/conf.d/20-xdebug.ini
+xdebug.max_nesting_level=-1" > /etc/php/8.0/apache2/conf.d/20-xdebug.ini
 
   service apache2 restart
 fi
@@ -539,69 +536,69 @@ crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
 service mysql restart
 
 echo "Configuring PHP"
-crudini --set /etc/php/7.2/apache2/php.ini PHP allow_url_fopen "1"
-crudini --set /etc/php/7.2/cli/php.ini PHP allow_url_fopen "1"
+crudini --set /etc/php/8.0/apache2/php.ini PHP allow_url_fopen "1"
+crudini --set /etc/php/8.0/cli/php.ini PHP allow_url_fopen "1"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP apc.entries_hint "524288"
-crudini --set /etc/php/7.2/cli/php.ini PHP apc.entries_hint "524288"
+crudini --set /etc/php/8.0/apache2/php.ini PHP apc.entries_hint "524288"
+crudini --set /etc/php/8.0/cli/php.ini PHP apc.entries_hint "524288"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP apc.gc_ttl "600"
-crudini --set /etc/php/7.2/cli/php.ini PHP apc.gc_ttl "600"
+crudini --set /etc/php/8.0/apache2/php.ini PHP apc.gc_ttl "600"
+crudini --set /etc/php/8.0/cli/php.ini PHP apc.gc_ttl "600"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP apc.shm_size "512M"
-crudini --set /etc/php/7.2/cli/php.ini PHP apc.shm_size "512M"
+crudini --set /etc/php/8.0/apache2/php.ini PHP apc.shm_size "512M"
+crudini --set /etc/php/8.0/cli/php.ini PHP apc.shm_size "512M"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP apc.ttl "60"
-crudini --set /etc/php/7.2/cli/php.ini PHP apc.ttl "60"
+crudini --set /etc/php/8.0/apache2/php.ini PHP apc.ttl "60"
+crudini --set /etc/php/8.0/cli/php.ini PHP apc.ttl "60"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP display_errors "1"
-crudini --set /etc/php/7.2/cli/php.ini PHP display_errors "1"
+crudini --set /etc/php/8.0/apache2/php.ini PHP display_errors "1"
+crudini --set /etc/php/8.0/cli/php.ini PHP display_errors "1"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP display_startup_errors "0"
-crudini --set /etc/php/7.2/cli/php.ini PHP display_startup_errors "0"
+crudini --set /etc/php/8.0/apache2/php.ini PHP display_startup_errors "0"
+crudini --set /etc/php/8.0/cli/php.ini PHP display_startup_errors "0"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP error_reporting "32767"
-crudini --set /etc/php/7.2/cli/php.ini PHP error_reporting "32767"
+crudini --set /etc/php/8.0/apache2/php.ini PHP error_reporting "32767"
+crudini --set /etc/php/8.0/cli/php.ini PHP error_reporting "32767"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP html_errors "0"
-crudini --set /etc/php/7.2/cli/php.ini PHP html_errors "0"
+crudini --set /etc/php/8.0/apache2/php.ini PHP html_errors "0"
+crudini --set /etc/php/8.0/cli/php.ini PHP html_errors "0"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP log_errors "1"
-crudini --set /etc/php/7.2/cli/php.ini PHP log_errors "1"
+crudini --set /etc/php/8.0/apache2/php.ini PHP log_errors "1"
+crudini --set /etc/php/8.0/cli/php.ini PHP log_errors "1"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
-crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP opcache.enable "1"
-crudini --set /etc/php/7.2/cli/php.ini PHP opcache.enable "1"
+crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.enable "1"
+crudini --set /etc/php/8.0/cli/php.ini PHP opcache.enable "1"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP opcache.max_accelerated_files "10000"
-crudini --set /etc/php/7.2/cli/php.ini PHP opcache.max_accelerated_files "10000"
+crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.max_accelerated_files "10000"
+crudini --set /etc/php/8.0/cli/php.ini PHP opcache.max_accelerated_files "10000"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP opcache.memory_consumption "128"
-crudini --set /etc/php/7.2/cli/php.ini PHP opcache.memory_consumption "128"
+crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.memory_consumption "128"
+crudini --set /etc/php/8.0/cli/php.ini PHP opcache.memory_consumption "128"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP opcache.validate_timestamps "1"
-crudini --set /etc/php/7.2/cli/php.ini PHP opcache.validate_timestamps "1"
+crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.validate_timestamps "1"
+crudini --set /etc/php/8.0/cli/php.ini PHP opcache.validate_timestamps "1"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP post_max_size "64M"
-crudini --set /etc/php/7.2/cli/php.ini PHP post_max_size "64M"
+crudini --set /etc/php/8.0/apache2/php.ini PHP post_max_size "64M"
+crudini --set /etc/php/8.0/cli/php.ini PHP post_max_size "64M"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP upload_max_filesize "64M"
-crudini --set /etc/php/7.2/cli/php.ini PHP upload_max_filesize "64M"
+crudini --set /etc/php/8.0/apache2/php.ini PHP upload_max_filesize "64M"
+crudini --set /etc/php/8.0/cli/php.ini PHP upload_max_filesize "64M"
 
-crudini --set /etc/php/7.2/apache2/php.ini PHP memory_limit "1024M"
-crudini --set /etc/php/7.2/cli/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
 
-touch /etc/php/7.2/mods-available/sync.ini
-echo "extension=sync.so" > /etc/php/7.2/mods-available/sync.ini
-ln -s /etc/php/7.2/mods-available/sync.ini /etc/php/7.2/apache2/conf.d/sync.ini
-ln -s /etc/php/7.2/mods-available/sync.ini /etc/php/7.2/cli/conf.d/sync.ini
+touch /etc/php/8.0/mods-available/sync.ini
+echo "extension=sync.so" > /etc/php/8.0/mods-available/sync.ini
+ln -s /etc/php/8.0/mods-available/sync.ini /etc/php/8.0/apache2/conf.d/sync.ini
+ln -s /etc/php/8.0/mods-available/sync.ini /etc/php/8.0/cli/conf.d/sync.ini
 
-touch /etc/php/7.2/mods-available/inotify.ini
-echo "extension=inotify.so" > /etc/php/7.2/mods-available/inotify.ini
-ln -s /etc/php/7.2/mods-available/inotify.ini /etc/php/7.2/apache2/conf.d/inotify.ini
-ln -s /etc/php/7.2/mods-available/inotify.ini /etc/php/7.2/cli/conf.d/inotify.ini
+touch /etc/php/8.0/mods-available/inotify.ini
+echo "extension=inotify.so" > /etc/php/8.0/mods-available/inotify.ini
+ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/apache2/conf.d/inotify.ini
+ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/cli/conf.d/inotify.ini
 
 # Restart all service
 service apache2 restart
