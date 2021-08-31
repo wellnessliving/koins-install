@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "x$(id -u)" != 'x0' ]; then
-  echo "Script can be run executed only by root"
+  echo "The script can only be run under the root"
   echo "Use command and enter password: sudo sh $0"
   exit 1
 fi
@@ -25,7 +25,7 @@ rm -f ${tmpfile}
 a2dismod php7.2
 a2enmod php8.0
 
-apt-get -y purge php7.2* # Remove PHP 7.2
+apt-get -y purge php7* # Remove PHP 7
 
 echo "Configuring PHP"
 crudini --set /etc/php/8.0/apache2/php.ini PHP allow_url_fopen "1"
@@ -90,7 +90,7 @@ xdebug.max_nesting_level=-1" > /etc/php/8.0/apache2/conf.d/20-xdebug.ini
 
 service apache2 restart
 
-apt -y install php8.0-dev php-pear
+apt-get -y install php8.0-dev php-pear
 pecl install sync
 pecl install inotify
 

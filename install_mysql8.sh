@@ -3,7 +3,7 @@
 export DEBIAN_FRONTEND=noninteractive
 
 if [[ "x$(id -u)" != 'x0' ]]; then
-  echo "Script can be run executed only by root"
+  echo "The script can only be run under the root"
   echo "Use command and enter password: sudo bash $0"
   exit 1
 fi

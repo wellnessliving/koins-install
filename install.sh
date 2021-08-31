@@ -136,7 +136,7 @@ set_default_value 'host_stable' 'stable.wellnessliving.local'
 
 printf "Checking root permissions: "
 if [[ "x$(id -u)" != 'x0' ]]; then
-  check_result 1 "Script can be run executed only by root"
+  check_result 1 "The script can only be run under the root"
 fi
 echo "[OK]"
 
@@ -462,8 +462,7 @@ AcceptFilter http none" >> /etc/apache2/apache2.conf
 
 # Configure xdebug
 if [[ "$xdebug" == "yes" ]]; then
-  apt-get -y install php8.0-xdebug openssh-server
-  dpkg-reconfigure openssh-server
+  apt-get -y install php8.0-xdebug
 
   cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
 
