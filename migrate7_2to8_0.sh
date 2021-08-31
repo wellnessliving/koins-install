@@ -91,6 +91,8 @@ xdebug.max_nesting_level=-1" > /etc/php/8.0/apache2/conf.d/20-xdebug.ini
 service apache2 restart
 
 apt-get -y install php8.0-dev php-pear
+pecl uninstall sync
+pecl uninstall inotify
 pecl install sync
 pecl install inotify
 
