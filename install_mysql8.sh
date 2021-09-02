@@ -14,7 +14,7 @@ if test "$BASH" = ""; then
 fi
 
 # Asking for confirmation to proceed
-echo "This script remove MySql 5.7 and install MySql 8"
+echo "This script remove old MySql and install MySql 8"
 echo "All databases will be deleted!!!"
 read -p 'Would you like to continue [y/n]: ' answer
 if [[ "$answer" != 'y' ]] && [[ "$answer" != 'Y'  ]]; then
