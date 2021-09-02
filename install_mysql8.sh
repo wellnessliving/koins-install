@@ -155,6 +155,7 @@ mysql -uroot -e "grant select on a_geo.* to '${MYSQL_USER}_read'@'localhost';"
 for db in ${db_list}; do
   mysql -uroot -e "create database ${db};"
   mysql -uroot -e "grant ${a_privileges} on ${db}.* to '${MYSQL_USER}'@'localhost';"
+  mysql -uroot -e "grant select on ${db}.* to '${MYSQL_USER}_read'@'localhost';"
 done
 
 mysql -uroot -e "flush privileges;"
