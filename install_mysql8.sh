@@ -48,7 +48,7 @@ for db in ${db_list_all}; do
   else
     echo "Dumping database: ${db}"
     # dump each database in a separate file
-    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --ignore-table=${db}.a_log --ignore-table=${db}.core_log_deprecate --ignore-table=${db}.core_log_data --ignore-table=${db}.core_log_state --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --skip-triggers "$db" > "$backup_dir/$db.sql"
+    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --ignore-table=${db}.a_log --ignore-table=${db}.core_log_deprecate --ignore-table=${db}.core_log_data --ignore-table=${db}.core_log_state --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --ignore-table=${db}.core_sos_provider_database --skip-triggers "$db" > "$backup_dir/$db.sql"
   fi
 done
 echo "Dump save to: ${backup_dir}"
