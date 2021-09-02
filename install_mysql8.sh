@@ -143,12 +143,19 @@ a_privileges="alter,create,delete,drop,index,insert,lock tables,references,selec
 
 # Create new DB user
 mysql -uroot -e "create user '${MYSQL_USER}'@'localhost' identified with mysql_native_password by '${MYSQL_PASS}';"
+mysql -uroot -e "create user '${MYSQL_USER}_read'@'localhost' identified with mysql_native_password by '${MYSQL_PASS}';"
+
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+
+mysql -uroot -e "create database a_geo;"
+mysql -uroot -e "grant ${a_privileges} on a_geo.* to '${MYSQL_USER}'@'localhost';"
+mysql -uroot -e "grant session_variables_admin on *.* to '${MYSQL_USER}'@'localhost';"
+mysql -uroot -e "grant select on a_geo.* to '${MYSQL_USER}_read'@'localhost';"
 
 for db in ${db_list}; do
   mysql -uroot -e "create database ${db};"
   mysql -uroot -e "grant ${a_privileges} on ${db}.* to '${MYSQL_USER}'@'localhost';"
 done
-mysql -uroot -e "grant session_variables_admin on *.* to '${MYSQL_USER}'@'localhost';"
 
 mysql -uroot -e "flush privileges;"
 
