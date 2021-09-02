@@ -72,8 +72,8 @@ rm -rf /etc/init.d/mysql
 rm -rf /var/log/mysql/
 rm -rf /var/lib/mysql/
 
-# Download MySql 8.0.19 sources
-wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz
+# Download MySql 8.0.25 sources
+wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
 if [[ "$?" -gt 0 ]]; then
   echo "Cannot download mysql"
   exit 1
@@ -81,11 +81,11 @@ fi
 
 # Extract all files from archive and delete archive.
 mkdir -p /usr/local/sql
-tar xf mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz -C /usr/local/sql
-rm -rf mysql-8.0.19-linux-glibc2.12-x86_64.tar.xz
+tar xf mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz -C /usr/local/sql
+rm -rf mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
 
 # Installing MySql
-SQL_BIN="mysql-8.0.19-linux-glibc2.12-x86_64"
+SQL_BIN="mysql-8.0.25-linux-glibc2.12-x86_64"
 
 groupadd -f mysql
 useradd -r -g mysql -s /bin/false mysql
