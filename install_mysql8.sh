@@ -43,7 +43,7 @@ db_list=""
 # Get the database list, exclude information_schema
 for db in ${db_list_all}; do
   db_list+=" ${db}"
-  if [[ "${db}" == *"test"* ]] || [[ "${db}" == "a_geo" ]] || [[ "${db}" == *"control"* ]]; then
+  if [[ "${db}" == *"test"* ]] || [[ "${db}" == "a_geo" ]] || [[ "${db}" == "mysql" ]] || [[ "${db}" == "information_schema" ]] || [[ "${db}" == "performance_schema" ]] || [[ "${db}" == "sys" ]] || [[ "${db}" == *"control"* ]]; then
     echo "Ignore database: ${db}"
   else
     echo "Dumping database: ${db}"
