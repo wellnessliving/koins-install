@@ -54,16 +54,16 @@ done
 echo "Dump save to: ${backup_dir}"
 
 # Update packages
-apt update
+apt-get update
 
-apt install libaio1 libaio-dev crudini -y
+apt-get install libaio1 libaio-dev crudini -y
 
 service mysql stop
 
-apt purge mysql-server* mysql-client* mysql-common* -y
+apt-get purge mysql-server* mysql-client* mysql-common* -y
 
-apt autoremove -y
-apt autoclean -y
+apt-get autoremove -y
+apt-get autoclean -y
 
 rm -rf /etc/mysql
 rm -rf /usr/local/mysql
