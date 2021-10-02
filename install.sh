@@ -776,12 +776,15 @@ for project in ${a_site}; do
   if [[ "$project" == "wl.trunk" ]]; then
     host=${host_trunk}
     CLASS_INITIALIZE="\\\Wl\\\Config\\\ConfigTrunkDeveloper"
+    CONFIGURATION_NAME="trunk.developer"
   elif [[ "$project" == "wl.stable" ]]; then
     host=${host_stable}
     CLASS_INITIALIZE="\\\Wl\\\Config\\\ConfigStableDeveloper"
+    CONFIGURATION_NAME="staging.developer"
   elif [[ "$project" == "wl.production" ]]; then
     host=${host_production}
     CLASS_INITIALIZE="\\\Wl\\\Config\\\ConfigProductionDeveloper"
+    CONFIGURATION_NAME="production.developer"
   elif [[ "$project" == "studio.trunk" ]]; then
     host=${host_studio}
     ALL_MAIN="studio"
@@ -824,6 +827,7 @@ for project in ${a_site}; do
   s;%ADDR_PATH_WORKSPACE%;${ADDR_PATH_WORKSPACE};g
   s;%WORKSPACE%;${unix_workspace};g
   s;%CLASS_INITIALIZE%;${CLASS_INITIALIZE};g
+  s;%CONFIGURATION_NAME%;${CONFIGURATION_NAME};g
   s;%A_TEST_XML_XSD%;${A_TEST_XML_XSD};g
   s;%ADDR_SECRET%;${ADDR_SECRET};g
   s;%email%;${email};g
