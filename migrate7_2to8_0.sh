@@ -82,6 +82,9 @@ crudini --set /etc/php/8.0/cli/php.ini PHP upload_max_filesize "64M"
 crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
 crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
 
+crudini --set /etc/php/8.0/apache2/php.ini PHP pcre.jit "0"
+crudini --set /etc/php/8.0/cli/php.ini PHP pcre.jit "0"
+
 echo "zend_extension=xdebug.so
 xdebug.mode=debug
 xdebug.start_with_request=trigger

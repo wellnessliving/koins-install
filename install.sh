@@ -589,6 +589,9 @@ crudini --set /etc/php/8.0/cli/php.ini PHP upload_max_filesize "64M"
 crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
 crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
 
+crudini --set /etc/php/8.0/apache2/php.ini PHP pcre.jit "0"
+crudini --set /etc/php/8.0/cli/php.ini PHP pcre.jit "0"
+
 touch /etc/php/8.0/mods-available/sync.ini
 echo "extension=sync.so" > /etc/php/8.0/mods-available/sync.ini
 ln -s /etc/php/8.0/mods-available/sync.ini /etc/php/8.0/apache2/conf.d/sync.ini
