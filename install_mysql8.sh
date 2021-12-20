@@ -145,7 +145,7 @@ a_privileges="alter,create,delete,drop,index,insert,lock tables,references,selec
 mysql -uroot -e "create user '${MYSQL_USER}'@'localhost' identified with mysql_native_password by '${MYSQL_PASS}';"
 mysql -uroot -e "create user '${MYSQL_USER}_read'@'localhost' identified with mysql_native_password by '${MYSQL_PASS}';"
 
-a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,create temporary tables"
 
 mysql -uroot -e "create database a_geo;"
 mysql -uroot -e "grant ${a_privileges} on a_geo.* to '${MYSQL_USER}'@'localhost';"

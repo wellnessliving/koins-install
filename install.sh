@@ -673,7 +673,7 @@ a2enmod rewrite
 mysql -uroot -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
 mysql -uroot -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
 
-a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger"
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,create temporary tables"
 
 mysql -uroot -e "create database a_geo;"
 mysql -uroot -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"
