@@ -735,10 +735,45 @@ if [[ "$checkout" = 'yes' ]]; then
 
   if [[ ! -z "$host_studio" ]]; then
     # Studio
-    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/studio.trunk/core" # Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
-    svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" # project
+    svn co "${unix_workspace}/studio.trunk/core" # Core
+    svn co "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
+    svn co "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
+    svn co "${unix_workspace}/studio.trunk/project" # project
+  fi
+else
+  if [[ ! -z "$host_trunk" ]]; then
+    # Trunk
+    svn update "${unix_workspace}/wl.trunk/core" # Core
+    svn update "${unix_workspace}/wl.trunk/namespace.Core" # namespace.Core
+    svn update "${unix_workspace}/wl.trunk/namespace.Social" # namespace.Social
+    svn update "${unix_workspace}/wl.trunk/namespace.Wl" # namespace.Wl
+    svn update "${unix_workspace}/wl.trunk/project" # project
+  fi
+
+  if [[ ! -z "$host_stable" ]]; then
+    # Stable
+    svn update "${unix_workspace}/wl.stable/core" # Core
+    svn update "${unix_workspace}/wl.stable/namespace.Core" # namespace.Core
+    svn update "${unix_workspace}/wl.stable/namespace.Social" # namespace.Social
+    svn update "${unix_workspace}/wl.stable/namespace.Wl" # namespace.Wl
+    svn update "${unix_workspace}/wl.stable/project" # project
+  fi
+
+  if [[ ! -z "$host_production" ]]; then
+    # Production
+    svn update "${unix_workspace}/wl.production/core" # Core
+    svn update "${unix_workspace}/wl.production/namespace.Core" # namespace.Core
+    svn update "${unix_workspace}/wl.production/namespace.Social" # namespace.Social
+    svn update "${unix_workspace}/wl.production/namespace.Wl" # namespace.Wl
+    svn update "${unix_workspace}/wl.production/project" # project
+  fi
+
+  if [[ ! -z "$host_studio" ]]; then
+    # Studio
+    svn update "${unix_workspace}/studio.trunk/core" # Core
+    svn update "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
+    svn update "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
+    svn update "${unix_workspace}/studio.trunk/project" # project
   fi
 fi
 
