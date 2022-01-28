@@ -735,10 +735,10 @@ if [[ "$checkout" = 'yes' ]]; then
 
   if [[ ! -z "$host_studio" ]]; then
     # Studio
-    svn co "${unix_workspace}/studio.trunk/core" # Core
-    svn co "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
-    svn co "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
-    svn co "${unix_workspace}/studio.trunk/project" # project
+    svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/studio.trunk/core" # Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
+    svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
+    svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" # project
   fi
 else
   if [[ ! -z "$host_trunk" ]]; then
