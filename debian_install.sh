@@ -740,9 +740,7 @@ for project in ${a_site}; do
   fi
 
   # public_html/index.php
-  sed -e "
-  s;%path_htprivate%;${path_htprivate};g
-  " "${templates}/public_html/index.php" > "${workspace}/${project}/public_html/index.php"
+  cp ${templates}/public_html/index.php "${unix_workspace}/${project}/public_html/index.php"
 
   # public_html/.htaccess
   sed -e "
@@ -757,30 +755,21 @@ for project in ${a_site}; do
   cp "${templates}/options/inc.php" "${workspace}/${project}/.htprivate/options/inc.php"
   cp "${templates}/options/cli.php" "${workspace}/${project}/.htprivate/options/cli.php"
 
-  ADDR_PATH_TOP="${path_htprivate}/"
-  ADDR_PATH_WORKSPACE="${workspace}/${project}/"
-  A_TEST_XML_XSD="${workspace}/shared/xsd/"
   ADDR_SECRET=$(gen_pass)
-  PATH_PUBLIC="${workspace}/${project}/public_html/"
   path_config="${workspace}/${project}/project/.config"
   mkdir -p -v "${path_config}"
 
   # options/addr.php
   sed -e "
   s;%ALL_MAIN%;${ALL_MAIN};g
-  s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
-  s;%ADDR_PATH_WORKSPACE%;${ADDR_PATH_WORKSPACE};g
-  s;%WORKSPACE%;${workspace};g
   s;%CLASS_INITIALIZE%;${CLASS_INITIALIZE};g
   s;%CONFIGURATION_NAME%;${CONFIGURATION_NAME};g
-  s;%A_TEST_XML_XSD%;${A_TEST_XML_XSD};g
   s;%ADDR_SECRET%;${ADDR_SECRET};g
   s;%email%;${email};g
   s;%bot_login%;${bot_login};g
   s;%bot_password%;${bot_password};g
   s;%prg_login%;${prg_login};g
   s;%ADDR_URL_SERVER%;${host};g
-  s;%PATH_PUBLIC%;${PATH_PUBLIC};g
   " "${s_addr_template}" > "${path_htprivate}/options/addr.php"
 
   project_db=$(echo "$project" | sed -r 's/\./_/g')
@@ -801,7 +790,6 @@ for project in ${a_site}; do
   s;%db_login%;${db_login};g
   s;%db_password%;${db_password};g
   s;%project%;${project_db};g
-  s;%ADDR_PATH_TOP%;${ADDR_PATH_TOP};g
   " "${s_config_template} "> "${path_config}/a.test.php"
 done
 
