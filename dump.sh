@@ -19,7 +19,7 @@ do
   else
     echo "Dumping database: ${db}"
     # dump each database in a separate file
-    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --ignore-table=${db}.core_sos_provider_database --skip-triggers "$db" > "$tmp_dir/$db.sql"
+    mysqldump -u ${MYSQL_USER} --password=${MYSQL_PASS} --no-tablespaces --ignore-table=${db}.core_log_cache --ignore-table=${db}.core_search_provider_index --ignore-table=${db}.core_amazon_search_index --ignore-table=${db}.core_sos_provider_database --skip-triggers "$db" > "$tmp_dir/$db.sql"
   fi
 done
 
