@@ -21,6 +21,7 @@ software="mc mcedit putty-tools crudini"
 software+=" apache2 php8.0 php8.0-bcmath php8.0-xml php8.0-curl"
 software+=" php8.0-gd php8.0-mbstring php8.0-mysql php8.0-soap php8.0-tidy php8.0-zip"
 software+=" php8.0-apcu php8.0-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
+software+=" default-jre awscli"
 
 # Defining return code check function
 check_result(){
@@ -346,6 +347,22 @@ pecl install inotify
 # Install Gearman
 apt -y install gearman php8.0-gearman
 
+# Delete php8.1-cli if installed.
+apt-get -y purge php8.1-cl
+
+wget -c https://s3.ap-south-1.amazonaws.com/dynamodb-local-mumbai/dynamodb_local_latest.tar.gz
+if [[ "$?" -gt 0 ]]; then
+  echo "Cannot download DynamoDb"
+fi
+
+mkdir -p /root/DynamoDb/
+tar xf dynamodb_local_latest.tar.gz -C /root/DynamoDb/
+rm dynamodb_local_latest.tar.gz
+
+aws configure set aws_access_key_id local
+aws configure set aws_secret_access_key local
+aws configure set region local
+
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
@@ -650,6 +667,11 @@ done
 # Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
 cp ${templates}/sh/clear.sh /root/clear.sh
+
+# Creates DynamoDb service and create tables.
+cp ${templates}/service/dynamodb /etc/init.d/dynamodb
+service dynamodb start
+aws dynamodb create-table --table-name test --attribute-definitions AttributeName=s_partition,AttributeType=S AttributeName=s_sort,AttributeType=S --key-schema AttributeName=s_partition,KeyType=HASH AttributeName=s_sort,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5 --endpoint-url http://localhost:8000
 
 # Create script to dump DB and restore db.
 sed -e "

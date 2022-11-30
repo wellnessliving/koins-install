@@ -15,15 +15,15 @@ if [[ "$?" -gt 0 ]]; then
   exit 1
 fi
 
-mkdir -p /root/DynamoDb/
-tar xf dynamodb_local_latest.tar.gz -C /root/DynamoDb/
+mkdir -p /usr/lib/dynamodb
+tar xf dynamodb_local_latest.tar.gz -C /usr/lib/dynamodb
 rm dynamodb_local_latest.tar.gz
 
 aws configure set aws_access_key_id local
 aws configure set aws_secret_access_key local
 aws configure set region local
 
-cd /root/DynamoDb/
-java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb &
+cd /usr/lib/dynamodb
+java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb >/dev/null 2>&1 &
 
 aws dynamodb create-table --table-name test --attribute-definitions AttributeName=s_partition,AttributeType=S AttributeName=s_sort,AttributeType=S --key-schema AttributeName=s_partition,KeyType=HASH AttributeName=s_sort,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5 --endpoint-url http://localhost:8000
