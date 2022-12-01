@@ -355,8 +355,8 @@ if [[ "$?" -gt 0 ]]; then
   echo "Cannot download DynamoDb"
 fi
 
-mkdir -p /root/DynamoDb/
-tar xf dynamodb_local_latest.tar.gz -C /root/DynamoDb/
+mkdir -p /usr/lib/dynamodb
+tar xf dynamodb_local_latest.tar.gz -C /usr/lib/dynamodb
 rm dynamodb_local_latest.tar.gz
 
 aws configure set aws_access_key_id local
