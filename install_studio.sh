@@ -353,6 +353,7 @@ rm -rf ${unix_workspace}/install_tmp
 service apache2 restart
 service mysql restart
 service memcached restart
+service dynamodb start
 service gearman-job-server start
 
 echo -e "${Green}

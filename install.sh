@@ -623,6 +623,7 @@ ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/cli/conf.d/inotify.in
 service apache2 restart
 service mysql restart
 service memcached restart
+service dynamodb start
 
 mkdir -p ${unix_workspace}/install_tmp
 
@@ -985,6 +986,7 @@ update-rc.d memcached defaults
 service apache2 restart
 service mysql restart
 service memcached restart
+service dynamodb start
 service gearman-job-server start
 
 echo -e "${Green}
