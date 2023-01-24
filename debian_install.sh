@@ -297,6 +297,9 @@ echo -e "${Purple}#----------------------------------------------------------#
 sudo apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
+echo "In the following prompt please select php 8.0 as your default php version (version php8.1+ is not supported yet): "
+sudo update-alternatives --config php
+
 cd "${workspace}/less/3.9.0" && npm install less@3.9.0
 
 # Install Pecl and Sync extension.
@@ -790,6 +793,8 @@ for project in ${a_site}; do
   s;%db_password%;${db_password};g
   s;%project%;${project_db};g
   " "${s_config_template} "> "${path_config}/a.test.php"
+
+  sudo chmod -R 777 "${path_htprivate}/writable"
 done
 
 echo "Downloading Selenium"
@@ -872,6 +877,18 @@ mkdir /dev/shm/demoTaskThread
 sudo chown www-data:www-data /dev/shm/demoTaskThread
 sudo chmod 777 /dev/shm/demoTaskThread/
 
+mkdir /dev/shm/demoDebugRun
+sudo chown www-data:www-data /dev/shm/demoDebugRun
+sudo chmod 777 /dev/shm/demoDebugRun/
+
+mkdir /dev/shm/stagingTaskThread
+sudo chown www-data:www-data /dev/shm/stagingTaskThread
+sudo chmod 777 /dev/shm/stagingTaskThread/
+
+mkdir /dev/shm/stagingDebugRun
+sudo chown www-data:www-data /dev/shm/stagingDebugRun
+sudo chmod 777 /dev/shm/stagingDebugRun/
+
 rm -rf "${install_tmp}"
 
 # Add service to start system
@@ -905,6 +922,8 @@ echo -e "Created scripts:
     ${workspace}/restore.sh - To restore DB from backup files. It will ask for the storage folder on start.
     ${workspace}/clear.sh   - To clear all the project cache folders. Usage: ${workspace}/clear.sh <project_folder>
                               Example: ${workspace}/clear.sh ${workspace}/wl.trunk
+
+Ensure that your wl.trunk directory and all its parents are searchable. To do it run chmod a+x on each of the parent directories.
 
 Project checked-out at: ${workspace}
 Key for repository 'libs' saved in ${workspace}/keys/libs.key${NC}"

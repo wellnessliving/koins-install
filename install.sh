@@ -306,6 +306,9 @@ echo -e "${Purple}#----------------------------------------------------------#
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
+echo "In the following prompt please select php 8.0 as your default php version (version php8.1+ is not supported yet): "
+update-alternatives --config php
+
 # Download MySql 8.0.25 sources
 wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
 
@@ -346,9 +349,6 @@ pecl install inotify
 
 # Install Gearman
 apt -y install gearman php8.0-gearman
-
-# Delete php8.1-cli if installed.
-apt-get -y purge php8.1-cl
 
 wget -c https://s3.ap-south-1.amazonaws.com/dynamodb-local-mumbai/dynamodb_local_latest.tar.gz
 if [[ "$?" -gt 0 ]]; then
