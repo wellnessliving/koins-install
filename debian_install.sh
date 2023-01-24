@@ -431,7 +431,7 @@ fi
 # Configuring svn
 svn info
 printf "Configuring SVN: "
-crudini --set ~/.subversion/config tunnels libs "ssh svn@libs.svn.1024.info -p 35469 -i ~/.ssh/libs.pub"
+sudo crudini --set ~/.subversion/config tunnels libs "ssh svn@libs.svn.1024.info -p 35469 -i ~/.ssh/libs.pub"
 
 echo "Configuring MySql"
 
@@ -511,17 +511,17 @@ sudo crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
 sudo crudini --set /etc/php/8.0/apache2/php.ini PHP pcre.jit "0"
 sudo crudini --set /etc/php/8.0/cli/php.ini PHP pcre.jit "0"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP post_max_size "64M"
-crudini --set /etc/php/8.0/cli/php.ini PHP post_max_size "64M"
+sudo crudini --set /etc/php/8.0/apache2/php.ini PHP post_max_size "64M"
+sudo crudini --set /etc/php/8.0/cli/php.ini PHP post_max_size "64M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP upload_max_filesize "64M"
-crudini --set /etc/php/8.0/cli/php.ini PHP upload_max_filesize "64M"
+sudo crudini --set /etc/php/8.0/apache2/php.ini PHP upload_max_filesize "64M"
+sudo crudini --set /etc/php/8.0/cli/php.ini PHP upload_max_filesize "64M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
-crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
+sudo crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
+sudo crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP pcre.jit "0"
-crudini --set /etc/php/8.0/cli/php.ini PHP pcre.jit "0"
+sudo crudini --set /etc/php/8.0/apache2/php.ini PHP pcre.jit "0"
+sudo crudini --set /etc/php/8.0/cli/php.ini PHP pcre.jit "0"
 
 # Restart all services
 sudo systemctl restart apache2
@@ -584,12 +584,11 @@ s;%mysql_password%;${db_password};g
 " "${templates}/sh/restore.sh" > "${workspace}/restore.sh"
 chmod +x "${workspace}/restore.sh"
 
-crudini --set ~/.my.conf mysqldump user "${db_login}"
-crudini --set ~/.my.conf mysqldump password "${db_password}"
+sudo crudini --set ~/.my.conf mysqldump user "${db_login}"
+sudo crudini --set ~/.my.conf mysqldump password "${db_password}"
 
 # a2enmod & a2enconf
 sudo a2enmod rewrite
-
 
 # Create new DB user
 sudo mysql -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
@@ -740,7 +739,7 @@ for project in ${a_site}; do
   fi
 
   # public_html/index.php
-  cp ${templates}/public_html/index.php "${unix_workspace}/${project}/public_html/index.php"
+  cp ${templates}/public_html/index.php "${workspace}/${project}/public_html/index.php"
 
   # public_html/.htaccess
   sed -e "
