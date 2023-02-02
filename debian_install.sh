@@ -597,7 +597,7 @@ sudo a2enmod rewrite
 sudo mysql -e "create user '${db_login}'@'localhost' identified with mysql_native_password by '${db_password}';"
 sudo mysql -e "create user '${db_login}_read'@'localhost' identified with mysql_native_password by '${db_password}';"
 
-a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,create temporary tables"
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,create temporary tables,alter routine,create routine,execute"
 
 sudo mysql -e "create database a_geo;"
 sudo mysql -e "grant ${a_privileges} on a_geo.* to '${db_login}'@'localhost';"

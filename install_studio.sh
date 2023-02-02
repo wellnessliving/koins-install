@@ -236,7 +236,7 @@ for project in ${a_site}; do
   a2ensite "${host}.conf"
 done
 
-a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,create temporary tables"
+a_privileges="alter,create,delete,drop,index,insert,lock tables,references,select,update,trigger,create temporary tables,alter routine,create routine,execute"
 
 # Creating databases
 for project in ${a_site}; do
