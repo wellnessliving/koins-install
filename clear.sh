@@ -29,6 +29,8 @@ rm -rfv ${s_project_dir}/.htprivate/writable/sos
 rm -rfv ${s_project_dir}/.htprivate/writable/testSos
 rm -rfv ${s_project_dir}/.htprivate/writable/tmp
 rm -rfv ${s_project_dir}/.htprivate/writable/var
+rm -rfv ${s_project_dir}/.htprivate/writable/php/ConfigAutoloadCache.php
+rm -rfv ${s_project_dir}/.htprivate/writable/php/ConfigAutoloadCache.var
 
 # Clear public_html
 rm -rfv ${s_project_dir}/public_html/static
