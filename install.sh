@@ -21,7 +21,7 @@ software="mc mcedit putty-tools crudini"
 software+=" apache2 php8.0 php8.0-bcmath php8.0-xml php8.0-curl"
 software+=" php8.0-gd php8.0-mbstring php8.0-mysql php8.0-soap php8.0-tidy php8.0-zip"
 software+=" php8.0-apcu php8.0-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
-software+=" default-jre awscli"
+software+=" default-jre awscli libncurses5"
 
 # Defining return code check function
 check_result(){
@@ -542,6 +542,8 @@ crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
 crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
 crudini --set /etc/mysql/my.cnf mysqld log_error "/var/log/mysql/mysql.log"
+crudini --set /etc/mysql/my.cnf mysqld expire_logs_days "1"
+crudini --set /etc/mysql/my.cnf mysqld binlog_order_commits "0"
 
 service mysql restart
 

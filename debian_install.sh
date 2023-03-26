@@ -447,6 +447,8 @@ sudo crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_trx_commit "0"
 sudo crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_native_password"
 sudo crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
 sudo crudini --set /etc/mysql/my.cnf mysqld log_error "/var/log/mysql/mysql.log"
+sudo crudini --set /etc/mysql/my.cnf mysqld expire_logs_days "1"
+sudo crudini --set /etc/mysql/my.cnf mysqld binlog_order_commits "0"
 
 sudo systemctl restart mysql
 

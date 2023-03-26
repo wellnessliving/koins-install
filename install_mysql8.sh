@@ -130,6 +130,8 @@ crudini --set /etc/mysql/my.cnf mysqld default_authentication_plugin "mysql_nati
 crudini --set /etc/mysql/my.cnf mysqld innodb_use_native_aio "off"
 crudini --set /etc/mysql/my.cnf mysqld port "3306"
 crudini --set /etc/mysql/my.cnf mysqld log_error "/var/log/mysql/mysql.log"
+crudini --set /etc/mysql/my.cnf mysqld expire_logs_days "1"
+crudini --set /etc/mysql/my.cnf mysqld binlog_order_commits "0"
 
 service mysql start
 
