@@ -873,7 +873,6 @@ for project in ${a_site}; do
   cp ${templates}/options/inc.php ${unix_workspace}/${project}/.htprivate/options/inc.php
   cp ${templates}/options/cli.php ${unix_workspace}/${project}/.htprivate/options/cli.php
 
-  ADDR_SECRET=$(gen_pass)
   path_config=${unix_workspace}/${project}/project/.config
   mkdir -p -v ${path_config}
 
@@ -882,7 +881,7 @@ for project in ${a_site}; do
   s;%ALL_MAIN%;${ALL_MAIN};g
   s;%CLASS_INITIALIZE%;${CLASS_INITIALIZE};g
   s;%CONFIGURATION_NAME%;${CONFIGURATION_NAME};g
-  s;%ADDR_SECRET%;${ADDR_SECRET};g
+  s;%ADDR_SECRET%;${bot_login};g
   s;%email%;${email};g
   s;%bot_login%;${bot_login};g
   s;%bot_password%;${bot_password};g
