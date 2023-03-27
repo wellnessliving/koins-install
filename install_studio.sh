@@ -166,6 +166,7 @@ a_site="studio.trunk"
 printf "Creating file structure: "
 
 mkdir -p ${unix_workspace}/keys
+mkdir -p ${unix_workspace}/less/3.9.0
 mkdir -p ${unix_workspace}/less/4.1.3
 
 for project in ${a_site}; do
