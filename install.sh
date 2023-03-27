@@ -278,7 +278,7 @@ fi
 printf "Creating file structure: "
 
 mkdir -p ${unix_workspace}/keys
-mkdir -p ${unix_workspace}/less/3.9.0
+mkdir -p ${unix_workspace}/less/4.1.3
 
 for project in ${a_site}; do
   mkdir -p ${unix_workspace}/${project}/{.htprivate/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}},public_html/{a/drive,static}}
@@ -340,7 +340,7 @@ done
 
 ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
-cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
+cd ${unix_workspace}/less/4.1.3 && npm install less@4.1.3
 
 # Install Pecl and Sync extension.
 apt -y install php8.0-dev php-pear

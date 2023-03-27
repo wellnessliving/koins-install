@@ -263,7 +263,7 @@ fi
 printf "Creating file structure: "
 
 mkdir -p "${workspace}/keys"
-mkdir -p "${workspace}/less/3.9.0"
+mkdir -p "${workspace}/less/4.1.3"
 
 for project in ${a_site}; do
   mkdir -p "${workspace}/${project}"/{.htprivate/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}},public_html/{a/drive,static}}
@@ -300,7 +300,7 @@ check_result $? "apt-get install failed"
 echo "In the following prompt please select php 8.0 as your default php version (version php8.1+ is not supported yet): "
 sudo update-alternatives --config php
 
-cd "${workspace}/less/3.9.0" && npm install less@3.9.0
+cd "${workspace}/less/4.1.3" && npm install less@4.1.3
 
 # Install Pecl and Sync extension.
 sudo pecl install sync
