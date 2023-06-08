@@ -122,6 +122,7 @@ chmod 444 /etc/mysql/my.cnf
 
 crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
 crudini --set /etc/mysql/my.cnf mysqld character_set_server "binary"
+crudini --set /etc/mysql/my.cnf mysqld log_bin "0"
 crudini --set /etc/mysql/my.cnf mysqld log_bin_trust_function_creators "ON"
 crudini --set /etc/mysql/my.cnf mysqld max_allowed_packet "104857600"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"

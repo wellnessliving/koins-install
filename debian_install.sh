@@ -315,6 +315,12 @@ echo "extension=inotify.so" | sudo tee /etc/php/8.0/mods-available/inotify.ini >
 sudo ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/apache2/conf.d/inotify.ini
 sudo ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/cli/conf.d/inotify.ini
 
+sudo pecl install yac
+touch /etc/php/8.0/mods-available/yac.ini
+echo "extension=yac.so" > /etc/php/8.0/mods-available/yac.ini
+ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/apache2/conf.d/yac.ini
+ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/cli/conf.d/yac.ini
+
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
 #----------------------------------------------------------#${NC}"
@@ -442,6 +448,7 @@ echo "Configuring MySql"
 
 sudo crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
 sudo crudini --set /etc/mysql/my.cnf mysqld character_set_server "binary"
+sudo crudini --set /etc/mysql/my.cnf mysqld log_bin "0"
 sudo crudini --set /etc/mysql/my.cnf mysqld log_bin_trust_function_creators "ON"
 sudo crudini --set /etc/mysql/my.cnf mysqld max_allowed_packet "104857600"
 sudo crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"

@@ -348,6 +348,7 @@ cd ${unix_workspace}/less/4.1.3 && npm install less@4.1.3
 apt -y install php8.0-dev php-pear
 pecl install sync
 pecl install inotify
+pecl install yac
 
 # Install Gearman
 apt -y install gearman php8.0-gearman
@@ -538,6 +539,7 @@ chmod 444 /etc/mysql/my.cnf
 
 crudini --set /etc/mysql/my.cnf mysqld sql_mode ""
 crudini --set /etc/mysql/my.cnf mysqld character_set_server "binary"
+crudini --set /etc/mysql/my.cnf mysqld log_bin "0"
 crudini --set /etc/mysql/my.cnf mysqld log_bin_trust_function_creators "ON"
 crudini --set /etc/mysql/my.cnf mysqld max_allowed_packet "104857600"
 crudini --set /etc/mysql/my.cnf mysqld innodb_flush_log_at_timeout "60"
@@ -623,6 +625,11 @@ touch /etc/php/8.0/mods-available/inotify.ini
 echo "extension=inotify.so" > /etc/php/8.0/mods-available/inotify.ini
 ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/apache2/conf.d/inotify.ini
 ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/cli/conf.d/inotify.ini
+
+touch /etc/php/8.0/mods-available/yac.ini
+echo "extension=yac.so" > /etc/php/8.0/mods-available/yac.ini
+ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/apache2/conf.d/yac.ini
+ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/cli/conf.d/yac.ini
 
 # Restart all service
 service apache2 restart
