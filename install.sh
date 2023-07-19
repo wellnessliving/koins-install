@@ -681,7 +681,6 @@ done
 
 # Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
-cp ${templates}/sh/clear.sh /root/clear.sh
 
 # Creates DynamoDb service and create tables.
 cp ${templates}/service/dynamodb /etc/init.d/dynamodb
@@ -943,7 +942,6 @@ for project in ${a_site}; do
   options=${unix_workspace}/${project}/.htprivate/options
 
   echo "Clearing cache for ${project}"
-  bash /root/clear.sh ${unix_workspace}/${project}
 
   is_update_ar=0
   while [[ ${is_update_ar} -eq 0 ]];
