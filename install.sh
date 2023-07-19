@@ -304,6 +304,8 @@ check_result $? 'apt-get upgrade failed'
 echo -e "${Purple}#----------------------------------------------------------#
 #             Install packages and dependencies            #
 #----------------------------------------------------------#${NC}"
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
