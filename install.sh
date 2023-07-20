@@ -304,6 +304,8 @@ check_result $? 'apt-get upgrade failed'
 echo -e "${Purple}#----------------------------------------------------------#
 #             Install packages and dependencies            #
 #----------------------------------------------------------#${NC}"
+
+dpkg --remove --force-remove-reinstreq libnode-dev
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 
 apt-get -y install ${software}
