@@ -76,12 +76,6 @@ if test "$BASH" = ""; then
   check_result 1 "You must use: bash $0"
 fi
 
-ubuntu_version=$(lsb_release -sr)
-
-if [[ "$ubuntu_version" != '18.04' ]]; then
-  check_result 1 "Script work only on Ubuntu 18.04"
-fi
-
 # Translating argument to --gnu-long-options
 for arg; do
   delimiter=""
