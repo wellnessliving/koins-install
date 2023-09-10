@@ -20,7 +20,7 @@ export PYTHONIOENCODING=utf8 # Need for decode json
 software="mc mcedit putty-tools crudini"
 software+=" apache2 php8.0 php8.0-bcmath php8.0-xml php8.0-curl"
 software+=" php8.0-gd php8.0-mbstring php8.0-mysql php8.0-soap php8.0-tidy php8.0-zip"
-software+=" php8.0-apcu php8.0-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev"
+software+=" php8.0-apcu php8.0-memcached memcached libneon27-gnutls libserf-1-1 jq subversion libaio1 libaio-dev"
 software+=" default-jre awscli libncurses5"
 
 # Defining return code check function
