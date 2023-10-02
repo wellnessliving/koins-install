@@ -6,6 +6,11 @@ if [ "x$(id -u)" != 'x0' ]; then
   exit 1
 fi
 
+ubuntu_version=$(lsb_release -sr)
+if [[ "$ubuntu_version" != '22.04' ]]; then
+  check_result 1 "Script work only on Ubuntu 22.04"
+fi
+
 add-apt-repository ppa:ondrej/php
 apt update
 
