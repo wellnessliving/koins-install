@@ -83,6 +83,8 @@ crudini --set /etc/php/8.2/cli/php.ini PHP memory_limit "1024M"
 crudini --set /etc/php/8.2/apache2/php.ini PHP pcre.jit "0"
 crudini --set /etc/php/8.2/cli/php.ini PHP pcre.jit "0"
 
+crudini --set /etc/php/8.2/apache2/php.ini PHP register_argc_argv ""
+
 echo "zend_extension=xdebug.so
 xdebug.mode=debug
 xdebug.start_with_request=trigger
