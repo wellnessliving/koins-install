@@ -20,7 +20,7 @@ export PYTHONIOENCODING=utf8 # Need for decode json
 software="mc mcedit putty-tools crudini gearman"
 software+=" apache2 php8.2 php8.2-bcmath php8.2-xml php8.2-curl"
 software+=" php8.2-gd php8.2-mbstring php8.2-mysql php8.2-soap php8.2-tidy php8.2-zip"
-software+=" php8.2-apcu php8.2-memcached php8.2-yac php8.2-gearman memcached libneon27-gnutls libserf-1-1 jq subversion libaio1 libaio-dev"
+software+=" php8.2-apcu php8.2-memcached php8.2-gearman memcached libneon27-gnutls libserf-1-1 jq subversion libaio1 libaio-dev"
 software+=" nodejs libncurses5"
 
 # Defining return code check function
@@ -341,6 +341,7 @@ cd ${unix_workspace}/less/4.1.3 && npm install less@4.1.3
 # Install Pecl and Sync extension.
 apt -y install php8.2-dev php-pear
 pecl install sync
+pecl install yac
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
@@ -596,6 +597,11 @@ touch /etc/php/8.2/mods-available/sync.ini
 echo "extension=sync.so" > /etc/php/8.2/mods-available/sync.ini
 ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/apache2/conf.d/sync.ini
 ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/cli/conf.d/sync.ini
+
+touch /etc/php/8.0/mods-available/yac.ini
+echo "extension=yac.so" > /etc/php/8.0/mods-available/yac.ini
+ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/apache2/conf.d/yac.ini
+ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/cli/conf.d/yac.ini
 
 # Restart all service
 service apache2 restart
@@ -892,7 +898,7 @@ done
 
 cp -a ${templates}/windows/selenium/ ${unix_workspace}
 
-echo -e "Changing permissions..."
+echo -e "Changing permissions for Workspace directory..."
 chmod 777 -R ${unix_workspace}
 
 echo -e "${Purple}#----------------------------------------------------------#
