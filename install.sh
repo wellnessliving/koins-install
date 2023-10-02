@@ -600,8 +600,8 @@ ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/cli/conf.d/sync.ini
 
 touch /etc/php/8.2/mods-available/yac.ini
 echo "extension=yac.so" > /etc/php/8.2/mods-available/yac.ini
-ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.2/apache2/conf.d/yac.ini
-ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.2/cli/conf.d/yac.ini
+ln -s /etc/php/8.2/mods-available/yac.ini /etc/php/8.2/apache2/conf.d/yac.ini
+ln -s /etc/php/8.2/mods-available/yac.ini /etc/php/8.2/cli/conf.d/yac.ini
 
 # Restart all service
 service apache2 restart
