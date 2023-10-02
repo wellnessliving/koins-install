@@ -591,6 +591,8 @@ crudini --set /etc/php/8.2/cli/php.ini PHP memory_limit "1024M"
 crudini --set /etc/php/8.2/apache2/php.ini PHP pcre.jit "0"
 crudini --set /etc/php/8.2/cli/php.ini PHP pcre.jit "0"
 
+crudini --set /etc/php/8.2/apache2/php.ini PHP register_argc_argv ""
+
 touch /etc/php/8.2/mods-available/sync.ini
 echo "extension=sync.so" > /etc/php/8.2/mods-available/sync.ini
 ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/apache2/conf.d/sync.ini
