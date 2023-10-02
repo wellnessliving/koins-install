@@ -118,6 +118,7 @@ set_default_value 'workspace' '/mnt/c/Workspace'
 set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
 
+ubuntu_version=$(lsb_release -sr)
 if [[ "$ubuntu_version" != '22.04' ]] && [[ -z "$force" ]]; then
   check_result 1 "Script work only on Ubuntu 22.04"
 fi
