@@ -95,7 +95,7 @@ apt-get -y install php8.2-dev php-pear
 pecl uninstall sync
 pecl install sync
 pecl uninstall yac
-pecl install yac
+echo '' | pecl install yac
 
 touch /etc/php/8.2/mods-available/sync.ini
 echo "extension=sync.so" > /etc/php/8.2/mods-available/sync.ini
