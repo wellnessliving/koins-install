@@ -17,11 +17,11 @@ Purple='\033[0;35m' # Purple
 export DEBIAN_FRONTEND=noninteractive
 export PYTHONIOENCODING=utf8 # Need for decode json
 
-software="mc mcedit putty-tools crudini"
-software+=" apache2 php8.0 php8.0-bcmath php8.0-xml php8.0-curl"
-software+=" php8.0-gd php8.0-mbstring php8.0-mysql php8.0-soap php8.0-tidy php8.0-zip"
-software+=" php8.0-apcu php8.0-memcached memcached libneon27-gnutls libserf-1-1 jq subversion libaio1 libaio-dev"
-software+=" default-jre awscli libncurses5"
+software="mc mcedit putty-tools crudini gearman"
+software+=" apache2 php8.2 php8.2-bcmath php8.2-xml php8.2-curl"
+software+=" php8.2-gd php8.2-mbstring php8.2-mysql php8.2-soap php8.2-tidy php8.2-zip"
+software+=" php8.2-apcu php8.2-memcached php8.2-yac php8.2-gearman memcached libneon27-gnutls libserf-1-1 jq subversion libaio1 libaio-dev"
+software+=" nodejs libncurses5"
 
 # Defining return code check function
 check_result(){
@@ -37,17 +37,6 @@ set_default_value() {
   if [[ -z "$variable" ]]; then
     eval $1=$2
   fi
-}
-
-# Defining password-gen function
-gen_pass() {
-  MATRIX='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-  LENGTH=16
-  while [[ ${n:=1} -le ${LENGTH} ]]; do
-    PASS="$PASS${MATRIX:$(($RANDOM%${#MATRIX})):1}"
-    let n+=1
-  done
-  echo "$PASS"
 }
 
 # Defining help function
@@ -129,6 +118,10 @@ set_default_value 'workspace' '/mnt/c/Workspace'
 set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
 
+if [[ "$ubuntu_version" != '22.04' ]] && [[ -z "$force" ]]; then
+  check_result 1 "Script work only on Ubuntu 22.04"
+fi
+
 printf "Checking root permissions: "
 if [[ "x$(id -u)" != 'x0' ]]; then
   check_result 1 "The script can only be run under the root"
@@ -201,7 +194,7 @@ echo "[OK]"
 echo "Checking installed packages..."
 tmpfile=$(mktemp -p /tmp)
 dpkg --get-selections > ${tmpfile}
-for pkg in mysql-server apache2 php8.0; do
+for pkg in mysql-server apache2 php8.2; do
   if [[ ! -z "$(grep ${pkg} ${tmpfile})" ]]; then
     conflicts="$pkg $conflicts"
   fi
@@ -272,7 +265,6 @@ fi
 printf "Creating file structure: "
 
 mkdir -p ${unix_workspace}/keys
-mkdir -p ${unix_workspace}/less/3.9.0
 mkdir -p ${unix_workspace}/less/4.1.3
 
 for project in ${a_site}; do
@@ -280,6 +272,12 @@ for project in ${a_site}; do
 done
 
 echo "[OK]"
+
+echo "Adding NodeJS repository..."
+apt update
+
+dpkg --remove --force-remove-reinstreq libnode-dev
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 
 echo "Adding php repository..."
 add-apt-repository ppa:ondrej/php -y
@@ -299,13 +297,11 @@ echo -e "${Purple}#----------------------------------------------------------#
 #             Install packages and dependencies            #
 #----------------------------------------------------------#${NC}"
 
-dpkg --remove --force-remove-reinstreq libnode-dev
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 
 apt-get -y install ${software}
 check_result $? "apt-get install failed"
 
-echo "In the following prompt please select php 8.0 as your default php version (version php8.1+ is not supported yet): "
+echo "In the following prompt please select php 8.2 as your default php version (version php8.1+ is not supported yet): "
 update-alternatives --config php
 
 # Download MySql 8.0.25 sources
@@ -339,30 +335,11 @@ done
 
 ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
 
-cd ${unix_workspace}/less/3.9.0 && npm install less@3.9.0
 cd ${unix_workspace}/less/4.1.3 && npm install less@4.1.3
 
 # Install Pecl and Sync extension.
-apt -y install php8.0-dev php-pear
+apt -y install php8.2-dev php-pear
 pecl install sync
-pecl install inotify
-pecl install yac
-
-# Install Gearman
-apt -y install gearman php8.0-gearman
-
-wget -c https://s3.ap-south-1.amazonaws.com/dynamodb-local-mumbai/dynamodb_local_latest.tar.gz
-if [[ "$?" -gt 0 ]]; then
-  echo "Cannot download DynamoDb"
-fi
-
-mkdir -p /usr/lib/dynamodb
-tar xf dynamodb_local_latest.tar.gz -C /usr/lib/dynamodb
-rm dynamodb_local_latest.tar.gz
-
-aws configure set aws_access_key_id local
-aws configure set aws_secret_access_key local
-aws configure set region local
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
@@ -480,7 +457,7 @@ AcceptFilter http none" >> /etc/apache2/apache2.conf
 
 # Configure xdebug
 if [[ "$xdebug" == "yes" ]]; then
-  apt-get -y install php8.0-xdebug
+  apt-get -y install php8.2-xdebug
 
   cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup # Create backup config file
 
@@ -499,7 +476,7 @@ if [[ "$xdebug" == "yes" ]]; then
 xdebug.mode=debug
 xdebug.start_with_request=trigger
 xdebug.idekey=PHPSTORM
-xdebug.max_nesting_level=-1" > /etc/php/8.0/apache2/conf.d/20-xdebug.ini
+xdebug.max_nesting_level=-1" > /etc/php/8.2/apache2/conf.d/20-xdebug.ini
 
   service apache2 restart
 fi
@@ -557,83 +534,72 @@ crudini --set /etc/mysql/my.cnf mysqld default_time_zone "UTC"
 service mysql restart
 
 echo "Configuring PHP"
-crudini --set /etc/php/8.0/apache2/php.ini PHP allow_url_fopen "1"
-crudini --set /etc/php/8.0/cli/php.ini PHP allow_url_fopen "1"
+crudini --set /etc/php/8.2/apache2/php.ini PHP allow_url_fopen "1"
+crudini --set /etc/php/8.2/cli/php.ini PHP allow_url_fopen "1"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP apc.entries_hint "524288"
-crudini --set /etc/php/8.0/cli/php.ini PHP apc.entries_hint "524288"
+crudini --set /etc/php/8.2/apache2/php.ini PHP apc.entries_hint "524288"
+crudini --set /etc/php/8.2/cli/php.ini PHP apc.entries_hint "524288"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP apc.gc_ttl "600"
-crudini --set /etc/php/8.0/cli/php.ini PHP apc.gc_ttl "600"
+crudini --set /etc/php/8.2/apache2/php.ini PHP apc.gc_ttl "600"
+crudini --set /etc/php/8.2/cli/php.ini PHP apc.gc_ttl "600"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP apc.shm_size "512M"
-crudini --set /etc/php/8.0/cli/php.ini PHP apc.shm_size "512M"
+crudini --set /etc/php/8.2/apache2/php.ini PHP apc.shm_size "512M"
+crudini --set /etc/php/8.2/cli/php.ini PHP apc.shm_size "512M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP apc.ttl "60"
-crudini --set /etc/php/8.0/cli/php.ini PHP apc.ttl "60"
+crudini --set /etc/php/8.2/apache2/php.ini PHP apc.ttl "60"
+crudini --set /etc/php/8.2/cli/php.ini PHP apc.ttl "60"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP display_errors "1"
-crudini --set /etc/php/8.0/cli/php.ini PHP display_errors "1"
+crudini --set /etc/php/8.2/apache2/php.ini PHP display_errors "1"
+crudini --set /etc/php/8.2/cli/php.ini PHP display_errors "1"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP display_startup_errors "0"
-crudini --set /etc/php/8.0/cli/php.ini PHP display_startup_errors "0"
+crudini --set /etc/php/8.2/apache2/php.ini PHP display_startup_errors "0"
+crudini --set /etc/php/8.2/cli/php.ini PHP display_startup_errors "0"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP error_reporting "32767"
-crudini --set /etc/php/8.0/cli/php.ini PHP error_reporting "32767"
+crudini --set /etc/php/8.2/apache2/php.ini PHP error_reporting "32767"
+crudini --set /etc/php/8.2/cli/php.ini PHP error_reporting "32767"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP html_errors "0"
-crudini --set /etc/php/8.0/cli/php.ini PHP html_errors "0"
+crudini --set /etc/php/8.2/apache2/php.ini PHP html_errors "0"
+crudini --set /etc/php/8.2/cli/php.ini PHP html_errors "0"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP log_errors "1"
-crudini --set /etc/php/8.0/cli/php.ini PHP log_errors "1"
+crudini --set /etc/php/8.2/apache2/php.ini PHP log_errors "1"
+crudini --set /etc/php/8.2/cli/php.ini PHP log_errors "1"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
-crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.2/apache2/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.2/cli/php.ini PHP memory_limit "1024M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.enable "1"
-crudini --set /etc/php/8.0/cli/php.ini PHP opcache.enable "1"
+crudini --set /etc/php/8.2/apache2/php.ini PHP opcache.enable "1"
+crudini --set /etc/php/8.2/cli/php.ini PHP opcache.enable "1"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.max_accelerated_files "10000"
-crudini --set /etc/php/8.0/cli/php.ini PHP opcache.max_accelerated_files "10000"
+crudini --set /etc/php/8.2/apache2/php.ini PHP opcache.max_accelerated_files "10000"
+crudini --set /etc/php/8.2/cli/php.ini PHP opcache.max_accelerated_files "10000"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.memory_consumption "128"
-crudini --set /etc/php/8.0/cli/php.ini PHP opcache.memory_consumption "128"
+crudini --set /etc/php/8.2/apache2/php.ini PHP opcache.memory_consumption "128"
+crudini --set /etc/php/8.2/cli/php.ini PHP opcache.memory_consumption "128"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP opcache.validate_timestamps "1"
-crudini --set /etc/php/8.0/cli/php.ini PHP opcache.validate_timestamps "1"
+crudini --set /etc/php/8.2/apache2/php.ini PHP opcache.validate_timestamps "1"
+crudini --set /etc/php/8.2/cli/php.ini PHP opcache.validate_timestamps "1"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP post_max_size "64M"
-crudini --set /etc/php/8.0/cli/php.ini PHP post_max_size "64M"
+crudini --set /etc/php/8.2/apache2/php.ini PHP post_max_size "64M"
+crudini --set /etc/php/8.2/cli/php.ini PHP post_max_size "64M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP upload_max_filesize "64M"
-crudini --set /etc/php/8.0/cli/php.ini PHP upload_max_filesize "64M"
+crudini --set /etc/php/8.2/apache2/php.ini PHP upload_max_filesize "64M"
+crudini --set /etc/php/8.2/cli/php.ini PHP upload_max_filesize "64M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP memory_limit "1024M"
-crudini --set /etc/php/8.0/cli/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.2/apache2/php.ini PHP memory_limit "1024M"
+crudini --set /etc/php/8.2/cli/php.ini PHP memory_limit "1024M"
 
-crudini --set /etc/php/8.0/apache2/php.ini PHP pcre.jit "0"
-crudini --set /etc/php/8.0/cli/php.ini PHP pcre.jit "0"
+crudini --set /etc/php/8.2/apache2/php.ini PHP pcre.jit "0"
+crudini --set /etc/php/8.2/cli/php.ini PHP pcre.jit "0"
 
-touch /etc/php/8.0/mods-available/sync.ini
-echo "extension=sync.so" > /etc/php/8.0/mods-available/sync.ini
-ln -s /etc/php/8.0/mods-available/sync.ini /etc/php/8.0/apache2/conf.d/sync.ini
-ln -s /etc/php/8.0/mods-available/sync.ini /etc/php/8.0/cli/conf.d/sync.ini
-
-touch /etc/php/8.0/mods-available/inotify.ini
-echo "extension=inotify.so" > /etc/php/8.0/mods-available/inotify.ini
-ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/apache2/conf.d/inotify.ini
-ln -s /etc/php/8.0/mods-available/inotify.ini /etc/php/8.0/cli/conf.d/inotify.ini
-
-touch /etc/php/8.0/mods-available/yac.ini
-echo "extension=yac.so" > /etc/php/8.0/mods-available/yac.ini
-ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/apache2/conf.d/yac.ini
-ln -s /etc/php/8.0/mods-available/yac.ini /etc/php/8.0/cli/conf.d/yac.ini
+touch /etc/php/8.2/mods-available/sync.ini
+echo "extension=sync.so" > /etc/php/8.2/mods-available/sync.ini
+ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/apache2/conf.d/sync.ini
+ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/cli/conf.d/sync.ini
 
 # Restart all service
 service apache2 restart
 service mysql restart
 service memcached restart
-service dynamodb start
 
 mkdir -p ${unix_workspace}/install_tmp
 
@@ -678,11 +644,6 @@ done
 # Create script to run services
 cp ${templates}/sh/server.sh /root/server.sh
 
-# Creates DynamoDb service and create tables.
-cp ${templates}/service/dynamodb /etc/init.d/dynamodb
-service dynamodb start
-aws dynamodb create-table --table-name test --attribute-definitions AttributeName=s_partition,AttributeType=S AttributeName=s_sort,AttributeType=S --key-schema AttributeName=s_partition,KeyType=HASH AttributeName=s_sort,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5 --endpoint-url http://localhost:8000
-
 # Create script to dump DB and restore db.
 sed -e "
 s;%workspace%;${unix_workspace};g
@@ -720,6 +681,10 @@ for project in ${a_site}; do
   s_prefix=$(echo "$project" | sed -r 's/_[a-z_]+//g')
   if [[ ${s_prefix} == "wl" ]]; then
     a_db_list+=" shard_0 shard_1"
+  fi
+
+  if [[ ${s_prefix} == "studio" ]]; then
+    a_db_list+=" mail"
   fi
 
   for db_name in ${a_db_list}; do
@@ -926,6 +891,7 @@ done
 
 cp -a ${templates}/windows/selenium/ ${unix_workspace}
 
+echo -e "Changing permissions..."
 chmod 777 -R ${unix_workspace}
 
 echo -e "${Purple}#----------------------------------------------------------#
@@ -1000,7 +966,6 @@ update-rc.d memcached defaults
 service apache2 restart
 service mysql restart
 service memcached restart
-service dynamodb start
 service gearman-job-server start
 
 echo -e "${Green}
@@ -1019,6 +984,7 @@ echo -e "Created script:
 
     server.sh - For start or restart all service. Use: sh /root/server.sh
     dump.sh - For dump database. Use: sh /root/dump.sh
+    restore.sh - For restore databases. Use: bash /root/restore.sh
 
 Project checkout on the path: ${win_workspace}
 Key for repository 'libs' saved in ${win_workspace}\\keys\\libs.key${NC}"
