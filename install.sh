@@ -494,8 +494,7 @@ cp -rf /root/.ssh/libs.key ${unix_workspace}/keys/libs.key
 tpm_old_passphrase=$(mktemp -p /tmp)
 tmp_new_passphrase=$(mktemp -p /tmp)
 printf ${passphrase} > ${tpm_old_passphrase}
-puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase}
-# puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase} --ppk-param version=2
+puttygen ${unix_workspace}/keys/libs.key -o ${unix_workspace}/keys/libs.ppk --old-passphrase ${tpm_old_passphrase} --new-passphrase ${tmp_new_passphrase} --ppk-param version=2
 rm -f ${tpm_old_passphrase}
 rm -f ${tmp_new_passphrase}
 crudini --set ${unix_workspace}/Subversion/config tunnels libs "plink.exe -P 35469 -l svn -i ${win_workspace_slash}\\\\keys\\\\libs.ppk libs.svn.1024.info"
