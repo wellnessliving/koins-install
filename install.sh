@@ -341,7 +341,7 @@ cd ${unix_workspace}/less/4.1.3 && npm install less@4.1.3
 # Install Pecl and Sync extension.
 apt -y install php8.2-dev php-pear
 pecl install sync
-pecl install yac
+echo '' | pecl install yac
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
