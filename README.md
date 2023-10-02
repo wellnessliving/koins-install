@@ -1,19 +1,20 @@
-# Installing project for WSL Ubuntu 18.04
+# Installing project for WSL Ubuntu 18.24
 
 This installer does the following:
 * Install packages:
   * apache2
   * mysql-server
-  * php7.2
-  * php7.2-bcmath
-  * php7.2-xml
-  * php7.2-curl
-  * php7.2-gd
-  * php7.2-mbstring
-  * php7.2-mysql
-  * php7.2-soap
-  * php7.2-tidy
-  * php7.2-zip
+  * php8.2
+  * php8.2-bcmath
+  * php8.2-xml
+  * php8.2-curl
+  * php8.2-gd
+  * php8.2-mbstring
+  * php8.2-mysql
+  * php8.2-soap
+  * php8.2-tidy
+  * php8.2-zip
+  * php8.2-yac
   * php-apcu
   * php-memcached
   * memcached
@@ -46,26 +47,28 @@ Installation script does the following:
 * Does full system update (apt update && upgrade)
 * Installs packages needed for the project to run:
   * crudini
-  * mysql-server-8.0.x
+  * mysql-server-8.2.x
   * git
   * aptitude
   * apache2
-  * php8.0 *(by adding ppa:ondrej/php)*
-  * php8.0-dev
+  * php8.2 *(by adding ppa:ondrej/php)*
+  * php8.2-dev
   * php-pear 
     * pecl sync
     * pecl inotify
-  * php8.0-bcmath
-  * php8.0-xml
-  * php8.0-curl
-  * php8.0-gd
-  * php8.0-mbstring
-  * php8.0-mysql
-  * php8.0-soap
-  * php8.0-tidy
-  * php8.0-zip
-  * php8.0-apcu
-  * php8.0-memcached
+  * php8.2-bcmath
+  * php8.2-xml
+  * php8.2-curl
+  * php8.2-gd
+  * php8.2-mbstring
+  * php8.2-mysql
+  * php8.2-soap
+  * php8.2-tidy
+  * php8.2-zip
+  * php8.2-apcu
+  * php8.2-memcached
+  * php8.2-gearman
+  * php8.2-yac
   * memcached
   * libneon27-gnutls
   * libserf-1-1
@@ -76,7 +79,6 @@ Installation script does the following:
   * libaio1
   * libaio-dev
   * gearman
-  * php8.0-gearman
 * Creates project folder structure
 * Configures packages
 * Checks out project files form the repos
