@@ -21,7 +21,7 @@ software="mc mcedit putty-tools crudini gearman"
 software+=" apache2 php8.2 php8.2-bcmath php8.2-xml php8.2-curl"
 software+=" php8.2-gd php8.2-mbstring php8.2-mysql php8.2-soap php8.2-tidy php8.2-zip"
 software+=" php8.2-apcu php8.2-memcached php8.2-gearman memcached libneon27-gnutls libserf-1-1 jq subversion libaio1 libaio-dev"
-software+=" nodejs libncurses5"
+software+=" nodejs libncurses5 ca-certificates gnupg"
 
 # Defining return code check function
 check_result(){
@@ -274,12 +274,6 @@ done
 
 echo "[OK]"
 
-echo "Adding NodeJS repository..."
-apt update
-
-dpkg --remove --force-remove-reinstreq libnode-dev
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-
 echo "Adding php repository..."
 add-apt-repository ppa:ondrej/php -y
 
@@ -298,6 +292,11 @@ echo -e "${Purple}#----------------------------------------------------------#
 #             Install packages and dependencies            #
 #----------------------------------------------------------#${NC}"
 
+echo "Adding NodeJS repository..."
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+apt-get update
 
 apt-get -y install ${software}
 check_result $? "apt-get install failed"

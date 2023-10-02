@@ -11,7 +11,7 @@ apt update
 
 software="php8.2 php8.2-bcmath php8.2-xml php8.2-curl"
 software+=" php8.2-gd php8.2-mbstring php8.2-mysql php8.2-soap php8.2-tidy php8.2-zip"
-software+=" php8.2-apcu php8.2-memcached php8.2-gearman php8.2-xdebug php8.2-yac"
+software+=" php8.2-apcu php8.2-memcached php8.2-gearman php8.2-xdebug"
 
 apt-get -y install $software
 
@@ -89,10 +89,17 @@ service apache2 restart
 apt-get -y install php8.2-dev php-pear
 pecl uninstall sync
 pecl install sync
+pecl uninstall yac
+pecl install yac
 
 touch /etc/php/8.2/mods-available/sync.ini
 echo "extension=sync.so" > /etc/php/8.2/mods-available/sync.ini
 ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/apache2/conf.d/sync.ini
 ln -s /etc/php/8.2/mods-available/sync.ini /etc/php/8.2/cli/conf.d/sync.ini
+
+touch /etc/php/8.2/mods-available/yac.ini
+echo "extension=yac.so" > /etc/php/8.2/mods-available/yac.ini
+ln -s /etc/php/8.2/mods-available/yac.ini /etc/php/8.2/apache2/conf.d/yac.ini
+ln -s /etc/php/8.2/mods-available/yac.ini /etc/php/8.2/cli/conf.d/yac.ini
 
 sh ~/server.sh
