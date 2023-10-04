@@ -56,7 +56,7 @@ help_message() {
   -f, --force               Force installing
   -h, --help                Print this help
 
-  Example simple: bash $0 -bot-login BotPassword --bot-password BotLogin
+  Example simple: bash $0 --bot-login BotLogin
   Use form to generate install command: http://output.jsbin.com/feguzef"
   exit 1
 }
