@@ -862,6 +862,8 @@ for project in ${a_site}; do
   path_config=${unix_workspace}/${project}/project/.config
   mkdir -p -v ${path_config}
 
+  cp "${path_htprivate}/options/addr.php" "${path_htprivate}/options/addr.php.bak"
+
   # options/addr.php
   sed -e "
   s;%ALL_MAIN%;${ALL_MAIN};g
