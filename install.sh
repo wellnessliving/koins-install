@@ -452,9 +452,11 @@ email=`jq -M -r '.text_mail' ${tmp_user_file}`
 bot_password=`jq -M -r '.s_bot_password' ${tmp_user_file}`
 rm -f ${tmp_user_file}
 
-# Add option AcceptFilter to config Apache and restart apache2
+# Add option AcceptFilter and ThreadStackSize to config Apache and restart apache2
 echo -e "
 AcceptFilter http none" >> /etc/apache2/apache2.conf
+echo -e "
+ThreadStackSize 8388608" >> /etc/apache2/apache2.conf
 
 # Configure xdebug
 if [[ "$xdebug" == "yes" ]]; then
