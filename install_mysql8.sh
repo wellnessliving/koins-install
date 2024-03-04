@@ -35,6 +35,13 @@ if [[ "$?" -gt 0 ]]; then
   exit 1
 fi
 
+# Download MySql 8.0.25 sources
+wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
+if [[ "$?" -gt 0 ]]; then
+  echo "Cannot download mysql"
+  exit 1
+fi
+
 backup_dir="/root/backup/$(date +%Y-%m-%d_%H_%M_%S)"
 mkdir -p ${backup_dir}
 echo ${db_list_all} > "/root/backup/db_list_$(date +%Y-%m-%d_%H_%M_%S)"
@@ -71,13 +78,6 @@ rm -rf /usr/local/sql
 rm -rf /etc/init.d/mysql
 rm -rf /var/log/mysql/
 rm -rf /var/lib/mysql/
-
-# Download MySql 8.0.25 sources
-wget -c https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
-if [[ "$?" -gt 0 ]]; then
-  echo "Cannot download mysql"
-  exit 1
-fi
 
 # Extract all files from archive and delete archive.
 mkdir -p /usr/local/sql
