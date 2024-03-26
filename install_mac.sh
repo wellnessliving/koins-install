@@ -334,8 +334,8 @@ rm -f ${tmp_user_file}
 # Configuring svn on WSL
 svn info
 printf "Configuring SVN: "
-echo "[tunnels]" > /Users/${USER}/.subversion/config
-echo "libs = ssh svn@libs.svn.1024.info -p 35469 -i ${unix_workspace}/keys/libs.pub" >> /Users/${USER}/.subversion/config
+sudo echo "[tunnels]" > /Users/${USER}/.subversion/config
+sudo echo "libs = ssh svn@libs.svn.1024.info -p 35469 -i ${unix_workspace}/keys/libs.pub" >> /Users/${USER}/.subversion/config
 
 mkdir -p ${unix_workspace}/install_tmp
 
