@@ -220,7 +220,7 @@ done
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/$(USER)/.zprofile
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/${USER}/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 brew install svn
@@ -334,8 +334,8 @@ rm -f ${tmp_user_file}
 # Configuring svn on WSL
 svn info
 printf "Configuring SVN: "
-echo "[tunnels]" > /Users/$(USER)/.subversion/config
-echo "libs = ssh svn@libs.svn.1024.info -p 35469 -i ${unix_workspace}/keys/libs.pub" >> /Users/$(USER)/.subversion/config
+echo "[tunnels]" > /Users/${USER}/.subversion/config
+echo "libs = ssh svn@libs.svn.1024.info -p 35469 -i ${unix_workspace}/keys/libs.pub" >> /Users/${USER}/.subversion/config
 
 mkdir -p ${unix_workspace}/install_tmp
 
@@ -353,11 +353,11 @@ if [[ ! -d "$templates" ]]; then
   fi
 fi
 
-git clone https://github.com/wellnessliving/wl-sdk.git ${unix_workspace}/Workspace/wl-sdk
-git clone https://github.com/wellnessliving/wl-docker.git ${unix_workspace}/Workspace/wl-docker
+git clone https://github.com/wellnessliving/wl-sdk.git ${unix_workspace}/wl-sdk
+git clone https://github.com/wellnessliving/wl-docker.git ${unix_workspace}/wl-docker
 
-cp -r ${unix_workspace}/Workspace/wl-docker/* ${unix_workspace}/Workspace/
-rm -rf ${unix_workspace}/Workspace/wl-docker
+cp -r ${unix_workspace}/wl-docker/* ${unix_workspace}/
+rm -rf ${unix_workspace}/wl-docker
 
 # Shared
 svn co "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
