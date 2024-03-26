@@ -51,7 +51,6 @@ for arg; do
     --prg-login)        args="${args}-l " ;;
     --checkout)         args="${args}-g " ;;
     --workspace)        args="${args}-w " ;;
-    --user-dir)         args="${args}-u " ;;
     --trunk)            args="${args}-t " ;;
     --stable)           args="${args}-s " ;;
     --production)       args="${args}-p " ;;
@@ -65,7 +64,7 @@ done
 eval set -- "${args}"
 
 # Parsing arguments
-while getopts "b:s:k:p:d:c:l:g:x:w:u:t:fh" Option; do
+while getopts "b:s:k:p:d:c:l:g:x:w:t:fh" Option; do
   case ${Option} in
     b) bot_login=$OPTARG ;;        # Bot login
     d) db_login=$OPTARG ;;         # Login for DB
@@ -73,7 +72,6 @@ while getopts "b:s:k:p:d:c:l:g:x:w:u:t:fh" Option; do
     l) prg_login=$OPTARG ;;        # Login for PRG
     g) checkout=$OPTARG ;;         # Checkout projects
     w) workspace=$OPTARG ;;        # Path to workspace
-    u) user_dir=$OPTARG ;;         # Path to user directory
     t) host_trunk=$OPTARG ;;       # Hostname for trunk
     s) host_stable=$OPTARG ;;      # Hostname for stable
     p) host_production=$OPTARG ;;  # Hostname for production
@@ -136,12 +134,6 @@ echo "[OK]"
 printf "Checking set argument --workspace: "
 if [[ ! -n "${workspace}" ]]; then
   check_result 1 "Workspace path not set or empty. Try 'bash $0 --help' for more information."
-fi
-echo "[OK]"
-
-printf "Checking set argument --user_dir: "
-if [[ ! -n "${user_dir}" ]]; then
-  check_result 1 "User directory path not set or empty. Try 'bash $0 --help' for more information."
 fi
 echo "[OK]"
 
@@ -228,7 +220,7 @@ done
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/user/.zprofile
+(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/$(USER)/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 brew install svn
@@ -342,8 +334,8 @@ rm -f ${tmp_user_file}
 # Configuring svn on WSL
 svn info
 printf "Configuring SVN: "
-echo "[tunnels]" > ${user_dir}/.subversion/config
-echo "libs = ssh svn@libs.svn.1024.info -p 35469 -i ${unix_workspace}/keys/libs.pub" >> ${user_dir}/.subversion/config
+echo "[tunnels]" > /Users/$(USER)/.subversion/config
+echo "libs = ssh svn@libs.svn.1024.info -p 35469 -i ${unix_workspace}/keys/libs.pub" >> /Users/$(USER)/.subversion/config
 
 mkdir -p ${unix_workspace}/install_tmp
 
