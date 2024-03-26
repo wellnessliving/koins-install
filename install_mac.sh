@@ -27,8 +27,8 @@ help_message() {
   -w, --workspace           Path to workspace
   -t, --trunk               Hostname for trunk             default: wellnessliving.local
   -s, --stable              Hostname for stable            default: stable.wellnessliving.local
-  -p, --production          Hostname for production
-  -k, --studio              Hostname for studio
+  -p, --production          Hostname for production        default: production.wellnessliving.local
+  -k, --studio              Hostname for studio            default: studio.tr
   -f, --force               Force installing
   -h, --help                Print this help
 
@@ -91,6 +91,8 @@ set_default_value 'prg_login' 'admin'
 set_default_value 'checkout' 'yes'
 set_default_value 'host_trunk' 'wellnessliving.local'
 set_default_value 'host_stable' 'stable.wellnessliving.local'
+set_default_value 'host_production' 'production.wellnessliving.local'
+set_default_value 'host_studio' 'studio.tr'
 
 printf "Checking root permissions: "
 if [[ "x$(id -u)" == 'x0' ]]; then
