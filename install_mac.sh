@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#
+#(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/${USER}/.zprofile
+#eval "$(/opt/homebrew/bin/brew shellenv)"
+#
+#brew install svn
+#brew install jq
+#brew install gnu-sed
+
 # Defining return code check function
 check_result(){
   if [[ "$1" -ne 0 ]]; then
@@ -218,14 +227,6 @@ for project in ${a_site}; do
   mkdir -p ${unix_workspace}/${project}/{.htprivate/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}},public_html/{a/drive,static}}
 done
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-(echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/${USER}/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-brew install svn
-brew install jq
-brew install gnu-sed
 PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
 
 echo -e "${Purple}#----------------------------------------------------------#
