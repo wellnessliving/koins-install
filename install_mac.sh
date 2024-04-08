@@ -8,6 +8,7 @@
 #brew install svn
 #brew install jq
 #brew install gnu-sed
+#PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
 
 # Defining return code check function
 check_result(){
@@ -226,8 +227,6 @@ mkdir -p ${unix_workspace}/less/4.1.3
 for project in ${a_site}; do
   mkdir -p ${unix_workspace}/${project}/{.htprivate/{options,writable/{cache,debug,log,php,sql,tmp,var/selenium}},public_html/{a/drive,static}}
 done
-
-PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                    Configuring system                    #
