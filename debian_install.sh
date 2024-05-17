@@ -20,7 +20,7 @@ export PYTHONIOENCODING=utf8 # Needed to decode json
 software="crudini mysql-server-8.0 git aptitude"
 software+=" apache2 php8.2 php8.2-dev php-pear php8.2-bcmath php8.2-xml php8.2-curl"
 software+=" php8.2-gd php8.2-mbstring php8.2-mysql php8.2-soap php8.2-tidy php8.2-zip"
-software+=" php8.2-apcu php8.2-memcached memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev gearman php8.2-gearman"
+software+=" php8.2-apcu php8.2-memcache memcached libneon27-gnutls libserf-1-1 jq subversion npm nodejs libaio1 libaio-dev gearman php8.2-gearman"
 
 # Defining return code check function
 check_result(){

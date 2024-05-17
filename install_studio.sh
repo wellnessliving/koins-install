@@ -63,9 +63,10 @@ if test "$BASH" = ""; then
 fi
 
 ubuntu_version=$(lsb_release -sr)
-
-if [[ "$ubuntu_version" != '18.04' ]]; then
-  check_result 1 "Script work only on Ubuntu 18.04"
+minimal_ubuntu_version='18.04';
+result=$(expr $minimal_ubuntu_version \<= "$ubuntu_version")
+if [ "$result" -eq 0 ]; then
+  check_result 1 "Script work only on Ubuntu 18.04 or higher"
 fi
 
 # Translating argument to --gnu-long-options
