@@ -645,6 +645,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${workspace}/wl.trunk/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${workspace}/wl.trunk/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${workspace}/wl.trunk/project" # project
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${workspace}/wl.trunk/Thoth/Report" # Thoth
   fi
 
   if [[ -n "$host_stable" ]]; then
@@ -654,13 +655,15 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${workspace}/wl.stable/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${workspace}/wl.stable/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${workspace}/wl.stable/project" # project
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${workspace}/wl.stable/Thoth/Report" # Thoth
 
     # Stable Old
-    svn co "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${unix_workspace}/wl.stable.old/core" # Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Core" # namespace.Core
-    svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Social" # namespace.Social
-    svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Wl" # namespace.Wl
-    svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${unix_workspace}/wl.stable.old/project" # project
+    svn co --quiet "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${workspace}/wl.stable.old/core" # Core
+    svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Core/servers/stable-old" "${workspace}/wl.stable.old/namespace.Core" # namespace.Core
+    svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/servers/stable-old" "${workspace}/wl.stable.old/namespace.Social" # namespace.Social
+    svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable-old" "${workspace}/wl.stable.old/namespace.Wl" # namespace.Wl
+    svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${workspace}/wl.stable.old/project" # project
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${workspace}/wl.stable/Thoth/Report" # Thoth
   fi
 
   if [[ -n "$host_production" ]]; then
@@ -670,6 +673,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-production" "${workspace}/wl.production/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${workspace}/wl.production/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${workspace}/wl.production/project" # project
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${workspace}/wl.production/Thoth/Report" # Thoth
   fi
 
   if [[ -n "$host_studio" ]]; then
