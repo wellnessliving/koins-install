@@ -384,8 +384,7 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/stable-old" "${unix
 svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Social" # namespace.Social
 svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Wl" # namespace.Wl
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${unix_workspace}/wl.stable.old/project" # project
-svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${unix_workspace}/wl.stable/Thoth/Report" # Thoth
-
+svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/Report" # Thoth
 
 # Production
 svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" # Core
