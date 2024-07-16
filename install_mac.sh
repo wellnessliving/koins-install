@@ -318,7 +318,7 @@ while [ "$status" != "ok" ]; do
     message=`jq -M -r '.message' ${tmp_user_file}`
     echo "Error getting repository key: ${message}"
     echo "Status: ${status}"
-    echo ${tmp_repository_file}
+    echo ${tmp_user_file}
     echo
     read -p 'Try again?[y/n]: ' answer
     if [[ "$answer" = 'n' ]] || [[ "$answer" = 'N'  ]]; then
