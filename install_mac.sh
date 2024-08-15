@@ -368,7 +368,9 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/w
 svn co "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${unix_workspace}/wl.trunk/namespace.Social" # namespace.Social
 svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.trunk/namespace.Wl" # namespace.Wl
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" # project
-svn co "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${unix_workspace}/wl.trunk/Thoth/Report" # Thoth
+svn co "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${unix_workspace}/wl.trunk/Thoth/Report" # Thoth Report
+svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/trunk" "${unix_workspace}/wl.trunk/Thoth/ReportCore" # Thoth ReportCore
+
 
 # Stable
 svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" # Core
@@ -376,7 +378,8 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-stable" "${unix_
 svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${unix_workspace}/wl.stable/namespace.Social" # namespace.Social
 svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_workspace}/wl.stable/namespace.Wl" # namespace.Wl
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" # project
-svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${unix_workspace}/wl.stable/Thoth/Report" # Thoth
+svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${unix_workspace}/wl.stable/Thoth/Report" # Thoth Report
+svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable" "${unix_workspace}/wl.stable/Thoth/ReportCore" # Thoth ReportCore
 
 # Stable Old
 svn co "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${unix_workspace}/wl.stable.old/core" # Core
@@ -384,7 +387,8 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/stable-old" "${unix
 svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Social" # namespace.Social
 svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable-old" "${unix_workspace}/wl.stable.old/namespace.Wl" # namespace.Wl
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${unix_workspace}/wl.stable.old/project" # project
-svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/Report" # Thoth
+svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/Report" # Thoth Report
+svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/ReportCore" # Thoth  ReportCore
 
 # Production
 svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" # Core
@@ -392,7 +396,8 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Core/servers/wl-production" "${u
 svn co "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-production" "${unix_workspace}/wl.production/namespace.Social" # namespace.Social
 svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${unix_workspace}/wl.production/namespace.Wl" # namespace.Wl
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${unix_workspace}/wl.production/project" # project
-svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${unix_workspace}/wl.production/Thoth/Report" # Thoth
+svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${unix_workspace}/wl.production/Thoth/Report" # Thoth Report
+svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/production" "${unix_workspace}/wl.production/Thoth/ReportCore" # Thoth ReportCore
 
 for project in ${a_site}; do
   path_htprivate="${unix_workspace}/${project}/.htprivate"
