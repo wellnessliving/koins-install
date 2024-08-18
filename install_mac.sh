@@ -370,6 +370,7 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${unix_workspace}/wl.
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${unix_workspace}/wl.trunk/project" # project
 svn co "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${unix_workspace}/wl.trunk/Thoth/Report" # Thoth Report
 svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/trunk" "${unix_workspace}/wl.trunk/Thoth/ReportCore" # Thoth ReportCore
+svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/trunk" "${unix_workspace}/wl.trunk/Thoth/WlShared" # Thoth WlShared
 
 
 # Stable
@@ -380,6 +381,7 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${unix_works
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${unix_workspace}/wl.stable/project" # project
 svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${unix_workspace}/wl.stable/Thoth/Report" # Thoth Report
 svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable" "${unix_workspace}/wl.stable/Thoth/ReportCore" # Thoth ReportCore
+svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable" "${unix_workspace}/wl.stable/Thoth/WlShared" # Thoth WlShared
 
 # Stable Old
 svn co "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${unix_workspace}/wl.stable.old/core" # Core
@@ -389,6 +391,7 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable-old" "${unix_w
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${unix_workspace}/wl.stable.old/project" # project
 svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/Report" # Thoth Report
 svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/ReportCore" # Thoth  ReportCore
+svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/WlShared" # Thoth  WlShared
 
 # Production
 svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" # Core
@@ -398,6 +401,7 @@ svn co "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${unix_w
 svn co "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${unix_workspace}/wl.production/project" # project
 svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${unix_workspace}/wl.production/Thoth/Report" # Thoth Report
 svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/production" "${unix_workspace}/wl.production/Thoth/ReportCore" # Thoth ReportCore
+svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/production" "${unix_workspace}/wl.production/Thoth/WlShared" # Thoth WlShared
 
 for project in ${a_site}; do
   path_htprivate="${unix_workspace}/${project}/.htprivate"

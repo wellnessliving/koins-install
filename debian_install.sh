@@ -647,6 +647,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${workspace}/wl.trunk/project" # project
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${workspace}/wl.trunk/Thoth/Report" # Thoth Report
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/trunk" "${workspace}/wl.trunk/Thoth/ReportCore" # Thoth ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/trunk" "${workspace}/wl.trunk/Thoth/WlShared" # Thoth WlShared
   fi
 
   if [[ -n "$host_stable" ]]; then
@@ -658,6 +659,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${workspace}/wl.stable/project" # project
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${workspace}/wl.stable/Thoth/Report" # Thoth Report
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable" "${workspace}/wl.stable/Thoth/ReportCore" # Thoth ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable" "${workspace}/wl.stable/Thoth/WlShared" # Thoth WlShared
 
     # Stable Old
     svn co --quiet "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${workspace}/wl.stable.old/core" # Core
@@ -667,6 +669,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${workspace}/wl.stable.old/project" # project
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${workspace}/wl.stable.old/Thoth/Report" # Thoth Report
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable-old" "${workspace}/wl.stable.old/Thoth/ReportCore" # Thoth  ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable-old" "${workspace}/wl.stable.old/Thoth/WlShared" # Thoth  WlShared
   fi
 
   if [[ -n "$host_production" ]]; then
@@ -678,6 +681,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${workspace}/wl.production/project" # project
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${workspace}/wl.production/Thoth/Report" # Thoth Report
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/production" "${workspace}/wl.production/Thoth/ReportCore" # Thoth ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/production" "${workspace}/wl.production/Thoth/WlShared" # Thoth WlShared
   fi
 
   if [[ -n "$host_studio" ]]; then
