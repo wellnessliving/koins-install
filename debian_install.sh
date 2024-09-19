@@ -645,7 +645,9 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/trunk" "${workspace}/wl.trunk/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/trunk" "${workspace}/wl.trunk/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/trunk" "${workspace}/wl.trunk/project" # project
-    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${workspace}/wl.trunk/Thoth/Report" # Thoth
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${workspace}/wl.trunk/Thoth/Report" # Thoth Report
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/trunk" "${workspace}/wl.trunk/Thoth/ReportCore" # Thoth ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/trunk" "${workspace}/wl.trunk/Thoth/WlShared" # Thoth WlShared
   fi
 
   if [[ -n "$host_stable" ]]; then
@@ -655,7 +657,9 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-stable" "${workspace}/wl.stable/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable" "${workspace}/wl.stable/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable" "${workspace}/wl.stable/project" # project
-    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${workspace}/wl.stable/Thoth/Report" # Thoth
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${workspace}/wl.stable/Thoth/Report" # Thoth Report
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable" "${workspace}/wl.stable/Thoth/ReportCore" # Thoth ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable" "${workspace}/wl.stable/Thoth/WlShared" # Thoth WlShared
 
     # Stable Old
     svn co --quiet "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${workspace}/wl.stable.old/core" # Core
@@ -663,7 +667,9 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/servers/stable-old" "${workspace}/wl.stable.old/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/servers/stable-old" "${workspace}/wl.stable.old/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/stable-old" "${workspace}/wl.stable.old/project" # project
-    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${workspace}/wl.stable.old/Thoth/Report" # Thoth
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${workspace}/wl.stable.old/Thoth/Report" # Thoth Report
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable-old" "${workspace}/wl.stable.old/Thoth/ReportCore" # Thoth  ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable-old" "${workspace}/wl.stable.old/Thoth/WlShared" # Thoth  WlShared
   fi
 
   if [[ -n "$host_production" ]]; then
@@ -673,7 +679,9 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Social/servers/wl-production" "${workspace}/wl.production/namespace.Social" # namespace.Social
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Wl/servers/production" "${workspace}/wl.production/namespace.Wl" # namespace.Wl
     svn co --quiet "svn+libs://libs.svn.1024.info/reservationspot.com/servers/production" "${workspace}/wl.production/project" # project
-    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${workspace}/wl.production/Thoth/Report" # Thoth
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${workspace}/wl.production/Thoth/Report" # Thoth Report
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/production" "${workspace}/wl.production/Thoth/ReportCore" # Thoth ReportCore
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/production" "${workspace}/wl.production/Thoth/WlShared" # Thoth WlShared
   fi
 
   if [[ -n "$host_studio" ]]; then
@@ -682,41 +690,6 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${workspace}/studio.trunk/namespace.Core" # namespace.Core
     svn co --quiet "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${workspace}/studio.trunk/namespace.Studio" # namespace.Studio
     svn co --quiet "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${workspace}/studio.trunk/project" # project
-  fi
-else
-  if [[ -n "$host_trunk" ]]; then
-    # Trunk
-    svn update --quiet "${workspace}/wl.trunk/core" # Core
-    svn update --quiet "${workspace}/wl.trunk/namespace.Core" # namespace.Core
-    svn update --quiet "${workspace}/wl.trunk/namespace.Social" # namespace.Social
-    svn update --quiet "${workspace}/wl.trunk/namespace.Wl" # namespace.Wl
-    svn update --quiet "${workspace}/wl.trunk/project" # project
-  fi
-
-  if [[ -n "$host_stable" ]]; then
-    # Stable
-    svn update --quiet "${workspace}/wl.stable/core" # Core
-    svn update --quiet "${workspace}/wl.stable/namespace.Core" # namespace.Core
-    svn update --quiet "${workspace}/wl.stable/namespace.Social" # namespace.Social
-    svn update --quiet "${workspace}/wl.stable/namespace.Wl" # namespace.Wl
-    svn update --quiet "${workspace}/wl.stable/project" # project
-  fi
-
-  if [[ -n "$host_production" ]]; then
-    # Production
-    svn update --quiet "${workspace}/wl.production/core" # Core
-    svn update --quiet "${workspace}/wl.production/namespace.Core" # namespace.Core
-    svn update --quiet "${workspace}/wl.production/namespace.Social" # namespace.Social
-    svn update --quiet "${workspace}/wl.production/namespace.Wl" # namespace.Wl
-    svn update --quiet "${workspace}/wl.production/project" # project
-  fi
-
-  if [[ -n "$host_studio" ]]; then
-    # Studio
-    svn update --quiet "${workspace}/studio.trunk/core" # Core
-    svn update --quiet "${workspace}/studio.trunk/namespace.Core" # namespace.Core
-    svn update --quiet "${workspace}/studio.trunk/namespace.Studio" # namespace.Studio
-    svn update --quiet "${workspace}/studio.trunk/project" # project
   fi
 fi
 
