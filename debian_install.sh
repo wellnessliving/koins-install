@@ -650,6 +650,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/trunk" "${workspace}/wl.trunk/Thoth/WlShared" # Thoth WlShared
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/trunk" "${workspace}/wl.trunk/Thoth/PayProcessor" # Thoth PayProcessor
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/DriveMs/trunk" "${workspace}/wl.trunk/Thoth/DriveMs" # Thoth DriveMs
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/trunk" "${workspace}/wl.trunk/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
   fi
 
   if [[ -n "$host_stable" ]]; then
@@ -664,6 +665,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable" "${workspace}/wl.stable/Thoth/WlShared" # Thoth WlShared
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/stable" "${workspace}/wl.stable/Thoth/PayProcessor" # Thoth PayProcessor
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/stable" "${workspace}/wl.stable/Thoth/DriveMs" # Thoth DriveMs
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/servers/stable" "${workspace}/wl.stable/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
 
     # Stable Old
     svn co --quiet "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${workspace}/wl.stable.old/core" # Core
@@ -676,6 +678,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable-old" "${workspace}/wl.stable.old/Thoth/WlShared" # Thoth  WlShared
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/stable-old" "${workspace}/wl.stable.old/Thoth/PayProcessor" # Thoth PayProcessor
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/stable-old" "${workspace}/wl.stable.old/Thoth/DriveMs" # Thoth DriveMs
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/servers/stable-old" "${workspace}/wl.stable.old/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
   fi
 
   if [[ -n "$host_production" ]]; then
@@ -690,6 +693,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/production" "${workspace}/wl.production/Thoth/WlShared" # Thoth WlShared
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/production" "${workspace}/wl.production/Thoth/PayProcessor" # Thoth PayProcessor
     svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/production" "${workspace}/wl.production/Thoth/DriveMs" # Thoth DriveMs
+    svn co --quiet "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/servers/production" "${workspace}/wl.production/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
   fi
 
   if [[ -n "$host_studio" ]]; then
