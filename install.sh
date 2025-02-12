@@ -722,6 +722,8 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/Thoth/Report/trunk" "${unix_workspace}/wl.trunk/Thoth/Report" # Thoth Report
     svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/trunk" "${unix_workspace}/wl.trunk/Thoth/ReportCore" # Thoth ReportCore
     svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/trunk" "${unix_workspace}/wl.trunk/Thoth/WlShared" # Thoth WlShared
+    svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/trunk" "${unix_workspace}/wl.trunk/Thoth/PayProcessor" # Thoth PayProcessor
+    svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/trunk" "${unix_workspace}/wl.trunk/Thoth/DriveMs" # Thoth DriveMs
   fi
 
   if [[ ! -z "$host_stable" ]]; then
@@ -734,6 +736,8 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable" "${unix_workspace}/wl.stable/Thoth/Report" # Thoth Report
     svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable" "${unix_workspace}/wl.stable/Thoth/ReportCore" # Thoth ReportCore
     svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable" "${unix_workspace}/wl.stable/Thoth/WlShared" # Thoth WlShared
+    svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/stable" "${unix_workspace}/wl.stable/Thoth/PayProcessor" # Thoth PayProcessor
+    svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/stable" "${unix_workspace}/wl.stable/Thoth/DriveMs" # Thoth DriveMs
 
     # Stable Old
     svn co "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${unix_workspace}/wl.stable.old/core" # Core
@@ -744,6 +748,8 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/Report" # Thoth Report
     svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/ReportCore" # Thoth  ReportCore
     svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/WlShared" # Thoth  WlShared
+    svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/PayProcessor" # Thoth PayProcessor
+    svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/DriveMs" # Thoth DriveMs
   fi
 
   if [[ ! -z "$host_production" ]]; then
@@ -756,6 +762,8 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/Thoth/Report/servers/production" "${unix_workspace}/wl.production/Thoth/Report" # Thoth Report
     svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/production" "${unix_workspace}/wl.production/Thoth/ReportCore" # Thoth ReportCore
     svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/production" "${unix_workspace}/wl.production/Thoth/WlShared" # Thoth WlShared
+    svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/production" "${unix_workspace}/wl.production/Thoth/PayProcessor" # Thoth PayProcessor
+    svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/production" "${unix_workspace}/wl.production/Thoth/DriveMs" # Thoth DriveMs
   fi
 
   if [[ ! -z "$host_studio" ]]; then
@@ -764,6 +772,7 @@ if [[ "$checkout" = 'yes' ]]; then
     svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
     svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
     svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" # project
+    svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/trunk" "${unix_workspace}/studio.trunk/Thoth/DriveMs" # Thoth DriveMs
   fi
 fi
 

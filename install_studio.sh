@@ -266,6 +266,7 @@ svn co "svn+libs://libs.svn.1024.info/core/trunk" "${unix_workspace}/studio.trun
 svn co "svn+libs://libs.svn.1024.info/namespace/Core/trunk" "${unix_workspace}/studio.trunk/namespace.Core" # namespace.Core
 svn co "svn+libs://libs.svn.1024.info/namespace/Studio/trunk" "${unix_workspace}/studio.trunk/namespace.Studio" # namespace.Studio
 svn co "svn+libs://libs.svn.1024.info/dev.1024.info/trunk" "${unix_workspace}/studio.trunk/project" # project
+svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/trunk" "${unix_workspace}/studio.trunk/Thoth/DriveMs" # Thoth DriveMs
 
 echo -e "${Purple}#----------------------------------------------------------#
 #                  Setting default files                   #
