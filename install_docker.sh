@@ -356,9 +356,6 @@ fi
 git clone https://github.com/wellnessliving/wl-sdk.git ${unix_workspace}/wl-sdk
 git clone https://github.com/wellnessliving/wl-docker.git ${unix_workspace}/wl-docker
 
-cp -r ${unix_workspace}/wl-docker/* ${unix_workspace}/
-rm -rf ${unix_workspace}/wl-docker
-
 # Shared
 svn co "svn+libs://libs.svn.1024.info/shared" "${unix_workspace}/shared"
 
