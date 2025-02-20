@@ -371,6 +371,7 @@ svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/trunk" "${unix_workspace}/w
 svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/trunk" "${unix_workspace}/wl.trunk/Thoth/PayProcessor" # Thoth PayProcessor
 svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/trunk" "${unix_workspace}/wl.trunk/Thoth/DriveMs" # Thoth DriveMs
 svn co "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/trunk" "${unix_workspace}/wl.trunk/Thoth/DriveMs" # Thoth DriveMs
+svn co "svn+libs://libs.svn.1024.info/Thoth/PayHardware/trunk" "${unix_workspace}/wl.trunk/Thoth/PayHardware" # Thoth DriveMs
 
 # Stable
 svn co "svn+libs://libs.svn.1024.info/core/servers/stable.wellnessliving.com" "${unix_workspace}/wl.stable/core" # Core
@@ -384,6 +385,7 @@ svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable" "${unix_wor
 svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/stable" "${unix_workspace}/wl.stable/Thoth/PayProcessor" # Thoth PayProcessor
 svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/stable" "${unix_workspace}/wl.stable/Thoth/DriveMs" # Thoth DriveMs
 svn co "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/servers/stable" "${unix_workspace}/wl.stable/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
+svn co "svn+libs://libs.svn.1024.info/Thoth/PayHardware/servers/stable" "${unix_workspace}/wl.stable/Thoth/PayHardware" # Thoth ExtractPayRefundReport
 
 # Stable Old
 svn co "svn+libs://libs.svn.1024.info/core/servers/stable-old" "${unix_workspace}/wl.stable.old/core" # Core
@@ -397,6 +399,7 @@ svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/stable-old" "${unix
 svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/PayProcessor" # Thoth PayProcessor
 svn co "svn+libs://libs.svn.1024.info/Thoth/DriveMs/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/DriveMs" # Thoth DriveMs
 svn co "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
+svn co "svn+libs://libs.svn.1024.info/Thoth/PayHardware/servers/stable-old" "${unix_workspace}/wl.stable.old/Thoth/PayHardware" # Thoth ExtractPayRefundReport
 
 # Production
 svn co "svn+libs://libs.svn.1024.info/core/servers/www.wellnessliving.com" "${unix_workspace}/wl.production/core" # Core
@@ -409,6 +412,7 @@ svn co "svn+libs://libs.svn.1024.info/Thoth/ReportCore/servers/production" "${un
 svn co "svn+libs://libs.svn.1024.info/Thoth/WlShared/servers/production" "${unix_workspace}/wl.production/Thoth/WlShared" # Thoth WlShared
 svn co "svn+libs://libs.svn.1024.info/Thoth/PayProcessor/servers/production" "${unix_workspace}/wl.production/Thoth/PayProcessor" # Thoth PayProcessor
 svn co "svn+libs://libs.svn.1024.info/Thoth/ExtractPayRefundReport/servers/production" "${unix_workspace}/wl.production/Thoth/ExtractPayRefundReport" # Thoth ExtractPayRefundReport
+svn co "svn+libs://libs.svn.1024.info/Thoth/PayHardware/servers/production" "${unix_workspace}/wl.production/Thoth/PayHardware" # Thoth ExtractPayRefundReport
 
 #s_geo_host=$(crudini --get ${install_tmp}/config/geo.ini connect host)
 #s_geo_login=$(crudini --get ${install_tmp}/config/geo.ini connect login)
